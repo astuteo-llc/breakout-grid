@@ -16,7 +16,7 @@ Inspired by [Viget's Fluid Breakout Layout](https://www.viget.com/articles/fluid
 
 1. Add the CSS:
 ```html
-<link rel="stylesheet" href="breakout-grid.css">
+<link rel="stylesheet" href="_objects.breakout-grid.css">
 ```
 
 2. Use the grid:
