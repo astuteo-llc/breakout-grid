@@ -2,7 +2,7 @@
 
 A CSS Grid layout system for content that "breaks out" of containers. No build step required—just CSS.
 
-Inspired by [Viget's Fluid Breakout Layout](https://www.viget.com/articles/fluid-breakout-layout-css-grid/).
+Inspired by [Kevin Powell's video](https://www.youtube.com/watch?v=c13gpBrnGEw), [Ryan Mulligan's Layout Breakouts](https://ryanmulligan.dev/blog/layout-breakouts/), and [Viget's Fluid Breakout Layout](https://www.viget.com/articles/fluid-breakout-layout-css-grid/).
 
 ## Features
 
