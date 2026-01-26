@@ -20,6 +20,15 @@ export const methods = {
       this.$nextTick(() => this.loadCurrentValues());
     }
 
+    // Load saved config from localStorage
+    const savedConfig = localStorage.getItem('breakoutGridConfig');
+    if (savedConfig) {
+      try {
+        const config = JSON.parse(savedConfig);
+        this.$nextTick(() => this.applyConfig(config));
+      } catch (e) {}
+    }
+
     // Load config editor position
     const editorPos = localStorage.getItem('breakoutGridEditorPos');
     if (editorPos) {
@@ -393,6 +402,7 @@ export const methods = {
     this.editValues[`gapScale_${key}`] = num + this.getGapScaleUnit(key);
     this.configCopied = false;
     this.updateGapLive();
+    this.saveConfigToStorage();
   },
 
   // Breakout helpers (use generic)
@@ -402,6 +412,7 @@ export const methods = {
     this.editValues[`breakout_${key}`] = num + this.getBreakoutUnit(key);
     this.configCopied = false;
     this.updateBreakoutLive();
+    this.saveConfigToStorage();
   },
 
   // Update --breakout-padding live
@@ -412,10 +423,84 @@ export const methods = {
     document.documentElement.style.setProperty('--breakout-padding', `clamp(${min}, ${scale}, ${max})`);
   },
 
+  // Save current config to localStorage
+  saveConfigToStorage() {
+    const config = this.generateConfigExport();
+    localStorage.setItem('breakoutGridConfig', JSON.stringify(config));
+  },
+
+  // Apply a config object (used by restore and localStorage load)
+  applyConfig(config) {
+    this.editMode = true;
+
+    // Apply main config values
+    Object.keys(this.configOptions).forEach(key => {
+      if (config[key] !== undefined) {
+        this.editValues[key] = config[key];
+        const opt = this.configOptions[key];
+        if (opt && opt.liveVar) {
+          document.documentElement.style.setProperty(opt.liveVar, config[key]);
+        }
+      }
+    });
+
+    // Apply track widths with minmax wrapper
+    if (config.popoutWidth) {
+      document.documentElement.style.setProperty('--popout', `minmax(0, ${config.popoutWidth})`);
+    }
+    if (config.featureMin || config.featureScale || config.featureMax) {
+      const featureMin = config.featureMin || this.configOptions.featureMin.value;
+      const featureScale = config.featureScale || this.configOptions.featureScale.value;
+      const featureMax = config.featureMax || this.configOptions.featureMax.value;
+      document.documentElement.style.setProperty('--feature', `minmax(0, clamp(${featureMin}, ${featureScale}, ${featureMax}))`);
+    }
+
+    // Apply gapScale values
+    if (config.gapScale) {
+      Object.keys(this.gapScaleOptions).forEach(key => {
+        if (config.gapScale[key] !== undefined) {
+          this.editValues[`gapScale_${key}`] = config.gapScale[key];
+        }
+      });
+      this.updateGapLive();
+    }
+
+    // Apply breakout values
+    if (config.breakoutMin !== undefined) {
+      this.editValues.breakout_min = config.breakoutMin;
+    }
+    if (config.breakoutScale !== undefined) {
+      this.editValues.breakout_scale = config.breakoutScale;
+    }
+    this.updateBreakoutLive();
+
+    // Apply breakpoint values
+    if (config.breakpoints) {
+      if (config.breakpoints.lg !== undefined) {
+        this.editValues.breakpoint_lg = config.breakpoints.lg;
+      }
+      if (config.breakpoints.xl !== undefined) {
+        this.editValues.breakpoint_xl = config.breakpoints.xl;
+      }
+    }
+
+    this.updateColumnWidths();
+  },
+
+  // Reset config to defaults and clear localStorage
+  resetConfigToDefaults() {
+    if (!confirm('Reset all config values to defaults?')) return;
+    localStorage.removeItem('breakoutGridConfig');
+    this.restoreCSSVariables();
+    this.loadCurrentValues();
+    this.configCopied = false;
+  },
+
   // Update a config value (and live CSS var if applicable)
   updateConfigValue(key, value) {
     this.editValues[key] = value;
     this.configCopied = false; // Mark as unsaved
+    this.saveConfigToStorage();
     const opt = this.configOptions[key];
     if (opt && opt.liveVar) {
       document.documentElement.style.setProperty(opt.liveVar, value);

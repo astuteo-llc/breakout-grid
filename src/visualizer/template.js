@@ -967,15 +967,20 @@ export const template = `
         </div>
 
         <!-- Action Buttons -->
-        <div style="padding: 10px 12px; background: #f7f7f7; display: flex; gap: 8px;">
-          <button @click="copyConfig()" :style="{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: '600', border: 'none', borderRadius: '4px', cursor: 'pointer', background: copySuccess ? '#10b981' : '#1a1a2e', color: 'white', transition: 'background 0.2s' }">
-            <span x-text="copySuccess ? '✓ Copied' : 'Copy Variables'"></span>
-          </button>
-          <button @click="openRestoreModal()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Restore from CSS variables">
-            Restore
-          </button>
-          <button @click="downloadCSS()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;">
-            CSS
+        <div style="padding: 10px 12px; background: #f7f7f7; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; gap: 8px;">
+            <button @click="copyConfig()" :style="{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: '500', border: '1px solid #e5e5e5', borderRadius: '4px', cursor: 'pointer', background: copySuccess ? '#10b981' : 'white', color: copySuccess ? 'white' : '#374151', transition: 'background 0.2s' }">
+              <span x-text="copySuccess ? '✓ Copied' : 'Copy'"></span>
+            </button>
+            <button @click="openRestoreModal()" style="flex: 1; padding: 8px; font-size: 11px; font-weight: 500; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Restore from CSS variables">
+              Restore
+            </button>
+            <button @click="resetConfigToDefaults()" style="flex: 1; padding: 8px; font-size: 11px; font-weight: 500; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; background: #fef2f2; color: #dc2626;" title="Reset to defaults">
+              Reset
+            </button>
+          </div>
+          <button @click="downloadCSS()" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white;">
+            Download CSS
           </button>
         </div>
       </div>
