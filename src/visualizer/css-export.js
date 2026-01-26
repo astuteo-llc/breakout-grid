@@ -20,7 +20,7 @@ export function generateCSSExport(c, version = BUILD_VERSION) {
  * Breakout Grid - Objects Layer (ITCSS)
  * Version: ${VERSION}
  *
- * Documentation: https://github.com/astuteo-llc/tailwind-breakout-grid
+ * Documentation: https://github.com/astuteo-llc/breakout-grid
  *
  * ============================================================================
  * TABLE OF CONTENTS
@@ -82,7 +82,7 @@ export function generateCSSExport(c, version = BUILD_VERSION) {
    ============================================================================
    To restore this grid in the visualizer, copy from here to END CONFIGURATION.
    Paste into the "Restore" dialog at:
-   https://github.com/astuteo-llc/tailwind-breakout-grid
+   https://github.com/astuteo-llc/breakout-grid
    ============================================================================ */
 
 :root {
