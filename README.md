@@ -174,6 +174,29 @@ plugins: [
 - [Nested Grids](docs/nested-grids.md) - `breakout-to-*` modifiers
 - [Layout Examples](docs/layout-examples.md) - Real-world patterns
 
+## Development
+
+### Building
+
+The visualizer files (`breakout-grid-visualizer.js` and `breakout-grid-visualizer-lite.js`) are build outputs that should never be manually edited. They are generated from source files in `src/visualizer/` with the version number automatically injected from `package.json`.
+
+To rebuild after making changes:
+
+```bash
+npm run build        # Build everything (visualizers + CSS)
+npm run build:full   # Build full visualizer only
+npm run build:lite   # Build lite visualizer only
+npm run build:css    # Build CSS only
+```
+
+### Testing
+
+Run the development server to test changes:
+
+```bash
+npm run demo         # Start Vite dev server at http://localhost:5173
+```
+
 ## License
 
 MIT
