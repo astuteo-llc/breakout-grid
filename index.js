@@ -373,8 +373,8 @@ const createBreakoutPaddingMediaQueries = (config, screens) => {
  *
  * How it works:
  * - p-to-feature: gap (aligns with feature column start)
- * - p-to-popout: gap + featureWidth (aligns with popout column start)
- * - p-to-content: gap + featureWidth + popoutWidth (aligns with content column start)
+ * - p-to-popout: gap + feature track (aligns with popout column start)
+ * - p-to-content: gap + feature track + popoutWidth (aligns with content column start)
  *
  * @returns {Object} Edge padding utility classes
  * @private

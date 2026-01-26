@@ -34,6 +34,9 @@ export default defineConfig(({ command, mode }) => {
   // Demo dev server: npm run dev
   return {
     root: 'demo',
+    define: {
+      __VERSION__: JSON.stringify(pkg.version)
+    },
     plugins: [tailwindcss()]
   };
 });

@@ -1,6 +1,6 @@
 (function() {
   "use strict";
-  const VERSION$1 = "v3.0";
+  const VERSION = `v${"5.0.0"}`;
   const LOREM_CONTENT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
 
 Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.`;
@@ -36,6 +36,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     min: { value: "1rem", desc: "Minimum breakout padding (floor)", cssVar: "--config-breakout-min" },
     scale: { value: "5vw", desc: "Fluid breakout scaling", cssVar: "--config-breakout-scale" }
     // max is popoutWidth
+  };
+  const BREAKPOINT_OPTIONS = {
+    lg: { value: "1024", desc: "Large breakpoint (px)", cssVar: "--config-breakpoint-lg" },
+    xl: { value: "1280", desc: "Extra large breakpoint (px)", cssVar: "--config-breakpoint-xl" }
   };
   function createInitialState() {
     return {
@@ -92,187 +96,168 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       sectionCopied: null
     };
   }
-  const VERSION = "3.1.3";
-  function generateCSSExport(c) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+  const BUILD_VERSION = "5.0.0";
+  function generateCSSExport(c, version = BUILD_VERSION) {
+    var _a, _b, _c, _d, _e;
+    const VERSION2 = version;
     const breakoutMin = c.breakoutMin || "1rem";
     const breakoutScale = c.breakoutScale || "5vw";
+    const breakpointLg = ((_a = c.breakpoints) == null ? void 0 : _a.lg) || "1024";
+    const breakpointXl = ((_b = c.breakpoints) == null ? void 0 : _b.xl) || "1280";
     return `/**
- * Breakout Grid - Standalone CSS
- * Version: ${VERSION}
- * Generated from Tailwind Breakout Grid Plugin
+ * Breakout Grid - Objects Layer (ITCSS)
+ * Version: ${VERSION2}
  *
- * Documentation: https://github.com/astuteo-llc/tailwind-breakout-grid
- * Lite Visualizer: https://github.com/astuteo-llc/tailwind-breakout-grid/blob/master/docs/visualizer-lite.md
+ * Documentation: https://github.com/astuteo-llc/breakout-grid
  *
- * For development debugging with this standalone CSS, use the lite visualizer:
- * https://github.com/astuteo-llc/tailwind-breakout-grid/blob/master/breakout-grid-visualizer-lite.js
+ * ============================================================================
+ * TABLE OF CONTENTS
+ * ============================================================================
  *
- * ========================================
- * Usage Instructions
- * ========================================
+ * CONFIGURATION
+ *   - Configuration Variables ........... Customizable :root variables
+ *   - Computed Values ................... Auto-calculated (do not edit)
  *
- * Option 1: CSS Layers with @import (Recommended for Vite/PostCSS)
- * ----------------------------------------------------------------
- * Save this file as _breakout-grid.css in your CSS directory, then
- * import it inside an @layer block in your main stylesheet:
+ * GRID CONTAINERS
+ *   - Grid Container - Main ............. .grid-cols-breakout
+ *   - Subgrid ........................... .grid-cols-breakout-subgrid
+ *   - Left/Right Aligned Variants ....... .grid-cols-{area}-{left|right}
+ *   - Breakout Modifiers ................ .breakout-to-{content|popout|feature}
+ *   - Breakout None ..................... .breakout-none, .breakout-none-flex
  *
- *   @layer base {
- *     @import './_breakout-grid.css';
- *   }
+ * COLUMN UTILITIES
+ *   - Basic ............................. .col-{full|feature|popout|content|center}
+ *   - Start/End ......................... .col-start-*, .col-end-*
+ *   - Left/Right Spans .................. .col-*-left, .col-*-right
+ *   - Advanced Spans .................... .col-*-to-*
+ *   - Full Limit ........................ .col-full-limit
  *
- * Or place it in your components layer alongside other objects:
+ * SPACING UTILITIES
+ *   - Padding ........................... .p-breakout, .p-gap, .p-*-to-content
+ *   - Margins ........................... .m-breakout, .m-gap, .-m-*
+ *
+ * ============================================================================
+ * INTEGRATION (ITCSS + Tailwind v4)
+ * ============================================================================
+ *
+ * Add this file to your Objects layer. In your main CSS file:
+ *
+ *   @import 'tailwindcss';
+ *
+ *   @import './_settings.fonts.css';
+ *   @import './_objects.breakout-grid.css';   <-- Add here (Objects layer)
+ *   @import './_utilities.global.css';
  *
  *   @layer components {
- *     @import './_breakout-grid.css';
- *     @import './_objects.buttons.css';
- *     @import './_objects.forms.css';
+ *       @import './_components.hero.css';
+ *       ...
  *   }
  *
- * This keeps the breakout grid scoped within your layer system and
- * prevents specificity conflicts with utilities that come later.
+ * ============================================================================
+ * QUICK START
+ * ============================================================================
  *
- * Option 2: Scoped to a Container
- * -------------------------------
- * If you need to isolate the CSS variables from :root, move the
- * custom properties to a container class:
+ *   <main class="grid-cols-breakout">
+ *     <article class="col-content">Reading width</article>
+ *     <figure class="col-feature">Wider for images</figure>
+ *     <div class="col-full">Edge to edge</div>
+ *   </main>
  *
- *   .breakout-scope {
- *     --base-gap: ${c.baseGap};
- *     --max-gap: ${c.maxGap};
- *     ... (rest of custom properties)
- *   }
- *
- * Then wrap your grid in that container:
- *
- *   <div class="breakout-scope">
- *     <main class="grid-cols-breakout">...</main>
- *   </div>
- *
- * Option 3: Direct Link (Simple Projects)
- * ---------------------------------------
- * For simple projects without a build step:
- *
- *   <link rel="stylesheet" href="breakout-grid.css">
- *
- * ========================================
- *
- * Configuration (for tailwind.config.js):
- * ----------------------------------------
- * import breakoutGrid from 'tailwind-breakout-grid'
- *
- * export default {
- *   plugins: [
- *     breakoutGrid({
- *       baseGap: '${c.baseGap}',
- *       maxGap: '${c.maxGap}',
- *       contentMin: '${c.contentMin}',
- *       contentMax: '${c.contentMax}',
- *       contentBase: '${c.contentBase}',
- *       popoutWidth: '${c.popoutWidth}',
- *       featureMin: '${c.featureMin}',
- *       featureScale: '${c.featureScale}',
- *       featureMax: '${c.featureMax}',
- *       fullLimit: '${c.fullLimit}',
- *       defaultCol: '${c.defaultCol || "content"}',
- *       gapScale: {
- *         default: '${((_a = c.gapScale) == null ? void 0 : _a.default) || "4vw"}',
- *         lg: '${((_b = c.gapScale) == null ? void 0 : _b.lg) || "5vw"}',
- *         xl: '${((_c = c.gapScale) == null ? void 0 : _c.xl) || "6vw"}'
- *       }
- *     })
- *   ]
- * }
- *
- * Grid Structure:
- *
- *   full         feature      popout    content    popout      feature         full
- *   (1fr)     (${c.featureMin}-${c.featureMax})   (${c.popoutWidth})                  (${c.popoutWidth})   (${c.featureMin}-${c.featureMax})       (1fr)
- *    ├────────────┼────────────┼─────────┼──────────┼─────────┼────────────┼────────────┤
- *    │            │            │         │          │         │            │            │
- *    │            │            │         │          │         │            │            │
- *    │            │            │         │          │         │            │            │
- *    ├────────────┼────────────┼─────────┼──────────┼─────────┼────────────┼────────────┤
- *  full-start  feature-start popout  content    content  popout      feature-end   full-end
- *                             -start  -start      -end    -end
- *
- * Track Formulas:
- *   Content: clamp(${c.contentMin}, ${c.contentBase}, ${c.contentMax})
- *   Feature: clamp(${c.featureMin}, ${c.featureScale}, ${c.featureMax})
- *   Popout:  ${c.popoutWidth}
- *   Gap:     clamp(${c.baseGap}, ${((_d = c.gapScale) == null ? void 0 : _d.default) || "4vw"}/${((_e = c.gapScale) == null ? void 0 : _e.lg) || "5vw"}/${((_f = c.gapScale) == null ? void 0 : _f.xl) || "6vw"}, ${c.maxGap})
- *
- * Think of the grid like an onion: content is the core, and each outer layer
- * (popout → feature → full) wraps around it. Configure content first, then
- * build outward. The inner tracks affect all outer track positioning.
- *
- * ----------------------------------------
- * A Note on Content Width & Readability
- * ----------------------------------------
- * The classic guideline is 45–75 characters per line, with ~66 often cited
- * as the sweet spot (from Bringhurst's Elements of Typographic Style).
- *
- * At 16px base font, 61rem = 976px—that could hit 100+ characters per line,
- * which is too wide for comfortable reading.
- *
- * Rough guide for body text at 1rem/16px:
- *   45ch ≈ 35–40rem (comfortable minimum)
- *   66ch ≈ 45–50rem (ideal for reading)
- *   75ch ≈ 50–55rem (comfortable maximum)
- *
- * Context matters:
- *   - Long-form articles/docs: 45–50rem is more comfortable
- *   - Marketing pages with mixed content: wider works (less continuous reading)
- *   - Larger body font (18–20px): you can go a bit wider
- *
- * If your content column is primarily for prose, consider tightening to
- * 45–55rem. The default 53–61rem range works well for mixed layouts with
- * cards, images, and text—but may be wide for pure reading.
- *
- * NOTE: This CSS export feature is in beta and not fully tested.
- * Please verify output before using in production.
  */
 
-/* ========================================
-   CSS Custom Properties
-   ======================================== */
-:root {
-  /* Base measurements */
-  --base-gap: ${c.baseGap};
-  --max-gap: ${c.maxGap};
-  --content-min: ${c.contentMin};
-  --content-max: ${c.contentMax};
-  --content-base: ${c.contentBase};
+/* ============================================================================
+   CONFIGURATION VARIABLES
+   ============================================================================
+   To restore this grid in the visualizer, copy from here to END CONFIGURATION.
+   Paste into the "Restore" dialog at:
+   https://github.com/astuteo-llc/breakout-grid
+   ============================================================================ */
 
-  /* Computed values */
-  --gap: clamp(var(--base-gap), ${((_g = c.gapScale) == null ? void 0 : _g.default) || "4vw"}, var(--max-gap));
-  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
-  --content: min(clamp(var(--content-min), var(--content-base), var(--content-max)), 100% - var(--gap) * 2);
-  --content-inset: min(clamp(var(--content-min), var(--content-base), var(--content-max)), calc(100% - var(--gap)));
-  --content-half: calc(var(--content) / 2);
+:root {
+  /* Content (text width) */
+  --content-min: ${c.contentMin};
+  --content-base: ${c.contentBase};
+  --content-max: ${c.contentMax};
+
+  /* Default column for children without col-* class */
+  --default-col: ${c.defaultCol || "content"};
 
   /* Track widths */
-  --full: minmax(var(--gap), 1fr);
-  --feature: minmax(0, clamp(${c.featureMin}, ${c.featureScale}, ${c.featureMax})); /* min: ${c.featureMin}, scale: ${c.featureScale}, max: ${c.featureMax} */
-  --popout: minmax(0, ${c.popoutWidth});
+  --popout-width: ${c.popoutWidth};
   --full-limit: ${c.fullLimit};
 
-  /* Padding/margin utilities */
-  --breakout-padding: clamp(${breakoutMin}, ${breakoutScale}, ${c.popoutWidth});
-  --popout-to-content: clamp(${breakoutMin}, ${breakoutScale}, ${c.popoutWidth});
-  --feature-to-content: calc(clamp(${c.featureMin}, ${c.featureScale}, ${c.featureMax}) + ${c.popoutWidth}); /* feature + popout widths */
+  /* Feature track */
+  --feature-min: ${c.featureMin};
+  --feature-scale: ${c.featureScale};
+  --feature-max: ${c.featureMax};
+
+  /* Outer margins */
+  --base-gap: ${c.baseGap};
+  --max-gap: ${c.maxGap};
+
+  /* Responsive scale */
+  --gap-scale-default: ${((_c = c.gapScale) == null ? void 0 : _c.default) || "4vw"};
+  --gap-scale-lg: ${((_d = c.gapScale) == null ? void 0 : _d.lg) || "5vw"};
+  --gap-scale-xl: ${((_e = c.gapScale) == null ? void 0 : _e.xl) || "6vw"};
+
+  /* Breakout padding */
+  --breakout-min: ${breakoutMin};
+  --breakout-scale: ${breakoutScale};
+
+  /* Breakpoints (used in media queries below) */
+  /* --breakpoint-lg: ${breakpointLg}px; */
+  /* --breakpoint-xl: ${breakpointXl}px; */
+}
+
+/* ============================================================================
+   END CONFIGURATION
+   ============================================================================ */
+
+
+/* ============================================================================
+   COMPUTED VALUES - DO NOT EDIT
+   ============================================================================
+   These are calculated from the customizable variables above.
+   Editing these directly will break the grid calculations.
+   ============================================================================ */
+
+:root {
+  /* Responsive gap: scales between base and max based on viewport */
+  --gap: clamp(var(--base-gap), var(--gap-scale-default), var(--max-gap));
+
+  /* Computed gap: larger value for full-width spacing */
+  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
+
+  /* Content width: fluid between min/max, respects gap on both sides */
+  --content: min(clamp(var(--content-min), var(--content-base), var(--content-max)), 100% - var(--gap) * 2);
+
+  /* Content inset: for left/right aligned grids (single gap) */
+  --content-inset: min(clamp(var(--content-min), var(--content-base), var(--content-max)), calc(100% - var(--gap)));
+
+  /* Half content: used for center alignment */
+  --content-half: calc(var(--content) / 2);
+
+  /* Track definitions for grid-template-columns */
+  --full: minmax(var(--gap), 1fr);
+  --feature: minmax(0, clamp(var(--feature-min), var(--feature-scale), var(--feature-max)));
+  --popout: minmax(0, var(--popout-width));
+
+  /* Alignment padding: for aligning content inside wider columns */
+  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
+  --popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
+  --feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
 }
 
 /* Responsive gap scaling */
-@media (min-width: 1024px) {
+@media (min-width: ${breakpointLg}px) {
   :root {
-    --gap: clamp(var(--base-gap), ${((_h = c.gapScale) == null ? void 0 : _h.lg) || ((_i = c.gapScale) == null ? void 0 : _i.default) || "5vw"}, var(--max-gap));
+    --gap: clamp(var(--base-gap), var(--gap-scale-lg), var(--max-gap));
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: ${breakpointXl}px) {
   :root {
-    --gap: clamp(var(--base-gap), ${((_j = c.gapScale) == null ? void 0 : _j.xl) || ((_k = c.gapScale) == null ? void 0 : _k.lg) || "6vw"}, var(--max-gap));
+    --gap: clamp(var(--base-gap), var(--gap-scale-xl), var(--max-gap));
   }
 }
 
@@ -308,7 +293,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 [class*='grid-cols-feature'] > *:not([class*='col-']),
 [class*='grid-cols-popout'] > *:not([class*='col-']),
 [class*='grid-cols-content'] > *:not([class*='col-']) {
-  grid-column: ${c.defaultCol || "content"};
+  grid-column: var(--default-col, content);
 }
 
 /* ----------------------------------------
@@ -908,6 +893,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     },
     // Generate export config object
     generateConfigExport() {
+      var _a, _b, _c, _d;
       const config = {};
       Object.keys(this.configOptions).forEach((key) => {
         config[key] = this.editValues[key] || this.configOptions[key].value;
@@ -918,6 +904,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       });
       config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
       config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+      config.breakpoints = {
+        lg: this.editValues.breakpoint_lg || ((_b = (_a = this.breakpointOptions) == null ? void 0 : _a.lg) == null ? void 0 : _b.value) || "1024",
+        xl: this.editValues.breakpoint_xl || ((_d = (_c = this.breakpointOptions) == null ? void 0 : _c.xl) == null ? void 0 : _d.value) || "1280"
+      };
       return config;
     },
     // Format config object with single quotes for values, no quotes for keys
@@ -1006,10 +996,41 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       });
       return lines.join("\n");
     },
-    // Copy config to clipboard
+    // Copy config to clipboard as CSS variables
     copyConfig() {
+      var _a, _b, _c, _d, _e;
       const config = this.generateConfigExport();
-      const configStr = `breakoutGrid(${this.formatConfig(config)})`;
+      const lines = [
+        ":root {",
+        `  /* Content (text width) */`,
+        `  --content-min: ${config.contentMin};`,
+        `  --content-base: ${config.contentBase};`,
+        `  --content-max: ${config.contentMax};`,
+        `  /* Default column */`,
+        `  --default-col: ${config.defaultCol || "content"};`,
+        `  /* Track widths */`,
+        `  --popout-width: ${config.popoutWidth};`,
+        `  --full-limit: ${config.fullLimit};`,
+        `  /* Feature track */`,
+        `  --feature-min: ${config.featureMin};`,
+        `  --feature-scale: ${config.featureScale};`,
+        `  --feature-max: ${config.featureMax};`,
+        `  /* Outer margins */`,
+        `  --base-gap: ${config.baseGap};`,
+        `  --max-gap: ${config.maxGap};`,
+        `  /* Responsive scale */`,
+        `  --gap-scale-default: ${((_a = config.gapScale) == null ? void 0 : _a.default) || "4vw"};`,
+        `  --gap-scale-lg: ${((_b = config.gapScale) == null ? void 0 : _b.lg) || "5vw"};`,
+        `  --gap-scale-xl: ${((_c = config.gapScale) == null ? void 0 : _c.xl) || "6vw"};`,
+        `  /* Breakout padding */`,
+        `  --breakout-min: ${config.breakoutMin || "1rem"};`,
+        `  --breakout-scale: ${config.breakoutScale || "5vw"};`,
+        `  /* Breakpoints */`,
+        `  /* --breakpoint-lg: ${((_d = config.breakpoints) == null ? void 0 : _d.lg) || "1024"}px; */`,
+        `  /* --breakpoint-xl: ${((_e = config.breakpoints) == null ? void 0 : _e.xl) || "1280"}px; */`,
+        "}"
+      ];
+      const configStr = lines.join("\n");
       navigator.clipboard.writeText(configStr).then(() => {
         this.copySuccess = true;
         this.configCopied = true;
@@ -1023,7 +1044,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `breakout-grid-${this.cssExportVersion}.css`;
+      a.download = `_objects.breakout-grid.css`;
       a.click();
       URL.revokeObjectURL(url);
     },
@@ -1273,19 +1294,53 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       };
       return map[colName] || null;
     },
-    // Parse a config string (from copyConfig output) into an object
+    // Parse a CSS variables string into a config object
     parseConfigString(input) {
-      let str = input.trim();
-      const match = str.match(/^breakoutGrid\s*\(([\s\S]*)\)\s*,?\s*$/);
-      if (match) {
-        str = match[1];
+      const str = input.trim();
+      const config = { gapScale: {}, breakpoints: {} };
+      const varMap = {
+        "--base-gap": "baseGap",
+        "--max-gap": "maxGap",
+        "--content-min": "contentMin",
+        "--content-max": "contentMax",
+        "--content-base": "contentBase",
+        "--popout-width": "popoutWidth",
+        "--feature-min": "featureMin",
+        "--feature-scale": "featureScale",
+        "--feature-max": "featureMax",
+        "--full-limit": "fullLimit",
+        "--breakout-min": "breakoutMin",
+        "--breakout-scale": "breakoutScale",
+        "--default-col": "defaultCol"
+      };
+      const gapScaleMap = {
+        "--gap-scale-default": "default",
+        "--gap-scale-lg": "lg",
+        "--gap-scale-xl": "xl"
+      };
+      const breakpointMap = {
+        "--breakpoint-lg": "lg",
+        "--breakpoint-xl": "xl"
+      };
+      const varRegex = /(?:\/\*\s*)?(--[\w-]+)\s*:\s*([^;*]+);?\s*(?:\*\/)?/g;
+      let match;
+      let foundAny = false;
+      while ((match = varRegex.exec(str)) !== null) {
+        const [, varName, value] = match;
+        let trimmedValue = value.trim();
+        foundAny = true;
+        if (varMap[varName]) {
+          config[varMap[varName]] = trimmedValue;
+        } else if (gapScaleMap[varName]) {
+          config.gapScale[gapScaleMap[varName]] = trimmedValue;
+        } else if (breakpointMap[varName]) {
+          config.breakpoints[breakpointMap[varName]] = trimmedValue.replace(/px$/, "");
+        }
       }
-      str = str.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*(\w+)\s*:/gm, '"$1":').replace(/'/g, '"').replace(/,(\s*[}\]])/g, "$1");
-      try {
-        return JSON.parse(str);
-      } catch (e) {
-        throw new Error('Invalid config format. Paste the output from "Copy Config".');
+      if (!foundAny) {
+        throw new Error('Invalid format. Paste CSS variables from "Copy Variables".');
       }
+      return config;
     },
     // Open restore modal
     openRestoreModal() {
@@ -1325,6 +1380,14 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
           this.editValues.breakout_scale = config.breakoutScale;
         }
         this.updateBreakoutLive();
+        if (config.breakpoints) {
+          if (config.breakpoints.lg !== void 0) {
+            this.editValues.breakpoint_lg = config.breakpoints.lg;
+          }
+          if (config.breakpoints.xl !== void 0) {
+            this.editValues.breakpoint_xl = config.breakpoints.xl;
+          }
+        }
         this.updateColumnWidths();
         this.closeRestoreModal();
         this.configCopied = false;
@@ -2299,9 +2362,9 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         <!-- Action Buttons -->
         <div style="padding: 10px 12px; background: #f7f7f7; display: flex; gap: 8px;">
           <button @click="copyConfig()" :style="{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: '600', border: 'none', borderRadius: '4px', cursor: 'pointer', background: copySuccess ? '#10b981' : '#1a1a2e', color: 'white', transition: 'background 0.2s' }">
-            <span x-text="copySuccess ? '✓ Copied' : 'Copy Config'"></span>
+            <span x-text="copySuccess ? '✓ Copied' : 'Copy Variables'"></span>
           </button>
-          <button @click="openRestoreModal()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Paste a config to restore">
+          <button @click="openRestoreModal()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Restore from CSS variables">
             Restore
           </button>
           <button @click="downloadCSS()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;">
@@ -2328,15 +2391,17 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
         <!-- Modal Body -->
         <div style="padding: 16px;">
-          <p style="font-size: 12px; color: #6b7280; margin: 0 0 12px 0; line-height: 1.5;">Paste a config from "Copy Config" to restore values:</p>
+          <p style="font-size: 12px; color: #6b7280; margin: 0 0 8px 0; line-height: 1.5;">Paste the <code style="background: #f3f4f6; padding: 1px 4px; border-radius: 3px;">:root { }</code> block from your exported CSS file:</p>
+          <p style="font-size: 10px; color: #9ca3af; margin: 0 0 12px 0;">Look for "CONFIGURATION VARIABLES" section in breakout-grid.css</p>
           <textarea x-model="restoreInput"
                     @keydown.meta.enter="restoreConfig()"
                     @keydown.ctrl.enter="restoreConfig()"
-                    placeholder="breakoutGrid({
-  contentMin: '53rem',
-  contentBase: '75vw',
+                    placeholder=":root {
+  --base-gap: 1rem;
+  --max-gap: 15rem;
+  --content-min: 53rem;
   ...
-})"
+}"
                     style="width: 100%; height: 200px; padding: 12px; font-family: 'SF Mono', Monaco, monospace; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; resize: vertical; box-sizing: border-box;"></textarea>
           <!-- Error message -->
           <div x-show="restoreError" x-text="restoreError" style="margin-top: 8px; padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; color: #dc2626; font-size: 11px;"></div>
@@ -2418,20 +2483,21 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     document.addEventListener("alpine:init", () => {
       Alpine.data("breakoutGridVisualizer", () => ({
         // Constants
-        version: VERSION$1,
+        version: VERSION,
         loremContent: LOREM_CONTENT,
         // Configuration
         gridAreas: GRID_AREAS,
         configOptions: CONFIG_OPTIONS,
         gapScaleOptions: GAP_SCALE_OPTIONS,
         breakoutOptions: BREAKOUT_OPTIONS,
+        breakpointOptions: BREAKPOINT_OPTIONS,
         // State
         ...createInitialState(),
         // Methods
         ...methods,
         // CSS export
         generateCSSExport,
-        cssExportVersion: VERSION,
+        cssExportVersion: BUILD_VERSION,
         // Template
         template
       }));

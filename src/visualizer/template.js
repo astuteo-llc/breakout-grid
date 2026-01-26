@@ -969,9 +969,9 @@ export const template = `
         <!-- Action Buttons -->
         <div style="padding: 10px 12px; background: #f7f7f7; display: flex; gap: 8px;">
           <button @click="copyConfig()" :style="{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: '600', border: 'none', borderRadius: '4px', cursor: 'pointer', background: copySuccess ? '#10b981' : '#1a1a2e', color: 'white', transition: 'background 0.2s' }">
-            <span x-text="copySuccess ? '✓ Copied' : 'Copy Config'"></span>
+            <span x-text="copySuccess ? '✓ Copied' : 'Copy Variables'"></span>
           </button>
-          <button @click="openRestoreModal()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Paste a config to restore">
+          <button @click="openRestoreModal()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;" title="Restore from CSS variables">
             Restore
           </button>
           <button @click="downloadCSS()" style="padding: 8px 12px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;">
@@ -998,15 +998,17 @@ export const template = `
         </div>
         <!-- Modal Body -->
         <div style="padding: 16px;">
-          <p style="font-size: 12px; color: #6b7280; margin: 0 0 12px 0; line-height: 1.5;">Paste a config from "Copy Config" to restore values:</p>
+          <p style="font-size: 12px; color: #6b7280; margin: 0 0 8px 0; line-height: 1.5;">Paste the <code style="background: #f3f4f6; padding: 1px 4px; border-radius: 3px;">:root { }</code> block from your exported CSS file:</p>
+          <p style="font-size: 10px; color: #9ca3af; margin: 0 0 12px 0;">Look for "CONFIGURATION VARIABLES" section in _objects.breakout-grid.css</p>
           <textarea x-model="restoreInput"
                     @keydown.meta.enter="restoreConfig()"
                     @keydown.ctrl.enter="restoreConfig()"
-                    placeholder="breakoutGrid({
-  contentMin: '53rem',
-  contentBase: '75vw',
+                    placeholder=":root {
+  --base-gap: 1rem;
+  --max-gap: 15rem;
+  --content-min: 53rem;
   ...
-})"
+}"
                     style="width: 100%; height: 200px; padding: 12px; font-family: 'SF Mono', Monaco, monospace; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; resize: vertical; box-sizing: border-box;"></textarea>
           <!-- Error message -->
           <div x-show="restoreError" x-text="restoreError" style="margin-top: 8px; padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; color: #dc2626; font-size: 11px;"></div>

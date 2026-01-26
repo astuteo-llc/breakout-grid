@@ -36,6 +36,7 @@ import {
   CONFIG_OPTIONS,
   GAP_SCALE_OPTIONS,
   BREAKOUT_OPTIONS,
+  BREAKPOINT_OPTIONS,
   createInitialState
 } from './state.js';
 import { generateCSSExport, CSS_EXPORT_VERSION } from './css-export.js';
@@ -58,6 +59,7 @@ import { template } from './template.js';
       configOptions: CONFIG_OPTIONS,
       gapScaleOptions: GAP_SCALE_OPTIONS,
       breakoutOptions: BREAKOUT_OPTIONS,
+      breakpointOptions: BREAKPOINT_OPTIONS,
 
       // State
       ...createInitialState(),

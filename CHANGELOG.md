@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2025-01-26
+
+### Breaking Changes
+
+- **Pure CSS distribution** - The package now exports standalone CSS as the primary format
+- **Tailwind plugin deprecated** - `index.js` still works but is no longer the recommended approach
+- **Removed config option:** `featureWidth` - replaced by `featureMin`, `featureScale`, `featureMax` for fluid behavior
+
+### Added
+
+- **Fluid feature track** - Feature column now uses `clamp(featureMin, featureScale, featureMax)` for responsive behavior
+- **Breakout padding config** - New `breakoutMin` and `breakoutScale` options for fluid breakout padding
+- **Dynamic versioning** - Visualizer version now reads from package.json at build time
+
+### Changed
+
+- Main package export is now `dist/_objects.breakout-grid.css`
+- Visualizer available as optional imports: `@astuteo/breakout-grid/visualizer`
+- TypeScript definitions updated with new config options
+
+### Migration from v3
+
+1. **If using Tailwind plugin:** Continue using `index.js` - it still works
+2. **For new projects:** Use the CSS file directly:
+   ```html
+   <link rel="stylesheet" href="breakout-grid.css">
+   ```
+3. **Update config** if customizing feature track:
+   - `featureWidth: '12vw'` → `featureMin: '0rem'`, `featureScale: '12vw'`, `featureMax: '12rem'`
+
 ## [3.0.0] - 2025-01-14
 
 ### Breaking Changes
@@ -175,12 +205,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic default column assignment for child elements
 - Debug mode for template generation logging
 
-[3.0.0]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v3.0.0
-[2.2.0]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v2.2.0
-[2.1.0]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v2.1.0
-[1.1.6]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.1.6
-[1.1.5]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.1.5
-[1.1.2]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.1.2
-[1.1.1]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.1.1
-[1.1.0]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.1.0
-[1.0.0]: https://github.com/astuteo-llc/tailwind-breakout-grid/releases/tag/v1.0.0
+[5.0.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v5.0.0
+[3.0.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v3.0.0
+[2.2.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v2.2.0
+[2.1.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v2.1.0
+[1.1.6]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.1.6
+[1.1.5]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.1.5
+[1.1.2]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.1.2
+[1.1.1]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.1.1
+[1.1.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.1.0
+[1.0.0]: https://github.com/astuteo-llc/breakout-grid/releases/tag/v1.0.0
