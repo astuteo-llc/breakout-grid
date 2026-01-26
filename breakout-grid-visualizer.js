@@ -2392,7 +2392,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         <!-- Modal Body -->
         <div style="padding: 16px;">
           <p style="font-size: 12px; color: #6b7280; margin: 0 0 8px 0; line-height: 1.5;">Paste the <code style="background: #f3f4f6; padding: 1px 4px; border-radius: 3px;">:root { }</code> block from your exported CSS file:</p>
-          <p style="font-size: 10px; color: #9ca3af; margin: 0 0 12px 0;">Look for "CONFIGURATION VARIABLES" section in breakout-grid.css</p>
+          <p style="font-size: 10px; color: #9ca3af; margin: 0 0 12px 0;">Look for "CONFIGURATION VARIABLES" section in _objects.breakout-grid.css</p>
           <textarea x-model="restoreInput"
                     @keydown.meta.enter="restoreConfig()"
                     @keydown.ctrl.enter="restoreConfig()"
