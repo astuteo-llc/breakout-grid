@@ -1,6 +1,6 @@
 (function() {
   "use strict";
-  const VERSION$1 = "v3.0";
+  const VERSION = `v${"4.0.0"}`;
   const LOREM_CONTENT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
 
 Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.`;
@@ -96,25 +96,73 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       sectionCopied: null
     };
   }
-  const VERSION = "4.0.0";
-  function generateCSSExport(c) {
+  const BUILD_VERSION = "4.0.0";
+  function generateCSSExport(c, version = BUILD_VERSION) {
     var _a, _b, _c, _d, _e;
+    const VERSION2 = version;
     const breakoutMin = c.breakoutMin || "1rem";
     const breakoutScale = c.breakoutScale || "5vw";
     const breakpointLg = ((_a = c.breakpoints) == null ? void 0 : _a.lg) || "1024";
     const breakpointXl = ((_b = c.breakpoints) == null ? void 0 : _b.xl) || "1280";
     return `/**
- * Breakout Grid - Standalone CSS
- * Version: ${VERSION}
+ * Breakout Grid - Objects Layer (ITCSS)
+ * Version: ${VERSION2}
  *
  * Documentation: https://github.com/astuteo-llc/tailwind-breakout-grid
  *
- * Quick Start:
+ * ============================================================================
+ * TABLE OF CONTENTS
+ * ============================================================================
+ *
+ * CONFIGURATION
+ *   - Configuration Variables ........... Customizable :root variables
+ *   - Computed Values ................... Auto-calculated (do not edit)
+ *
+ * GRID CONTAINERS
+ *   - Grid Container - Main ............. .grid-cols-breakout
+ *   - Subgrid ........................... .grid-cols-breakout-subgrid
+ *   - Left/Right Aligned Variants ....... .grid-cols-{area}-{left|right}
+ *   - Breakout Modifiers ................ .breakout-to-{content|popout|feature}
+ *   - Breakout None ..................... .breakout-none, .breakout-none-flex
+ *
+ * COLUMN UTILITIES
+ *   - Basic ............................. .col-{full|feature|popout|content|center}
+ *   - Start/End ......................... .col-start-*, .col-end-*
+ *   - Left/Right Spans .................. .col-*-left, .col-*-right
+ *   - Advanced Spans .................... .col-*-to-*
+ *   - Full Limit ........................ .col-full-limit
+ *
+ * SPACING UTILITIES
+ *   - Padding ........................... .p-breakout, .p-gap, .p-*-to-content
+ *   - Margins ........................... .m-breakout, .m-gap, .-m-*
+ *
+ * ============================================================================
+ * INTEGRATION (ITCSS + Tailwind v4)
+ * ============================================================================
+ *
+ * Add this file to your Objects layer. In your main CSS file:
+ *
+ *   @import 'tailwindcss';
+ *
+ *   @import './_settings.fonts.css';
+ *   @import './_objects.breakout-grid.css';   <-- Add here (Objects layer)
+ *   @import './_utilities.global.css';
+ *
+ *   @layer components {
+ *       @import './_components.hero.css';
+ *       ...
+ *   }
+ *
+ * ============================================================================
+ * QUICK START
+ * ============================================================================
+ *
  *   <main class="grid-cols-breakout">
  *     <article class="col-content">Reading width</article>
  *     <figure class="col-feature">Wider for images</figure>
  *     <div class="col-full">Edge to edge</div>
  *   </main>
+ *
  */
 
 /* ============================================================================
@@ -996,7 +1044,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `breakout-grid-${this.cssExportVersion}.css`;
+      a.download = `_objects.breakout-grid.css`;
       a.click();
       URL.revokeObjectURL(url);
     },
@@ -2435,7 +2483,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     document.addEventListener("alpine:init", () => {
       Alpine.data("breakoutGridVisualizer", () => ({
         // Constants
-        version: VERSION$1,
+        version: VERSION,
         loremContent: LOREM_CONTENT,
         // Configuration
         gridAreas: GRID_AREAS,
@@ -2449,7 +2497,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         ...methods,
         // CSS export
         generateCSSExport,
-        cssExportVersion: VERSION,
+        cssExportVersion: BUILD_VERSION,
         // Template
         template
       }));

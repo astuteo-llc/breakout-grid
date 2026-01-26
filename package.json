@@ -3,10 +3,10 @@
   "version": "4.0.0",
   "type": "module",
   "description": "CSS Grid breakout layout system with visual configurator",
-  "main": "dist/breakout-grid.css",
-  "style": "dist/breakout-grid.css",
+  "main": "dist/_objects.breakout-grid.css",
+  "style": "dist/_objects.breakout-grid.css",
   "files": [
-    "dist/breakout-grid.css",
+    "dist/_objects.breakout-grid.css",
     "breakout-grid-visualizer.js",
     "breakout-grid-visualizer-lite.js",
     "craft-integration.twig",
@@ -14,8 +14,8 @@
     "LICENSE"
   ],
   "exports": {
-    ".": "./dist/breakout-grid.css",
-    "./css": "./dist/breakout-grid.css",
+    ".": "./dist/_objects.breakout-grid.css",
+    "./css": "./dist/_objects.breakout-grid.css",
     "./visualizer": "./breakout-grid-visualizer.js",
     "./visualizer-lite": "./breakout-grid-visualizer-lite.js"
   },

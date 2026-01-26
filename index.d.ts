@@ -41,10 +41,34 @@ export interface BreakoutGridConfig {
   popoutWidth?: string;
 
   /**
-   * How far feature sections extend beyond content
+   * Minimum feature track width (floor)
+   * @default '0rem'
+   */
+  featureMin?: string;
+
+  /**
+   * Fluid feature track scaling
    * @default '12vw'
    */
-  featureWidth?: string;
+  featureScale?: string;
+
+  /**
+   * Maximum feature track width (ceiling)
+   * @default '12rem'
+   */
+  featureMax?: string;
+
+  /**
+   * Minimum breakout padding (floor)
+   * @default '1rem'
+   */
+  breakoutMin?: string;
+
+  /**
+   * Fluid breakout padding scaling
+   * @default '5vw'
+   */
+  breakoutScale?: string;
 
   /**
    * Default column for elements without a col-* class

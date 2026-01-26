@@ -3,8 +3,10 @@
  * Run with: npm run build:css
  */
 
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { generateCSSExport } from '../src/visualizer/css-export.js';
+
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
 const defaults = {
   baseGap: '1rem',
@@ -24,5 +26,5 @@ const defaults = {
 };
 
 mkdirSync('dist', { recursive: true });
-writeFileSync('dist/breakout-grid.css', generateCSSExport(defaults));
-console.log('Generated dist/breakout-grid.css');
+writeFileSync('dist/_objects.breakout-grid.css', generateCSSExport(defaults, pkg.version));
+console.log(`Generated dist/_objects.breakout-grid.css (v${pkg.version})`);

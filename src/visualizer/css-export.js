@@ -3,12 +3,13 @@
  * Generates standalone CSS from visualizer configuration
  */
 
-// Version injected at build time by Vite
-const VERSION = typeof __VERSION__ !== 'undefined' ? __VERSION__ : 'dev';
+// Version injected at build time by Vite, or passed as parameter
+const BUILD_VERSION = typeof __VERSION__ !== 'undefined' ? __VERSION__ : 'dev';
 
-export { VERSION as CSS_EXPORT_VERSION };
+export { BUILD_VERSION as CSS_EXPORT_VERSION };
 
-export function generateCSSExport(c) {
+export function generateCSSExport(c, version = BUILD_VERSION) {
+  const VERSION = version;
   // Extract config with fallbacks
   const breakoutMin = c.breakoutMin || '1rem';
   const breakoutScale = c.breakoutScale || '5vw';
@@ -16,17 +17,64 @@ export function generateCSSExport(c) {
   const breakpointXl = c.breakpoints?.xl || '1280';
 
   return `/**
- * Breakout Grid - Standalone CSS
+ * Breakout Grid - Objects Layer (ITCSS)
  * Version: ${VERSION}
  *
  * Documentation: https://github.com/astuteo-llc/tailwind-breakout-grid
  *
- * Quick Start:
+ * ============================================================================
+ * TABLE OF CONTENTS
+ * ============================================================================
+ *
+ * CONFIGURATION
+ *   - Configuration Variables ........... Customizable :root variables
+ *   - Computed Values ................... Auto-calculated (do not edit)
+ *
+ * GRID CONTAINERS
+ *   - Grid Container - Main ............. .grid-cols-breakout
+ *   - Subgrid ........................... .grid-cols-breakout-subgrid
+ *   - Left/Right Aligned Variants ....... .grid-cols-{area}-{left|right}
+ *   - Breakout Modifiers ................ .breakout-to-{content|popout|feature}
+ *   - Breakout None ..................... .breakout-none, .breakout-none-flex
+ *
+ * COLUMN UTILITIES
+ *   - Basic ............................. .col-{full|feature|popout|content|center}
+ *   - Start/End ......................... .col-start-*, .col-end-*
+ *   - Left/Right Spans .................. .col-*-left, .col-*-right
+ *   - Advanced Spans .................... .col-*-to-*
+ *   - Full Limit ........................ .col-full-limit
+ *
+ * SPACING UTILITIES
+ *   - Padding ........................... .p-breakout, .p-gap, .p-*-to-content
+ *   - Margins ........................... .m-breakout, .m-gap, .-m-*
+ *
+ * ============================================================================
+ * INTEGRATION (ITCSS + Tailwind v4)
+ * ============================================================================
+ *
+ * Add this file to your Objects layer. In your main CSS file:
+ *
+ *   @import 'tailwindcss';
+ *
+ *   @import './_settings.fonts.css';
+ *   @import './_objects.breakout-grid.css';   <-- Add here (Objects layer)
+ *   @import './_utilities.global.css';
+ *
+ *   @layer components {
+ *       @import './_components.hero.css';
+ *       ...
+ *   }
+ *
+ * ============================================================================
+ * QUICK START
+ * ============================================================================
+ *
  *   <main class="grid-cols-breakout">
  *     <article class="col-content">Reading width</article>
  *     <figure class="col-feature">Wider for images</figure>
  *     <div class="col-full">Edge to edge</div>
  *   </main>
+ *
  */
 
 /* ============================================================================
