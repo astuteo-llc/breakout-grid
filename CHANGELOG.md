@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Main package export is now `dist/breakout-grid.css`
+- Main package export is now `dist/_objects.breakout-grid.css`
 - Visualizer available as optional imports: `@astuteo/breakout-grid/visualizer`
 - TypeScript definitions updated with new config options
 
