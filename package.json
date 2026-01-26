@@ -31,7 +31,6 @@
   ],
   "author": "Astuteo LLC",
   "license": "MIT",
-  "private": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/astuteo-llc/breakout-grid.git"
