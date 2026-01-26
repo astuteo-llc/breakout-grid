@@ -1,30 +1,33 @@
 {
-  "name": "@astuteo/tailwind-breakout-grid",
-  "version": "3.1.3",
+  "name": "@astuteo/breakout-grid",
+  "version": "4.0.0",
   "type": "module",
-  "description": "A Tailwind CSS plugin for creating fluid breakout grid layouts with optimal reading widths",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "description": "CSS Grid breakout layout system with visual configurator",
+  "main": "dist/breakout-grid.css",
+  "style": "dist/breakout-grid.css",
   "files": [
-    "index.js",
-    "index.d.ts",
+    "dist/breakout-grid.css",
     "breakout-grid-visualizer.js",
     "breakout-grid-visualizer-lite.js",
     "craft-integration.twig",
     "README.md",
     "LICENSE"
   ],
+  "exports": {
+    ".": "./dist/breakout-grid.css",
+    "./css": "./dist/breakout-grid.css",
+    "./visualizer": "./breakout-grid-visualizer.js",
+    "./visualizer-lite": "./breakout-grid-visualizer-lite.js"
+  },
   "keywords": [
-    "tailwindcss",
-    "tailwind",
-    "plugin",
     "css",
     "grid",
     "breakout",
     "layout",
     "editorial",
     "responsive",
-    "fluid"
+    "fluid",
+    "css-grid"
   ],
   "author": "Astuteo LLC",
   "license": "MIT",
@@ -37,9 +40,6 @@
     "url": "https://github.com/astuteo-llc/tailwind-breakout-grid/issues"
   },
   "homepage": "https://github.com/astuteo-llc/tailwind-breakout-grid#readme",
-  "peerDependencies": {
-    "tailwindcss": ">=3.0.0"
-  },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
     "alpinejs": "^3.14.0",
@@ -51,7 +51,8 @@
   },
   "scripts": {
     "demo": "vite",
-    "build": "vite build && vite build --mode lite",
+    "build": "vite build && vite build --mode lite && npm run build:css",
+    "build:css": "node scripts/build-css.js",
     "build:full": "vite build",
     "build:lite": "vite build --mode lite",
     "prepublishOnly": "npm run build && npm run check-files",

@@ -48,6 +48,11 @@ export const BREAKOUT_OPTIONS = {
   // max is popoutWidth
 };
 
+export const BREAKPOINT_OPTIONS = {
+  lg: { value: '1024', desc: 'Large breakpoint (px)', cssVar: '--config-breakpoint-lg' },
+  xl: { value: '1280', desc: 'Extra large breakpoint (px)', cssVar: '--config-breakpoint-xl' },
+};
+
 // Initial state factory
 export function createInitialState() {
   return {

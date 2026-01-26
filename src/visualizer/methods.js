@@ -171,6 +171,11 @@ export const methods = {
     // Add breakout values
     config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
     config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+    // Add breakpoint values
+    config.breakpoints = {
+      lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || '1024',
+      xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || '1280',
+    };
     return config;
   },
 
@@ -270,10 +275,40 @@ export const methods = {
     return lines.join('\n');
   },
 
-  // Copy config to clipboard
+  // Copy config to clipboard as CSS variables
   copyConfig() {
     const config = this.generateConfigExport();
-    const configStr = `breakoutGrid(${this.formatConfig(config)})`;
+    const lines = [
+      ':root {',
+      `  /* Content (text width) */`,
+      `  --content-min: ${config.contentMin};`,
+      `  --content-base: ${config.contentBase};`,
+      `  --content-max: ${config.contentMax};`,
+      `  /* Default column */`,
+      `  --default-col: ${config.defaultCol || 'content'};`,
+      `  /* Track widths */`,
+      `  --popout-width: ${config.popoutWidth};`,
+      `  --full-limit: ${config.fullLimit};`,
+      `  /* Feature track */`,
+      `  --feature-min: ${config.featureMin};`,
+      `  --feature-scale: ${config.featureScale};`,
+      `  --feature-max: ${config.featureMax};`,
+      `  /* Outer margins */`,
+      `  --base-gap: ${config.baseGap};`,
+      `  --max-gap: ${config.maxGap};`,
+      `  /* Responsive scale */`,
+      `  --gap-scale-default: ${config.gapScale?.default || '4vw'};`,
+      `  --gap-scale-lg: ${config.gapScale?.lg || '5vw'};`,
+      `  --gap-scale-xl: ${config.gapScale?.xl || '6vw'};`,
+      `  /* Breakout padding */`,
+      `  --breakout-min: ${config.breakoutMin || '1rem'};`,
+      `  --breakout-scale: ${config.breakoutScale || '5vw'};`,
+      `  /* Breakpoints */`,
+      `  /* --breakpoint-lg: ${config.breakpoints?.lg || '1024'}px; */`,
+      `  /* --breakpoint-xl: ${config.breakpoints?.xl || '1280'}px; */`,
+      '}'
+    ];
+    const configStr = lines.join('\n');
     navigator.clipboard.writeText(configStr).then(() => {
       this.copySuccess = true;
       this.configCopied = true;
@@ -564,33 +599,65 @@ export const methods = {
     return map[colName] || null;
   },
 
-  // Parse a config string (from copyConfig output) into an object
+  // Parse a CSS variables string into a config object
   parseConfigString(input) {
-    // Strip breakoutGrid( wrapper and trailing )
-    let str = input.trim();
-    const match = str.match(/^breakoutGrid\s*\(([\s\S]*)\)\s*,?\s*$/);
-    if (match) {
-      str = match[1];
+    const str = input.trim();
+    const config = { gapScale: {}, breakpoints: {} };
+
+    // Map CSS variable names to config keys
+    const varMap = {
+      '--base-gap': 'baseGap',
+      '--max-gap': 'maxGap',
+      '--content-min': 'contentMin',
+      '--content-max': 'contentMax',
+      '--content-base': 'contentBase',
+      '--popout-width': 'popoutWidth',
+      '--feature-min': 'featureMin',
+      '--feature-scale': 'featureScale',
+      '--feature-max': 'featureMax',
+      '--full-limit': 'fullLimit',
+      '--breakout-min': 'breakoutMin',
+      '--breakout-scale': 'breakoutScale',
+      '--default-col': 'defaultCol',
+    };
+
+    const gapScaleMap = {
+      '--gap-scale-default': 'default',
+      '--gap-scale-lg': 'lg',
+      '--gap-scale-xl': 'xl',
+    };
+
+    const breakpointMap = {
+      '--breakpoint-lg': 'lg',
+      '--breakpoint-xl': 'xl',
+    };
+
+    // Parse CSS variable declarations (including commented ones for breakpoints)
+    // Matches: --var-name: value; OR /* --var-name: value; */
+    const varRegex = /(?:\/\*\s*)?(--[\w-]+)\s*:\s*([^;*]+);?\s*(?:\*\/)?/g;
+    let match;
+    let foundAny = false;
+
+    while ((match = varRegex.exec(str)) !== null) {
+      const [, varName, value] = match;
+      let trimmedValue = value.trim();
+      foundAny = true;
+
+      if (varMap[varName]) {
+        config[varMap[varName]] = trimmedValue;
+      } else if (gapScaleMap[varName]) {
+        config.gapScale[gapScaleMap[varName]] = trimmedValue;
+      } else if (breakpointMap[varName]) {
+        // Strip 'px' suffix for breakpoints
+        config.breakpoints[breakpointMap[varName]] = trimmedValue.replace(/px$/, '');
+      }
     }
 
-    // Convert to valid JSON:
-    str = str
-      // Strip single-line comments (// ...)
-      .replace(/\/\/.*$/gm, '')
-      // Strip multi-line comments (/* ... */)
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      // Handle keys without quotes: "  key:" -> "  "key":"
-      .replace(/^\s*(\w+)\s*:/gm, '"$1":')
-      // Convert single quotes to double quotes for values
-      .replace(/'/g, '"')
-      // Remove trailing commas before } or ]
-      .replace(/,(\s*[}\]])/g, '$1');
-
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      throw new Error('Invalid config format. Paste the output from "Copy Config".');
+    if (!foundAny) {
+      throw new Error('Invalid format. Paste CSS variables from "Copy Variables".');
     }
+
+    return config;
   },
 
   // Open restore modal
@@ -640,6 +707,16 @@ export const methods = {
         this.editValues.breakout_scale = config.breakoutScale;
       }
       this.updateBreakoutLive();
+
+      // Apply breakpoint values
+      if (config.breakpoints) {
+        if (config.breakpoints.lg !== undefined) {
+          this.editValues.breakpoint_lg = config.breakpoints.lg;
+        }
+        if (config.breakpoints.xl !== undefined) {
+          this.editValues.breakpoint_xl = config.breakpoints.xl;
+        }
+      }
 
       // Update column widths display
       this.updateColumnWidths();
