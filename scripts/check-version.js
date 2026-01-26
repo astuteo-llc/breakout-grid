@@ -8,6 +8,10 @@ import { readFileSync } from 'fs';
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const expectedVersion = pkg.version;
 
+// Check for version strings in built files
+// The patterns match how Vite injects __VERSION__ placeholder:
+//   `v${"5.0.0"}` - template literal syntax preserved in IIFE output
+//   "5.0.0" - string literal for BUILD_VERSION constant
 const files = [
   { path: 'breakout-grid-visualizer.js', pattern: /const VERSION = `v\$\{"([^"]+)"\}`/ },
   { path: 'breakout-grid-visualizer.js', pattern: /const BUILD_VERSION = "([^"]+)"/ },
@@ -38,7 +42,11 @@ for (const { path, pattern } of files) {
       console.log(`✅ ${path}: v${foundVersion}`);
     }
   } catch (err) {
-    console.error(`❌ ${path}: ${err.message}`);
+    if (err.code === 'ENOENT') {
+      console.error(`❌ ${path}: File not found. Run "npm run build" to generate it.`);
+    } else {
+      console.error(`❌ ${path}: ${err.message}`);
+    }
     hasError = true;
   }
 }
