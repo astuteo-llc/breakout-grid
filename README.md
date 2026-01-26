@@ -12,12 +12,41 @@ Inspired by [Viget's Fluid Breakout Layout](https://www.viget.com/articles/fluid
 - **CSS variables** - Customize by overriding `:root` properties
 - **Visual configurator** - Optional tool for experimenting and exporting
 
-## Quick Start
+## Installation
 
-1. Add the CSS:
+### CDN / Direct Download
+
+Download the CSS file and include it directly:
+
 ```html
 <link rel="stylesheet" href="_objects.breakout-grid.css">
 ```
+
+### npm
+
+```bash
+npm install github:astuteo-llc/breakout-grid
+```
+
+Import the CSS in your build:
+
+```js
+import '@astuteo/breakout-grid'
+// or
+import '@astuteo/breakout-grid/css'
+```
+
+For the visualizer:
+
+```js
+import '@astuteo/breakout-grid/visualizer'
+// or lite version
+import '@astuteo/breakout-grid/visualizer-lite'
+```
+
+## Quick Start
+
+1. Add the CSS (see Installation above)
 
 2. Use the grid:
 ```html
@@ -99,10 +128,25 @@ See the CSS file header for the complete list.
 Want to experiment with values before committing? Use the visualizer:
 
 ```html
-<script src="breakout-grid-visualizer.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script defer src="breakout-grid-visualizer.js"></script>
 ```
 
 Press `Ctrl+G` / `Cmd+G` to toggle. Adjust values interactively, then click **Export CSS** to download your customized stylesheet.
+
+### With Alpine.js (Vite)
+
+If your project already uses Alpine, import the visualizer before `Alpine.start()`:
+
+```js
+import Alpine from 'alpinejs'
+
+if (import.meta.env.DEV) {
+  await import('@astuteo/breakout-grid/visualizer')
+}
+
+Alpine.start()
+```
 
 Two versions available:
 
