@@ -159,7 +159,7 @@ plugins: [
 
 2. Add the CSS file:
 ```html
-<link rel="stylesheet" href="breakout-grid.css">
+<link rel="stylesheet" href="_objects.breakout-grid.css">
 ```
 
 3. All class names are identical—no HTML changes needed.
