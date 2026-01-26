@@ -55,6 +55,7 @@
     "build:css": "node scripts/build-css.js",
     "build:full": "vite build",
     "build:lite": "vite build --mode lite",
+    "check-version": "node scripts/check-version.js",
     "prepublishOnly": "npm run build && npm run check-files",
     "check-files": "npm pack --dry-run",
     "release": "npm run build && npm run check-files",
