@@ -22,7 +22,8 @@ const defaults = {
   defaultCol: 'content',
   gapScale: { default: '4vw', lg: '5vw', xl: '6vw' },
   breakoutMin: '1rem',
-  breakoutScale: '5vw'
+  breakoutScale: '5vw',
+  breakpoints: { lg: '1024px', xl: '1280px' }
 };
 
 mkdirSync('dist', { recursive: true });
