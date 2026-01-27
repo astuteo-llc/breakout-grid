@@ -907,39 +907,28 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       const section = this.configSections[sectionName];
       if (!section) return;
       const lines = [];
-      const varNames = {
-        contentMin: "--content-min",
-        contentBase: "--content-base",
-        contentMax: "--content-max",
-        defaultCol: "--default-col",
-        popoutWidth: "--popout-width",
-        fullLimit: "--full-limit",
-        featureMin: "--feature-min",
-        featureScale: "--feature-scale",
-        featureMax: "--feature-max",
-        baseGap: "--base-gap",
-        maxGap: "--max-gap",
-        breakoutMin: "--breakout-min",
-        breakoutScale: "--breakout-scale"
-      };
       section.keys.forEach((key) => {
-        let value;
+        let value, varName;
         if (this.configOptions[key]) {
           value = this.editValues[key] || this.configOptions[key].value;
+          varName = this.configOptions[key].liveVar;
         } else if (key === "breakoutMin") {
           value = this.editValues.breakout_min || this.breakoutOptions.min.value;
+          varName = this.breakoutOptions.min.liveVar;
         } else if (key === "breakoutScale") {
           value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+          varName = this.breakoutOptions.scale.liveVar;
         }
-        if (varNames[key]) {
-          lines.push(`${varNames[key]}: ${value};`);
+        if (varName) {
+          lines.push(`${varName}: ${value};`);
         }
       });
       if (section.nested) {
         Object.keys(section.nested).forEach((nestedKey) => {
           section.nested[nestedKey].forEach((subKey) => {
-            const value = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
-            lines.push(`--gap-scale-${subKey}: ${value};`);
+            const opt = this.gapScaleOptions[subKey];
+            const value = this.editValues[`gapScale_${subKey}`] || opt.value;
+            lines.push(`${opt.liveVar}: ${value};`);
           });
         });
       }
@@ -2327,7 +2316,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             </div>
           </div>
 
-          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale</div>
+          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale (Gap)</div>
           <div style="font-size: 9px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4;">Fluid value (vw) that grows with viewport.</div>
           <template x-for="key in Object.keys(gapScaleOptions)" :key="'ed_gs_'+key">
             <div :style="{

@@ -178,42 +178,29 @@ export const methods = {
 
     const lines = [];
 
-    // Map config keys to CSS variable names
-    const varNames = {
-      contentMin: '--content-min',
-      contentBase: '--content-base',
-      contentMax: '--content-max',
-      defaultCol: '--default-col',
-      popoutWidth: '--popout-width',
-      fullLimit: '--full-limit',
-      featureMin: '--feature-min',
-      featureScale: '--feature-scale',
-      featureMax: '--feature-max',
-      baseGap: '--base-gap',
-      maxGap: '--max-gap',
-      breakoutMin: '--breakout-min',
-      breakoutScale: '--breakout-scale',
-    };
-
     section.keys.forEach(key => {
-      let value;
+      let value, varName;
       if (this.configOptions[key]) {
         value = this.editValues[key] || this.configOptions[key].value;
+        varName = this.configOptions[key].liveVar;
       } else if (key === 'breakoutMin') {
         value = this.editValues.breakout_min || this.breakoutOptions.min.value;
+        varName = this.breakoutOptions.min.liveVar;
       } else if (key === 'breakoutScale') {
         value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+        varName = this.breakoutOptions.scale.liveVar;
       }
-      if (varNames[key]) {
-        lines.push(`${varNames[key]}: ${value};`);
+      if (varName) {
+        lines.push(`${varName}: ${value};`);
       }
     });
 
     if (section.nested) {
       Object.keys(section.nested).forEach(nestedKey => {
         section.nested[nestedKey].forEach(subKey => {
-          const value = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
-          lines.push(`--gap-scale-${subKey}: ${value};`);
+          const opt = this.gapScaleOptions[subKey];
+          const value = this.editValues[`gapScale_${subKey}`] || opt.value;
+          lines.push(`${opt.liveVar}: ${value};`);
         });
       });
     }
