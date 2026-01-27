@@ -1,18 +1,10 @@
-/**
- * Breakout Grid Visualizer - Methods
- * All component methods
- */
-
 export const methods = {
-  // Initialize
   init() {
-    // Load saved state
     const saved = localStorage.getItem('breakoutGridVisualizerVisible');
     if (saved !== null) {
       this.isVisible = saved === 'true';
     }
 
-    // Load config editor state
     const editorOpen = localStorage.getItem('breakoutGridEditorOpen');
     if (editorOpen === 'true') {
       this.showEditor = true;
@@ -20,7 +12,6 @@ export const methods = {
       this.$nextTick(() => this.loadCurrentValues());
     }
 
-    // Load saved config from localStorage
     const savedConfig = localStorage.getItem('breakoutGridConfig');
     if (savedConfig) {
       try {
@@ -29,7 +20,6 @@ export const methods = {
       } catch (e) {}
     }
 
-    // Load config editor position
     const editorPos = localStorage.getItem('breakoutGridEditorPos');
     if (editorPos) {
       try {
@@ -37,7 +27,6 @@ export const methods = {
       } catch (e) {}
     }
 
-    // Load spacing panel position and state
     const spacingPos = localStorage.getItem('breakoutGridSpacingPos');
     if (spacingPos) {
       try {
@@ -49,7 +38,6 @@ export const methods = {
       this.spacingPanelCollapsed = spacingCollapsed === 'true';
     }
 
-    // Keyboard shortcut: Ctrl/Cmd + G
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
         e.preventDefault();
@@ -57,7 +45,6 @@ export const methods = {
       }
     });
 
-    // Update viewport width, column widths, and breakpoint on resize
     window.addEventListener('resize', () => {
       this.viewportWidth = window.innerWidth;
       this.updateColumnWidths();
@@ -67,19 +54,15 @@ export const methods = {
       }
     });
 
-    // Initialize breakpoint
     this.updateCurrentBreakpoint();
-
     console.log('Breakout Grid Visualizer loaded. Press Ctrl/Cmd + G to toggle.');
   },
 
-  // Toggle visibility
   toggle() {
     this.isVisible = !this.isVisible;
     localStorage.setItem('breakoutGridVisualizerVisible', this.isVisible);
   },
 
-  // Update column widths by querying DOM elements
   updateColumnWidths() {
     this.$nextTick(() => {
       this.gridAreas.forEach(area => {
@@ -91,7 +74,6 @@ export const methods = {
     });
   },
 
-  // Detect current breakpoint based on viewport width
   updateCurrentBreakpoint() {
     const width = window.innerWidth;
     if (width >= 1280) {
@@ -103,7 +85,6 @@ export const methods = {
     }
   },
 
-  // Update --gap live based on current breakpoint and edit values
   updateGapLive() {
     const scaleKey = this.currentBreakpoint === 'mobile' ? 'default' : this.currentBreakpoint;
     const base = this.editValues.baseGap || this.configOptions.baseGap.value;
@@ -114,7 +95,6 @@ export const methods = {
     this.updateColumnWidths();
   },
 
-  // Check if content width exceeds comfortable reading width (55rem)
   getContentReadabilityWarning() {
     const contentMax = parseFloat(this.editValues.contentMax || this.configOptions.contentMax.value);
     if (contentMax > 55) {
@@ -123,13 +103,11 @@ export const methods = {
     return null;
   },
 
-  // Check if configured track widths would exceed viewport
   getTrackOverflowWarning() {
     const contentMax = parseFloat(this.editValues.contentMax || this.configOptions.contentMax.value) * 16;
     const featureMax = parseFloat(this.editValues.featureMax || this.configOptions.featureMax.value) * 16;
     const popoutWidth = parseFloat(this.editValues.popoutWidth || this.configOptions.popoutWidth.value) * 16;
 
-    // Feature max is in rem, convert to px
     const featurePx = featureMax * 2;
     const popoutPx = popoutWidth * 2;
     const totalFixed = contentMax + featurePx + popoutPx;
@@ -140,13 +118,11 @@ export const methods = {
     return null;
   },
 
-  // Get computed CSS variable value
   getCSSVariable(varName) {
     const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     return value || 'Not set';
   },
 
-  // Helper to load options from CSS variables
   loadOptionsFromCSS(options, prefix = '') {
     Object.keys(options).forEach(key => {
       const opt = options[key];
@@ -160,14 +136,12 @@ export const methods = {
     });
   },
 
-  // Load current values from CSS variables where available
   loadCurrentValues() {
     this.loadOptionsFromCSS(this.configOptions);
     this.loadOptionsFromCSS(this.gapScaleOptions, 'gapScale');
     this.loadOptionsFromCSS(this.breakoutOptions, 'breakout');
   },
 
-  // Generate export config object
   generateConfigExport() {
     const config = {};
     Object.keys(this.configOptions).forEach(key => {
@@ -177,10 +151,8 @@ export const methods = {
     Object.keys(this.gapScaleOptions).forEach(key => {
       config.gapScale[key] = this.editValues[`gapScale_${key}`] || this.gapScaleOptions[key].value;
     });
-    // Add breakout values
     config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
     config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-    // Add breakpoint values
     config.breakpoints = {
       lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || '1024',
       xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || '1280',
@@ -188,7 +160,6 @@ export const methods = {
     return config;
   },
 
-  // Format config object with single quotes for values, no quotes for keys
   formatConfig(obj, indent = 2) {
     const pad = ' '.repeat(indent);
     const lines = ['{'];
@@ -205,43 +176,20 @@ export const methods = {
     return lines.join('\n');
   },
 
-  // Section definitions for partial copying
   configSections: {
-    content: {
-      keys: ['contentMin', 'contentBase', 'contentMax'],
-      label: 'Content'
-    },
-    defaultCol: {
-      keys: ['defaultCol'],
-      label: 'Default Column'
-    },
-    tracks: {
-      keys: ['popoutWidth', 'fullLimit'],
-      label: 'Track Widths'
-    },
-    feature: {
-      keys: ['featureMin', 'featureScale', 'featureMax'],
-      label: 'Feature'
-    },
-    gap: {
-      keys: ['baseGap', 'maxGap'],
-      nested: { gapScale: ['default', 'lg', 'xl'] },
-      label: 'Gap'
-    },
-    breakout: {
-      keys: ['breakoutMin', 'breakoutScale'],
-      label: 'Breakout'
-    }
+    content: { keys: ['contentMin', 'contentBase', 'contentMax'], label: 'Content' },
+    defaultCol: { keys: ['defaultCol'], label: 'Default Column' },
+    tracks: { keys: ['popoutWidth', 'fullLimit'], label: 'Track Widths' },
+    feature: { keys: ['featureMin', 'featureScale', 'featureMax'], label: 'Feature' },
+    gap: { keys: ['baseGap', 'maxGap'], nested: { gapScale: ['default', 'lg', 'xl'] }, label: 'Gap' },
+    breakout: { keys: ['breakoutMin', 'breakoutScale'], label: 'Breakout' }
   },
 
-  // Copy a specific section to clipboard
   copySection(sectionName) {
     const section = this.configSections[sectionName];
     if (!section) return;
 
     const config = {};
-
-    // Add direct keys
     section.keys.forEach(key => {
       if (this.configOptions[key]) {
         config[key] = this.editValues[key] || this.configOptions[key].value;
@@ -252,7 +200,6 @@ export const methods = {
       }
     });
 
-    // Add nested keys (like gapScale)
     if (section.nested) {
       Object.keys(section.nested).forEach(nestedKey => {
         config[nestedKey] = {};
@@ -269,7 +216,6 @@ export const methods = {
     });
   },
 
-  // Format config as flat key-value pairs (no wrapping braces)
   formatConfigFlat(obj) {
     const lines = [];
     const entries = Object.entries(obj);
@@ -284,7 +230,6 @@ export const methods = {
     return lines.join('\n');
   },
 
-  // Copy config to clipboard as CSS variables
   copyConfig() {
     const config = this.generateConfigExport();
     const lines = [
@@ -325,7 +270,6 @@ export const methods = {
     });
   },
 
-  // Generate and download standalone CSS file
   downloadCSS() {
     const css = this.generateCSSExport(this.generateConfigExport());
     const blob = new Blob([css], { type: 'text/css' });
@@ -337,7 +281,6 @@ export const methods = {
     URL.revokeObjectURL(url);
   },
 
-  // Parse CSS value into number and unit (e.g., "4rem" -> { num: 4, unit: "rem" })
   parseValue(val) {
     const match = String(val).match(/^([\d.]+)(.*)$/);
     if (match) {
@@ -346,36 +289,29 @@ export const methods = {
     return { num: 0, unit: 'rem' };
   },
 
-  // Get the numeric part of a config value
   getNumericValue(key) {
     const val = this.editValues[key] || this.configOptions[key].value;
     return this.parseValue(val).num;
   },
 
-  // Get the unit part of a config value
   getUnit(key) {
     const val = this.editValues[key] || this.configOptions[key].value;
     return this.parseValue(val).unit;
   },
 
-  // Check if a field should have unit selection (rem-based fields only)
   hasUnitSelector(key) {
     const unit = this.getUnit(key);
     return unit === 'rem' || unit === 'ch' || unit === 'px';
   },
 
-  // Available units for selection
   unitOptions: ['rem', 'ch', 'px'],
 
-  // Update just the unit, keeping the numeric value
   updateUnit(key, newUnit) {
     const num = this.getNumericValue(key);
     this.updateConfigValue(key, num + newUnit);
   },
 
-  // Update just the numeric part, keeping the unit
   updateNumericValue(key, num) {
-    // Enforce minimums for certain fields
     if (key === 'content' && num < 1) num = 1;
     if (key === 'baseGap' && num < 0) num = 0;
     if (key === 'popoutWidth' && num < 0) num = 0;
@@ -384,7 +320,6 @@ export const methods = {
     this.updateConfigValue(key, num + unit);
   },
 
-  // Generic getter for prefixed options (gapScale, breakout)
   getPrefixedNumeric(prefix, options, key) {
     const val = this.editValues[`${prefix}_${key}`] || options[key].value;
     return this.parseValue(val).num;
@@ -395,7 +330,6 @@ export const methods = {
     return this.parseValue(val).unit;
   },
 
-  // Gap scale helpers (use generic)
   getGapScaleNumeric(key) { return this.getPrefixedNumeric('gapScale', this.gapScaleOptions, key); },
   getGapScaleUnit(key) { return this.getPrefixedUnit('gapScale', this.gapScaleOptions, key); },
   updateGapScaleNumeric(key, num) {
@@ -405,7 +339,6 @@ export const methods = {
     this.saveConfigToStorage();
   },
 
-  // Breakout helpers (use generic)
   getBreakoutNumeric(key) { return this.getPrefixedNumeric('breakout', this.breakoutOptions, key); },
   getBreakoutUnit(key) { return this.getPrefixedUnit('breakout', this.breakoutOptions, key); },
   updateBreakoutNumeric(key, num) {
@@ -415,7 +348,6 @@ export const methods = {
     this.saveConfigToStorage();
   },
 
-  // Update --breakout-padding live
   updateBreakoutLive() {
     const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
     const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
@@ -423,17 +355,14 @@ export const methods = {
     document.documentElement.style.setProperty('--breakout-padding', `clamp(${min}, ${scale}, ${max})`);
   },
 
-  // Save current config to localStorage
   saveConfigToStorage() {
     const config = this.generateConfigExport();
     localStorage.setItem('breakoutGridConfig', JSON.stringify(config));
   },
 
-  // Apply a config object (used by restore and localStorage load)
   applyConfig(config) {
     this.editMode = true;
 
-    // Apply main config values
     Object.keys(this.configOptions).forEach(key => {
       if (config[key] !== undefined) {
         this.editValues[key] = config[key];
@@ -444,7 +373,7 @@ export const methods = {
       }
     });
 
-    // Apply track widths with minmax wrapper
+    // Track widths need minmax wrapper for CSS grid
     if (config.popoutWidth) {
       document.documentElement.style.setProperty('--popout', `minmax(0, ${config.popoutWidth})`);
     }
@@ -455,7 +384,6 @@ export const methods = {
       document.documentElement.style.setProperty('--feature', `minmax(0, clamp(${featureMin}, ${featureScale}, ${featureMax}))`);
     }
 
-    // Apply gapScale values
     if (config.gapScale) {
       Object.keys(this.gapScaleOptions).forEach(key => {
         if (config.gapScale[key] !== undefined) {
@@ -465,7 +393,6 @@ export const methods = {
       this.updateGapLive();
     }
 
-    // Apply breakout values
     if (config.breakoutMin !== undefined) {
       this.editValues.breakout_min = config.breakoutMin;
     }
@@ -474,7 +401,6 @@ export const methods = {
     }
     this.updateBreakoutLive();
 
-    // Apply breakpoint values
     if (config.breakpoints) {
       if (config.breakpoints.lg !== undefined) {
         this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -487,7 +413,6 @@ export const methods = {
     this.updateColumnWidths();
   },
 
-  // Reset config to defaults and clear localStorage
   resetConfigToDefaults() {
     if (!confirm('Reset all config values to defaults?')) return;
     localStorage.removeItem('breakoutGridConfig');
@@ -496,19 +421,18 @@ export const methods = {
     this.configCopied = false;
   },
 
-  // Update a config value (and live CSS var if applicable)
   updateConfigValue(key, value) {
     this.editValues[key] = value;
-    this.configCopied = false; // Mark as unsaved
+    this.configCopied = false;
     this.saveConfigToStorage();
     const opt = this.configOptions[key];
     if (opt && opt.liveVar) {
       document.documentElement.style.setProperty(opt.liveVar, value);
     }
-    // Special handling for track widths (need minmax wrapper)
+    // Track widths need minmax wrapper for CSS grid
     if (key === 'popoutWidth') {
       document.documentElement.style.setProperty('--popout', `minmax(0, ${value})`);
-      this.updateBreakoutLive(); // Update breakout padding with new popout ceiling
+      this.updateBreakoutLive();
     }
     if (key === 'featureMin' || key === 'featureScale' || key === 'featureMax') {
       const featureMin = this.editValues.featureMin || this.configOptions.featureMin.value;
@@ -519,23 +443,19 @@ export const methods = {
     if (key === 'content') {
       document.documentElement.style.setProperty('--content', `minmax(0, ${value})`);
     }
-    // Update gap live when min/max change
     if (key === 'baseGap' || key === 'maxGap') {
       this.updateGapLive();
     }
   },
 
-  // Select a grid area
   selectArea(areaName) {
     this.selectedArea = this.selectedArea === areaName ? null : areaName;
   },
 
-  // Check if area is selected
   isSelected(areaName) {
     return this.selectedArea === areaName;
   },
 
-  // Restore all CSS variable overrides to original values
   restoreCSSVariables() {
     Object.keys(this.configOptions).forEach(key => {
       const opt = this.configOptions[key];
@@ -543,7 +463,6 @@ export const methods = {
         document.documentElement.style.removeProperty(opt.liveVar);
       }
     });
-    // Also restore track widths (set via minmax wrapper)
     document.documentElement.style.removeProperty('--popout');
     document.documentElement.style.removeProperty('--feature');
     document.documentElement.style.removeProperty('--content');
@@ -553,7 +472,6 @@ export const methods = {
     this.configCopied = false;
   },
 
-  // Toggle edit mode
   toggleEditMode() {
     this.editMode = !this.editMode;
     if (this.editMode) {
@@ -563,12 +481,10 @@ export const methods = {
     }
   },
 
-  // Check if any values have been edited and not yet copied
   hasUnsavedEdits() {
     return Object.keys(this.editValues).length > 0 && !this.configCopied;
   },
 
-  // Open floating editor
   openEditor() {
     this.showEditor = true;
     this.editMode = true;
@@ -576,7 +492,6 @@ export const methods = {
     localStorage.setItem('breakoutGridEditorOpen', 'true');
   },
 
-  // Close floating editor
   closeEditor(force = false) {
     if (!force && this.hasUnsavedEdits()) {
       this.showCloseWarningModal = true;
@@ -588,7 +503,6 @@ export const methods = {
     localStorage.setItem('breakoutGridEditorOpen', 'false');
   },
 
-  // Close warning modal actions
   closeWarningCopyAndClose() {
     this.copyConfig();
     this.showCloseWarningModal = false;
@@ -604,7 +518,6 @@ export const methods = {
     this.showCloseWarningModal = false;
   },
 
-  // Generic drag handling for panels
   _dragConfigs: {
     editor: { pos: 'editorPos', dragging: 'isDragging', offset: 'dragOffset', storage: 'breakoutGridEditorPos' },
     spacing: { pos: 'spacingPanelPos', dragging: 'isDraggingSpacing', offset: 'dragOffsetSpacing', storage: 'breakoutGridSpacingPos' }
@@ -629,24 +542,20 @@ export const methods = {
     this[cfg.dragging] = false;
   },
 
-  // Editor drag (shorthand)
   startDrag(e) { this.startPanelDrag(e, 'editor'); },
   onDrag(e) { this.onPanelDrag(e, 'editor'); },
   stopDrag() { this.stopPanelDrag('editor'); },
 
-  // Spacing drag (shorthand)
   startDragSpacing(e) { this.startPanelDrag(e, 'spacing'); },
   onDragSpacing(e) { this.onPanelDrag(e, 'spacing'); },
   stopDragSpacing() { this.stopPanelDrag('spacing'); },
 
-  // Column resize drag handling
   startColumnResize(e, columnType) {
     if (!this.editMode) return;
     e.preventDefault();
     e.stopPropagation();
     this.resizingColumn = columnType;
     this.resizeStartX = e.clientX;
-    // Get current value
     const currentVal = this.editValues[columnType] || this.configOptions[columnType].value;
     this.resizeStartValue = this.parseValue(currentVal).num;
   },
@@ -657,7 +566,6 @@ export const methods = {
     const col = this.resizingColumn;
     const unit = this.getUnit(col);
 
-    // Calculate pixels per unit
     let pxPerUnit;
     if (unit === 'vw') {
       pxPerUnit = window.innerWidth / 100;
@@ -667,16 +575,12 @@ export const methods = {
       pxPerUnit = 1;
     }
 
-    // For right-edge handles (contentMax, contentBase), dragging right increases value
-    // For left-edge handles (contentMin, others), dragging left increases value (inverted)
+    // Right-edge handles: drag right = increase; left-edge: drag left = increase
     const isRightHandle = col === 'contentMax' || col === 'contentBase';
     const delta = isRightHandle ? (deltaX / pxPerUnit) : (-deltaX / pxPerUnit);
     let newValue = this.resizeStartValue + delta;
 
-    // Enforce minimums
     if (newValue < 0) newValue = 0;
-
-    // Round to 1 decimal
     newValue = Math.round(newValue * 10) / 10;
 
     this.updateConfigValue(col, newValue + unit);
@@ -687,24 +591,19 @@ export const methods = {
     this.resizingColumn = null;
   },
 
-  // Map column names to their config keys for resizing
   getResizeConfig(colName) {
     const map = {
       'full-limit': 'fullLimit',
       'feature': 'featureScale',
       'popout': 'popoutWidth'
-      // content has its own integrated handles for min/max/base
-      // feature has its own integrated handles for min/scale/max
     };
     return map[colName] || null;
   },
 
-  // Parse a CSS variables string into a config object
   parseConfigString(input) {
     const str = input.trim();
     const config = { gapScale: {}, breakpoints: {} };
 
-    // Map CSS variable names to config keys
     const varMap = {
       '--base-gap': 'baseGap',
       '--max-gap': 'maxGap',
@@ -732,7 +631,6 @@ export const methods = {
       '--breakpoint-xl': 'xl',
     };
 
-    // Parse CSS variable declarations (including commented ones for breakpoints)
     // Matches: --var-name: value; OR /* --var-name: value; */
     const varRegex = /(?:\/\*\s*)?(--[\w-]+)\s*:\s*([^;*]+);?\s*(?:\*\/)?/g;
     let match;
@@ -748,7 +646,6 @@ export const methods = {
       } else if (gapScaleMap[varName]) {
         config.gapScale[gapScaleMap[varName]] = trimmedValue;
       } else if (breakpointMap[varName]) {
-        // Strip 'px' suffix for breakpoints
         config.breakpoints[breakpointMap[varName]] = trimmedValue.replace(/px$/, '');
       }
     }
@@ -760,28 +657,24 @@ export const methods = {
     return config;
   },
 
-  // Open restore modal
   openRestoreModal() {
     this.showRestoreModal = true;
     this.restoreInput = '';
     this.restoreError = null;
   },
 
-  // Close restore modal
   closeRestoreModal() {
     this.showRestoreModal = false;
     this.restoreInput = '';
     this.restoreError = null;
   },
 
-  // Apply a parsed config to the editor
   restoreConfig() {
     this.restoreError = null;
 
     try {
       const config = this.parseConfigString(this.restoreInput);
 
-      // Apply main config values
       Object.keys(this.configOptions).forEach(key => {
         if (config[key] !== undefined) {
           this.editValues[key] = config[key];
@@ -789,7 +682,6 @@ export const methods = {
         }
       });
 
-      // Apply gapScale values
       if (config.gapScale) {
         Object.keys(this.gapScaleOptions).forEach(key => {
           if (config.gapScale[key] !== undefined) {
@@ -799,7 +691,6 @@ export const methods = {
         this.updateGapLive();
       }
 
-      // Apply breakout values
       if (config.breakoutMin !== undefined) {
         this.editValues.breakout_min = config.breakoutMin;
       }
@@ -808,7 +699,6 @@ export const methods = {
       }
       this.updateBreakoutLive();
 
-      // Apply breakpoint values
       if (config.breakpoints) {
         if (config.breakpoints.lg !== undefined) {
           this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -818,10 +708,7 @@ export const methods = {
         }
       }
 
-      // Update column widths display
       this.updateColumnWidths();
-
-      // Close modal on success
       this.closeRestoreModal();
       this.configCopied = false;
 

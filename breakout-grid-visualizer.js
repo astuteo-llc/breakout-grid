@@ -12,19 +12,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     { name: "content", label: "Content", className: ".col-content", color: "rgba(168, 85, 247, 0.25)", borderColor: "rgb(168, 85, 247)" }
   ];
   const CONFIG_OPTIONS = {
-    // Base measurements
     baseGap: { value: "1rem", desc: "Minimum gap between columns. Use rem.", cssVar: "--config-base-gap", liveVar: "--base-gap" },
     maxGap: { value: "15rem", desc: "Maximum gap cap for ultra-wide. Use rem.", cssVar: "--config-max-gap", liveVar: "--max-gap" },
     contentMin: { value: "50rem", desc: "Min width for content column (~848px). Use rem.", cssVar: "--config-content-min", liveVar: "--content-min" },
     contentMax: { value: "55rem", desc: "Max width for content column (~976px). Use rem.", cssVar: "--config-content-max", liveVar: "--content-max" },
     contentBase: { value: "75vw", desc: "Preferred width for content (fluid). Use vw.", cssVar: "--config-content-base", liveVar: "--content-base" },
-    // Track widths
     popoutWidth: { value: "5rem", desc: "Popout extends beyond content. Use rem.", cssVar: "--config-popout", liveVar: null },
     featureMin: { value: "0rem", desc: "Minimum feature track width (floor)", cssVar: "--config-feature-min", liveVar: null },
     featureScale: { value: "12vw", desc: "Fluid feature track scaling", cssVar: "--config-feature-scale", liveVar: null },
     featureMax: { value: "12rem", desc: "Maximum feature track width (ceiling)", cssVar: "--config-feature-max", liveVar: null },
     fullLimit: { value: "115rem", desc: "Max width for col-full-limit. Use rem.", cssVar: "--config-full-limit", liveVar: "--full-limit" },
-    // Default column
     defaultCol: { value: "content", desc: "Default column when no col-* class", type: "select", options: ["content", "popout", "feature", "full"], cssVar: "--config-default-col" }
   };
   const GAP_SCALE_OPTIONS = {
@@ -43,7 +40,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   };
   function createInitialState() {
     return {
-      // UI State
       isVisible: false,
       showLabels: true,
       showClassNames: true,
@@ -65,37 +61,25 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       editorPos: { x: 20, y: 100 },
       isDragging: false,
       dragOffset: { x: 0, y: 0 },
-      // Column resize drag state
       resizingColumn: null,
       resizeStartX: 0,
       resizeStartValue: 0,
-      // Panel collapse state
       controlPanelCollapsed: false,
       configEditorCollapsed: false,
-      // Computed column widths in pixels (pre-initialized for reactivity)
-      columnWidths: {
-        full: 0,
-        "full-limit": 0,
-        feature: 0,
-        popout: 0,
-        content: 0,
-        center: 0
-      },
-      // Current breakpoint for gap scale (mobile, lg, xl)
+      // Pre-initialized for Alpine reactivity
+      columnWidths: { full: 0, "full-limit": 0, feature: 0, popout: 0, content: 0, center: 0 },
       currentBreakpoint: "mobile",
-      // Spacing panel state
       spacingPanelCollapsed: false,
       spacingPanelPos: { x: 16, y: 16 },
       isDraggingSpacing: false,
       dragOffsetSpacing: { x: 0, y: 0 },
-      // Restore config modal
       showRestoreModal: false,
       restoreInput: "",
       restoreError: null,
-      // Section copy feedback
       sectionCopied: null,
-      // Close warning modal
-      showCloseWarningModal: false
+      showCloseWarningModal: false,
+      gridOpacity: 0.8,
+      backdropOpacity: 0.85
     };
   }
   const BUILD_VERSION = "5.1.1";
@@ -765,7 +749,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 `;
   }
   const methods = {
-    // Initialize
     init() {
       const saved = localStorage.getItem("breakoutGridVisualizerVisible");
       if (saved !== null) {
@@ -820,12 +803,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.updateCurrentBreakpoint();
       console.log("Breakout Grid Visualizer loaded. Press Ctrl/Cmd + G to toggle.");
     },
-    // Toggle visibility
     toggle() {
       this.isVisible = !this.isVisible;
       localStorage.setItem("breakoutGridVisualizerVisible", this.isVisible);
     },
-    // Update column widths by querying DOM elements
     updateColumnWidths() {
       this.$nextTick(() => {
         this.gridAreas.forEach((area) => {
@@ -836,7 +817,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         });
       });
     },
-    // Detect current breakpoint based on viewport width
     updateCurrentBreakpoint() {
       const width = window.innerWidth;
       if (width >= 1280) {
@@ -847,7 +827,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         this.currentBreakpoint = "mobile";
       }
     },
-    // Update --gap live based on current breakpoint and edit values
     updateGapLive() {
       const scaleKey = this.currentBreakpoint === "mobile" ? "default" : this.currentBreakpoint;
       const base = this.editValues.baseGap || this.configOptions.baseGap.value;
@@ -856,7 +835,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       document.documentElement.style.setProperty("--gap", `clamp(${base}, ${scale}, ${max})`);
       this.updateColumnWidths();
     },
-    // Check if content width exceeds comfortable reading width (55rem)
     getContentReadabilityWarning() {
       const contentMax = parseFloat(this.editValues.contentMax || this.configOptions.contentMax.value);
       if (contentMax > 55) {
@@ -864,7 +842,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       return null;
     },
-    // Check if configured track widths would exceed viewport
     getTrackOverflowWarning() {
       const contentMax = parseFloat(this.editValues.contentMax || this.configOptions.contentMax.value) * 16;
       const featureMax = parseFloat(this.editValues.featureMax || this.configOptions.featureMax.value) * 16;
@@ -877,12 +854,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       return null;
     },
-    // Get computed CSS variable value
     getCSSVariable(varName) {
       const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
       return value || "Not set";
     },
-    // Helper to load options from CSS variables
     loadOptionsFromCSS(options, prefix = "") {
       Object.keys(options).forEach((key) => {
         const opt = options[key];
@@ -895,13 +870,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         }
       });
     },
-    // Load current values from CSS variables where available
     loadCurrentValues() {
       this.loadOptionsFromCSS(this.configOptions);
       this.loadOptionsFromCSS(this.gapScaleOptions, "gapScale");
       this.loadOptionsFromCSS(this.breakoutOptions, "breakout");
     },
-    // Generate export config object
     generateConfigExport() {
       var _a, _b, _c, _d;
       const config = {};
@@ -920,7 +893,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       };
       return config;
     },
-    // Format config object with single quotes for values, no quotes for keys
     formatConfig(obj, indent = 2) {
       const pad = " ".repeat(indent);
       const lines = ["{"];
@@ -936,35 +908,14 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       lines.push("}");
       return lines.join("\n");
     },
-    // Section definitions for partial copying
     configSections: {
-      content: {
-        keys: ["contentMin", "contentBase", "contentMax"],
-        label: "Content"
-      },
-      defaultCol: {
-        keys: ["defaultCol"],
-        label: "Default Column"
-      },
-      tracks: {
-        keys: ["popoutWidth", "fullLimit"],
-        label: "Track Widths"
-      },
-      feature: {
-        keys: ["featureMin", "featureScale", "featureMax"],
-        label: "Feature"
-      },
-      gap: {
-        keys: ["baseGap", "maxGap"],
-        nested: { gapScale: ["default", "lg", "xl"] },
-        label: "Gap"
-      },
-      breakout: {
-        keys: ["breakoutMin", "breakoutScale"],
-        label: "Breakout"
-      }
+      content: { keys: ["contentMin", "contentBase", "contentMax"], label: "Content" },
+      defaultCol: { keys: ["defaultCol"], label: "Default Column" },
+      tracks: { keys: ["popoutWidth", "fullLimit"], label: "Track Widths" },
+      feature: { keys: ["featureMin", "featureScale", "featureMax"], label: "Feature" },
+      gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" },
+      breakout: { keys: ["breakoutMin", "breakoutScale"], label: "Breakout" }
     },
-    // Copy a specific section to clipboard
     copySection(sectionName) {
       const section = this.configSections[sectionName];
       if (!section) return;
@@ -992,7 +943,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         setTimeout(() => this.sectionCopied = null, 1500);
       });
     },
-    // Format config as flat key-value pairs (no wrapping braces)
     formatConfigFlat(obj) {
       const lines = [];
       const entries = Object.entries(obj);
@@ -1006,7 +956,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       });
       return lines.join("\n");
     },
-    // Copy config to clipboard as CSS variables
     copyConfig() {
       var _a, _b, _c, _d, _e;
       const config = this.generateConfigExport();
@@ -1047,7 +996,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         setTimeout(() => this.copySuccess = false, 2e3);
       });
     },
-    // Generate and download standalone CSS file
     downloadCSS() {
       const css = this.generateCSSExport(this.generateConfigExport());
       const blob = new Blob([css], { type: "text/css" });
@@ -1058,7 +1006,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       a.click();
       URL.revokeObjectURL(url);
     },
-    // Parse CSS value into number and unit (e.g., "4rem" -> { num: 4, unit: "rem" })
     parseValue(val) {
       const match = String(val).match(/^([\d.]+)(.*)$/);
       if (match) {
@@ -1066,29 +1013,23 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       return { num: 0, unit: "rem" };
     },
-    // Get the numeric part of a config value
     getNumericValue(key) {
       const val = this.editValues[key] || this.configOptions[key].value;
       return this.parseValue(val).num;
     },
-    // Get the unit part of a config value
     getUnit(key) {
       const val = this.editValues[key] || this.configOptions[key].value;
       return this.parseValue(val).unit;
     },
-    // Check if a field should have unit selection (rem-based fields only)
     hasUnitSelector(key) {
       const unit = this.getUnit(key);
       return unit === "rem" || unit === "ch" || unit === "px";
     },
-    // Available units for selection
     unitOptions: ["rem", "ch", "px"],
-    // Update just the unit, keeping the numeric value
     updateUnit(key, newUnit) {
       const num = this.getNumericValue(key);
       this.updateConfigValue(key, num + newUnit);
     },
-    // Update just the numeric part, keeping the unit
     updateNumericValue(key, num) {
       if (key === "content" && num < 1) num = 1;
       if (key === "baseGap" && num < 0) num = 0;
@@ -1097,7 +1038,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       const unit = this.getUnit(key);
       this.updateConfigValue(key, num + unit);
     },
-    // Generic getter for prefixed options (gapScale, breakout)
     getPrefixedNumeric(prefix, options, key) {
       const val = this.editValues[`${prefix}_${key}`] || options[key].value;
       return this.parseValue(val).num;
@@ -1106,7 +1046,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       const val = this.editValues[`${prefix}_${key}`] || options[key].value;
       return this.parseValue(val).unit;
     },
-    // Gap scale helpers (use generic)
     getGapScaleNumeric(key) {
       return this.getPrefixedNumeric("gapScale", this.gapScaleOptions, key);
     },
@@ -1119,7 +1058,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.updateGapLive();
       this.saveConfigToStorage();
     },
-    // Breakout helpers (use generic)
     getBreakoutNumeric(key) {
       return this.getPrefixedNumeric("breakout", this.breakoutOptions, key);
     },
@@ -1132,19 +1070,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.updateBreakoutLive();
       this.saveConfigToStorage();
     },
-    // Update --breakout-padding live
     updateBreakoutLive() {
       const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
       const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
       const max = this.editValues.popoutWidth || this.configOptions.popoutWidth.value;
       document.documentElement.style.setProperty("--breakout-padding", `clamp(${min}, ${scale}, ${max})`);
     },
-    // Save current config to localStorage
     saveConfigToStorage() {
       const config = this.generateConfigExport();
       localStorage.setItem("breakoutGridConfig", JSON.stringify(config));
     },
-    // Apply a config object (used by restore and localStorage load)
     applyConfig(config) {
       this.editMode = true;
       Object.keys(this.configOptions).forEach((key) => {
@@ -1190,7 +1125,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       this.updateColumnWidths();
     },
-    // Reset config to defaults and clear localStorage
     resetConfigToDefaults() {
       if (!confirm("Reset all config values to defaults?")) return;
       localStorage.removeItem("breakoutGridConfig");
@@ -1198,7 +1132,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.loadCurrentValues();
       this.configCopied = false;
     },
-    // Update a config value (and live CSS var if applicable)
     updateConfigValue(key, value) {
       this.editValues[key] = value;
       this.configCopied = false;
@@ -1224,15 +1157,12 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         this.updateGapLive();
       }
     },
-    // Select a grid area
     selectArea(areaName) {
       this.selectedArea = this.selectedArea === areaName ? null : areaName;
     },
-    // Check if area is selected
     isSelected(areaName) {
       return this.selectedArea === areaName;
     },
-    // Restore all CSS variable overrides to original values
     restoreCSSVariables() {
       Object.keys(this.configOptions).forEach((key) => {
         const opt = this.configOptions[key];
@@ -1248,7 +1178,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.editValues = {};
       this.configCopied = false;
     },
-    // Toggle edit mode
     toggleEditMode() {
       this.editMode = !this.editMode;
       if (this.editMode) {
@@ -1257,18 +1186,15 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         this.restoreCSSVariables();
       }
     },
-    // Check if any values have been edited and not yet copied
     hasUnsavedEdits() {
       return Object.keys(this.editValues).length > 0 && !this.configCopied;
     },
-    // Open floating editor
     openEditor() {
       this.showEditor = true;
       this.editMode = true;
       this.loadCurrentValues();
       localStorage.setItem("breakoutGridEditorOpen", "true");
     },
-    // Close floating editor
     closeEditor(force = false) {
       if (!force && this.hasUnsavedEdits()) {
         this.showCloseWarningModal = true;
@@ -1279,7 +1205,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.restoreCSSVariables();
       localStorage.setItem("breakoutGridEditorOpen", "false");
     },
-    // Close warning modal actions
     closeWarningCopyAndClose() {
       this.copyConfig();
       this.showCloseWarningModal = false;
@@ -1292,7 +1217,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     closeWarningGoBack() {
       this.showCloseWarningModal = false;
     },
-    // Generic drag handling for panels
     _dragConfigs: {
       editor: { pos: "editorPos", dragging: "isDragging", offset: "dragOffset", storage: "breakoutGridEditorPos" },
       spacing: { pos: "spacingPanelPos", dragging: "isDraggingSpacing", offset: "dragOffsetSpacing", storage: "breakoutGridSpacingPos" }
@@ -1313,7 +1237,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       if (this[cfg.dragging]) localStorage.setItem(cfg.storage, JSON.stringify(this[cfg.pos]));
       this[cfg.dragging] = false;
     },
-    // Editor drag (shorthand)
     startDrag(e) {
       this.startPanelDrag(e, "editor");
     },
@@ -1323,7 +1246,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     stopDrag() {
       this.stopPanelDrag("editor");
     },
-    // Spacing drag (shorthand)
     startDragSpacing(e) {
       this.startPanelDrag(e, "spacing");
     },
@@ -1333,7 +1255,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     stopDragSpacing() {
       this.stopPanelDrag("spacing");
     },
-    // Column resize drag handling
     startColumnResize(e, columnType) {
       if (!this.editMode) return;
       e.preventDefault();
@@ -1367,18 +1288,14 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     stopColumnResize() {
       this.resizingColumn = null;
     },
-    // Map column names to their config keys for resizing
     getResizeConfig(colName) {
       const map = {
         "full-limit": "fullLimit",
         "feature": "featureScale",
         "popout": "popoutWidth"
-        // content has its own integrated handles for min/max/base
-        // feature has its own integrated handles for min/scale/max
       };
       return map[colName] || null;
     },
-    // Parse a CSS variables string into a config object
     parseConfigString(input) {
       const str = input.trim();
       const config = { gapScale: {}, breakpoints: {} };
@@ -1426,19 +1343,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       return config;
     },
-    // Open restore modal
     openRestoreModal() {
       this.showRestoreModal = true;
       this.restoreInput = "";
       this.restoreError = null;
     },
-    // Close restore modal
     closeRestoreModal() {
       this.showRestoreModal = false;
       this.restoreInput = "";
       this.restoreError = null;
     },
-    // Apply a parsed config to the editor
     restoreConfig() {
       this.restoreError = null;
       try {
@@ -1496,7 +1410,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.85); z-index: 1;"></div>
+         :style="{ position: 'absolute', inset: 0, background: 'rgba(255, 255, 255, ' + backdropOpacity + ')', zIndex: 1 }"></div>
 
     <!-- Advanced Span Examples Overlay -->
     <div x-show="showAdvanced"
@@ -1766,7 +1680,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     </div>
 
     <!-- Grid Overlay (hidden in Advanced mode) -->
-    <div x-show="!showAdvanced" x-init="$watch('isVisible', v => v && setTimeout(() => updateColumnWidths(), 50)); setTimeout(() => updateColumnWidths(), 100)" class="grid-cols-breakout breakout-visualizer-grid" style="height: 100%; position: relative; z-index: 2;">
+    <div x-show="!showAdvanced" x-init="$watch('isVisible', v => v && setTimeout(() => updateColumnWidths(), 50)); setTimeout(() => updateColumnWidths(), 100)" class="grid-cols-breakout breakout-visualizer-grid" :style="{ height: '100%', position: 'relative', zIndex: 2, opacity: gridOpacity }">
       <template x-for="area in gridAreas" :key="area.name">
         <div :class="'col-' + area.name"
              @click="selectArea(area.name)"
@@ -2171,6 +2085,22 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
       </div>
 
+      <!-- Opacity Sliders -->
+      <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; width: 28px; flex-shrink: 0;">Grid</span>
+            <input type="range" x-model="gridOpacity" min="0.1" max="1" step="0.1"
+                   style="flex: 1; height: 4px; cursor: pointer; accent-color: #1a1a2e;">
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; width: 28px; flex-shrink: 0;">Page</span>
+            <input type="range" x-model="backdropOpacity" min="0" max="1" step="0.05"
+                   style="flex: 1; height: 4px; cursor: pointer; accent-color: #1a1a2e;">
+          </div>
+        </div>
+      </div>
+
       <!-- Padding Options -->
       <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
         <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Padding</div>
@@ -2251,6 +2181,23 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
           <span style="font-weight: 600;">⚠️</span> <span x-text="getTrackOverflowWarning()"></span>
         </div>
 
+        <!-- Default Column Section -->
+        <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div @click="copySection('defaultCol')" style="cursor: pointer;">
+              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;" :style="{ color: sectionCopied === 'defaultCol' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'defaultCol' ? '✓ Copied' : 'Default Column'"></div>
+              <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">For children without col-* class</div>
+            </div>
+            <select @change="editValues.defaultCol = $event.target.value; configCopied = false"
+                    :value="editValues.defaultCol || configOptions.defaultCol.value"
+                    style="padding: 6px 8px; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9fafb; cursor: pointer;">
+              <template x-for="opt in configOptions.defaultCol.options" :key="opt">
+                <option :value="opt" :selected="(editValues.defaultCol || configOptions.defaultCol.value) === opt" x-text="opt"></option>
+              </template>
+            </select>
+          </div>
+        </div>
+
         <!-- Content Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('content')" style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;" :style="{ color: sectionCopied === 'content' ? '#10b981' : '#6b7280' }">
@@ -2293,23 +2240,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Default Column Section -->
-        <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div @click="copySection('defaultCol')" style="cursor: pointer;">
-              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;" :style="{ color: sectionCopied === 'defaultCol' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'defaultCol' ? '✓ Copied' : 'Default Column'"></div>
-              <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">For children without col-* class</div>
-            </div>
-            <select @change="editValues.defaultCol = $event.target.value; configCopied = false"
-                    :value="editValues.defaultCol || configOptions.defaultCol.value"
-                    style="padding: 6px 8px; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9fafb; cursor: pointer;">
-              <template x-for="opt in configOptions.defaultCol.options" :key="opt">
-                <option :value="opt" :selected="(editValues.defaultCol || configOptions.defaultCol.value) === opt" x-text="opt"></option>
-              </template>
-            </select>
           </div>
         </div>
 

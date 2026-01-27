@@ -19,7 +19,7 @@ export const template = `
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.85); z-index: 1;"></div>
+         :style="{ position: 'absolute', inset: 0, background: 'rgba(255, 255, 255, ' + backdropOpacity + ')', zIndex: 1 }"></div>
 
     <!-- Advanced Span Examples Overlay -->
     <div x-show="showAdvanced"
@@ -289,7 +289,7 @@ export const template = `
     </div>
 
     <!-- Grid Overlay (hidden in Advanced mode) -->
-    <div x-show="!showAdvanced" x-init="$watch('isVisible', v => v && setTimeout(() => updateColumnWidths(), 50)); setTimeout(() => updateColumnWidths(), 100)" class="grid-cols-breakout breakout-visualizer-grid" style="height: 100%; position: relative; z-index: 2;">
+    <div x-show="!showAdvanced" x-init="$watch('isVisible', v => v && setTimeout(() => updateColumnWidths(), 50)); setTimeout(() => updateColumnWidths(), 100)" class="grid-cols-breakout breakout-visualizer-grid" :style="{ height: '100%', position: 'relative', zIndex: 2, opacity: gridOpacity }">
       <template x-for="area in gridAreas" :key="area.name">
         <div :class="'col-' + area.name"
              @click="selectArea(area.name)"
@@ -694,6 +694,22 @@ export const template = `
         </div>
       </div>
 
+      <!-- Opacity Sliders -->
+      <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; width: 28px; flex-shrink: 0;">Grid</span>
+            <input type="range" x-model="gridOpacity" min="0.1" max="1" step="0.1"
+                   style="flex: 1; height: 4px; cursor: pointer; accent-color: #1a1a2e;">
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; width: 28px; flex-shrink: 0;">Page</span>
+            <input type="range" x-model="backdropOpacity" min="0" max="1" step="0.05"
+                   style="flex: 1; height: 4px; cursor: pointer; accent-color: #1a1a2e;">
+          </div>
+        </div>
+      </div>
+
       <!-- Padding Options -->
       <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
         <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Padding</div>
@@ -774,6 +790,23 @@ export const template = `
           <span style="font-weight: 600;">⚠️</span> <span x-text="getTrackOverflowWarning()"></span>
         </div>
 
+        <!-- Default Column Section -->
+        <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div @click="copySection('defaultCol')" style="cursor: pointer;">
+              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;" :style="{ color: sectionCopied === 'defaultCol' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'defaultCol' ? '✓ Copied' : 'Default Column'"></div>
+              <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">For children without col-* class</div>
+            </div>
+            <select @change="editValues.defaultCol = $event.target.value; configCopied = false"
+                    :value="editValues.defaultCol || configOptions.defaultCol.value"
+                    style="padding: 6px 8px; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9fafb; cursor: pointer;">
+              <template x-for="opt in configOptions.defaultCol.options" :key="opt">
+                <option :value="opt" :selected="(editValues.defaultCol || configOptions.defaultCol.value) === opt" x-text="opt"></option>
+              </template>
+            </select>
+          </div>
+        </div>
+
         <!-- Content Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('content')" style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;" :style="{ color: sectionCopied === 'content' ? '#10b981' : '#6b7280' }">
@@ -816,23 +849,6 @@ export const template = `
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Default Column Section -->
-        <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div @click="copySection('defaultCol')" style="cursor: pointer;">
-              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;" :style="{ color: sectionCopied === 'defaultCol' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'defaultCol' ? '✓ Copied' : 'Default Column'"></div>
-              <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">For children without col-* class</div>
-            </div>
-            <select @change="editValues.defaultCol = $event.target.value; configCopied = false"
-                    :value="editValues.defaultCol || configOptions.defaultCol.value"
-                    style="padding: 6px 8px; font-size: 11px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9fafb; cursor: pointer;">
-              <template x-for="opt in configOptions.defaultCol.options" :key="opt">
-                <option :value="opt" :selected="(editValues.defaultCol || configOptions.defaultCol.value) === opt" x-text="opt"></option>
-              </template>
-            </select>
           </div>
         </div>
 
