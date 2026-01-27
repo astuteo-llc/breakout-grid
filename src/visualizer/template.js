@@ -1027,6 +1027,53 @@ export const template = `
       </div>
     </div>
 
+    <!-- Close Warning Modal -->
+    <div x-show="showCloseWarningModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10003; pointer-events: auto;">
+      <div @click.stop style="background: white; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); width: 420px; max-width: 90vw; font-family: system-ui, -apple-system, sans-serif;">
+        <!-- Modal Header -->
+        <div style="padding: 12px 16px; background: #fef3c7; color: #92400e; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 10px;">
+          <svg style="width: 20px; height: 20px; flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span style="font-weight: 600; font-size: 14px;">Unsaved Configuration</span>
+        </div>
+        <!-- Modal Body -->
+        <div style="padding: 16px;">
+          <p style="font-size: 13px; color: #374151; margin: 0 0 12px 0; line-height: 1.5;">
+            Your grid configuration changes are stored in <strong>browser localStorage</strong> and will only apply while the visualizer is loaded.
+          </p>
+          <div style="background: #f3f4f6; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+            <p style="font-size: 12px; color: #4b5563; margin: 0 0 8px 0; line-height: 1.5;">
+              <strong>To make changes permanent:</strong>
+            </p>
+            <ol style="font-size: 11px; color: #6b7280; margin: 0; padding-left: 16px; line-height: 1.6;">
+              <li>Copy the config to your clipboard</li>
+              <li>Paste into your project's CSS file</li>
+              <li>Remove the visualizer script from production</li>
+            </ol>
+          </div>
+          <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.4;">
+            Without copying, your changes will be lost when the visualizer is removed.
+          </p>
+        </div>
+        <!-- Modal Footer -->
+        <div style="padding: 12px 16px; background: #f7f7f7; border-radius: 0 0 8px 8px; display: flex; justify-content: space-between; gap: 8px;">
+          <button @click="closeWarningDiscard()" style="padding: 8px 16px; font-size: 11px; font-weight: 600; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; background: #fef2f2; color: #dc2626;">Discard Changes</button>
+          <div style="display: flex; gap: 8px;">
+            <button @click="closeWarningGoBack()" style="padding: 8px 16px; font-size: 11px; font-weight: 600; border: 1px solid #e5e5e5; border-radius: 4px; cursor: pointer; background: white; color: #374151;">Go Back</button>
+            <button @click="closeWarningCopyAndClose()" style="padding: 8px 16px; font-size: 11px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white;">Copy & Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Grid Diagram -->
     <div x-show="showDiagram"
          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 0.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); pointer-events: auto; z-index: 10001; padding: 1.5rem; max-width: 90vw;">

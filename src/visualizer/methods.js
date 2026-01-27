@@ -579,14 +579,29 @@ export const methods = {
   // Close floating editor
   closeEditor(force = false) {
     if (!force && this.hasUnsavedEdits()) {
-      if (!confirm('You have unsaved config changes. Close without copying?')) {
-        return;
-      }
+      this.showCloseWarningModal = true;
+      return;
     }
     this.showEditor = false;
     this.editMode = false;
     this.restoreCSSVariables();
     localStorage.setItem('breakoutGridEditorOpen', 'false');
+  },
+
+  // Close warning modal actions
+  closeWarningCopyAndClose() {
+    this.copyConfig();
+    this.showCloseWarningModal = false;
+    this.closeEditor(true);
+  },
+
+  closeWarningDiscard() {
+    this.showCloseWarningModal = false;
+    this.closeEditor(true);
+  },
+
+  closeWarningGoBack() {
+    this.showCloseWarningModal = false;
   },
 
   // Generic drag handling for panels

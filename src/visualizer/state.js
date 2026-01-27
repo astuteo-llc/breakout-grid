@@ -24,8 +24,8 @@ export const CONFIG_OPTIONS = {
   // Base measurements
   baseGap: { value: '1rem', desc: 'Minimum gap between columns. Use rem.', cssVar: '--config-base-gap', liveVar: '--base-gap' },
   maxGap: { value: '15rem', desc: 'Maximum gap cap for ultra-wide. Use rem.', cssVar: '--config-max-gap', liveVar: '--max-gap' },
-  contentMin: { value: '53rem', desc: 'Min width for content column (~848px). Use rem.', cssVar: '--config-content-min', liveVar: '--content-min' },
-  contentMax: { value: '61rem', desc: 'Max width for content column (~976px). Use rem.', cssVar: '--config-content-max', liveVar: '--content-max' },
+  contentMin: { value: '50rem', desc: 'Min width for content column (~848px). Use rem.', cssVar: '--config-content-min', liveVar: '--content-min' },
+  contentMax: { value: '55rem', desc: 'Max width for content column (~976px). Use rem.', cssVar: '--config-content-max', liveVar: '--content-max' },
   contentBase: { value: '75vw', desc: 'Preferred width for content (fluid). Use vw.', cssVar: '--config-content-base', liveVar: '--content-base' },
   // Track widths
   popoutWidth: { value: '5rem', desc: 'Popout extends beyond content. Use rem.', cssVar: '--config-popout', liveVar: null },
@@ -108,5 +108,9 @@ export function createInitialState() {
     restoreError: null,
     // Section copy feedback
     sectionCopied: null,
+    // Close warning modal
+    showCloseWarningModal: false,
+    // Grid overlay opacity
+    gridOpacity: 0.8,
   };
 }
