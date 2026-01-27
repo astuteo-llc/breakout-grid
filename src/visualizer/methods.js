@@ -127,12 +127,15 @@ export const methods = {
     Object.keys(options).forEach(key => {
       const opt = options[key];
       const editKey = prefix ? `${prefix}_${key}` : key;
-      if (opt.cssVar) {
-        const computed = this.getCSSVariable(opt.cssVar);
-        this.editValues[editKey] = (computed && computed !== 'Not set' && computed !== '') ? computed : opt.value;
-      } else {
-        this.editValues[editKey] = opt.value;
+      // Check liveVar first (what users typically set), then cssVar, then default
+      let computed = null;
+      if (opt.liveVar) {
+        computed = this.getCSSVariable(opt.liveVar);
       }
+      if ((!computed || computed === 'Not set' || computed === '') && opt.cssVar) {
+        computed = this.getCSSVariable(opt.cssVar);
+      }
+      this.editValues[editKey] = (computed && computed !== 'Not set' && computed !== '') ? computed : opt.value;
     });
   },
 

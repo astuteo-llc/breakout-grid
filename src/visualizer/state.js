@@ -19,23 +19,23 @@ export const CONFIG_OPTIONS = {
   contentMin: { value: '50rem', desc: 'Min width for content column (~848px). Use rem.', cssVar: '--config-content-min', liveVar: '--content-min' },
   contentMax: { value: '55rem', desc: 'Max width for content column (~976px). Use rem.', cssVar: '--config-content-max', liveVar: '--content-max' },
   contentBase: { value: '75vw', desc: 'Preferred width for content (fluid). Use vw.', cssVar: '--config-content-base', liveVar: '--content-base' },
-  popoutWidth: { value: '5rem', desc: 'Popout extends beyond content. Use rem.', cssVar: '--config-popout', liveVar: null },
-  featureMin: { value: '0rem', desc: 'Minimum feature track width (floor)', cssVar: '--config-feature-min', liveVar: null },
-  featureScale: { value: '12vw', desc: 'Fluid feature track scaling', cssVar: '--config-feature-scale', liveVar: null },
-  featureMax: { value: '12rem', desc: 'Maximum feature track width (ceiling)', cssVar: '--config-feature-max', liveVar: null },
+  popoutWidth: { value: '5rem', desc: 'Popout extends beyond content. Use rem.', cssVar: '--config-popout', liveVar: '--popout-width' },
+  featureMin: { value: '0rem', desc: 'Minimum feature track width (floor)', cssVar: '--config-feature-min', liveVar: '--feature-min' },
+  featureScale: { value: '12vw', desc: 'Fluid feature track scaling', cssVar: '--config-feature-scale', liveVar: '--feature-scale' },
+  featureMax: { value: '12rem', desc: 'Maximum feature track width (ceiling)', cssVar: '--config-feature-max', liveVar: '--feature-max' },
   fullLimit: { value: '115rem', desc: 'Max width for col-full-limit. Use rem.', cssVar: '--config-full-limit', liveVar: '--full-limit' },
-  defaultCol: { value: 'content', desc: 'Default column when no col-* class', type: 'select', options: ['content', 'popout', 'feature', 'full'], cssVar: '--config-default-col' },
+  defaultCol: { value: 'content', desc: 'Default column when no col-* class', type: 'select', options: ['content', 'popout', 'feature', 'full'], cssVar: '--config-default-col', liveVar: '--default-col' },
 };
 
 export const GAP_SCALE_OPTIONS = {
-  default: { value: '4vw', desc: 'Mobile/default gap scaling. Use vw.', cssVar: '--config-gap-scale-default' },
-  lg: { value: '5vw', desc: 'Large screens (1024px+). Use vw.', cssVar: '--config-gap-scale-lg' },
-  xl: { value: '6vw', desc: 'Extra large (1280px+). Use vw.', cssVar: '--config-gap-scale-xl' },
+  default: { value: '4vw', desc: 'Mobile/default gap scaling. Use vw.', cssVar: '--config-gap-scale-default', liveVar: '--gap-scale-default' },
+  lg: { value: '5vw', desc: 'Large screens (1024px+). Use vw.', cssVar: '--config-gap-scale-lg', liveVar: '--gap-scale-lg' },
+  xl: { value: '6vw', desc: 'Extra large (1280px+). Use vw.', cssVar: '--config-gap-scale-xl', liveVar: '--gap-scale-xl' },
 };
 
 export const BREAKOUT_OPTIONS = {
-  min: { value: '1rem', desc: 'Minimum breakout padding (floor)', cssVar: '--config-breakout-min' },
-  scale: { value: '5vw', desc: 'Fluid breakout scaling', cssVar: '--config-breakout-scale' },
+  min: { value: '1rem', desc: 'Minimum breakout padding (floor)', cssVar: '--config-breakout-min', liveVar: '--breakout-min' },
+  scale: { value: '5vw', desc: 'Fluid breakout scaling', cssVar: '--config-breakout-scale', liveVar: '--breakout-scale' },
   // max is popoutWidth
 };
 
