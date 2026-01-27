@@ -1,6 +1,6 @@
 {
   "name": "@astuteo/breakout-grid",
-  "version": "5.1.2",
+  "version": "5.1.3",
   "type": "module",
   "description": "CSS Grid breakout layout system with visual configurator",
   "main": "dist/_objects.breakout-grid.css",
