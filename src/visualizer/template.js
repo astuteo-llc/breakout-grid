@@ -915,7 +915,6 @@ export const template = `
             <div>
               <span style="font-size: 11px; color: #374151;">min</span>
               <span style="font-size: 9px; color: #9ca3af; margin-left: 4px;">floor</span>
-              <span style="font-size: 8px; color: #10b981; margin-left: 4px; font-weight: 500;">live</span>
             </div>
             <div style="display: flex; align-items: center; gap: 4px;">
               <input type="number" :value="getNumericValue('baseGap')" @input="updateNumericValue('baseGap', $event.target.value)" step="0.5"
@@ -932,7 +931,6 @@ export const template = `
             <div>
               <span style="font-size: 11px; color: #374151;">max</span>
               <span style="font-size: 9px; color: #9ca3af; margin-left: 4px;">ceiling</span>
-              <span style="font-size: 8px; color: #10b981; margin-left: 4px; font-weight: 500;">live</span>
             </div>
             <div style="display: flex; align-items: center; gap: 4px;">
               <input type="number" :value="getNumericValue('maxGap')" @input="updateNumericValue('maxGap', $event.target.value)" step="1"
@@ -946,8 +944,8 @@ export const template = `
             </div>
           </div>
 
-          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale <span style="font-size: 8px; color: #10b981; font-weight: 500; text-transform: none;">live preview</span></div>
-          <div style="font-size: 9px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4;">Fluid value (vw) that grows with viewport. Active breakpoint previews live.</div>
+          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale</div>
+          <div style="font-size: 9px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4;">Fluid value (vw) that grows with viewport.</div>
           <template x-for="key in Object.keys(gapScaleOptions)" :key="'ed_gs_'+key">
             <div :style="{
               display: 'flex',
@@ -973,7 +971,6 @@ export const template = `
             </div>
           </template>
 
-          <!-- Live formula preview -->
           <div style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 9px; line-height: 1.6;">
             <div style="color: #6b7280; margin-bottom: 4px;">Generated CSS:</div>
             <div style="color: #374151;"><span style="color: #9ca3af;">mobile:</span> clamp(<span x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span x-text="editValues.gapScale_default || gapScaleOptions.default.value"></span>, <span x-text="editValues.maxGap || configOptions.maxGap.value"></span>)</div>

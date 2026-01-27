@@ -895,21 +895,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       };
       return config;
     },
-    formatConfig(obj, indent = 2) {
-      const pad = " ".repeat(indent);
-      const lines = ["{"];
-      const entries = Object.entries(obj);
-      entries.forEach(([key, value], i) => {
-        const comma = i < entries.length - 1 ? "," : "";
-        if (typeof value === "object" && value !== null) {
-          lines.push(`${pad}${key}: ${this.formatConfig(value, indent + 2).replace(/\n/g, "\n" + pad)}${comma}`);
-        } else {
-          lines.push(`${pad}${key}: '${value}'${comma}`);
-        }
-      });
-      lines.push("}");
-      return lines.join("\n");
-    },
     configSections: {
       content: { keys: ["contentMin", "contentBase", "contentMax"], label: "Content" },
       defaultCol: { keys: ["defaultCol"], label: "Default Column" },
@@ -921,42 +906,47 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     copySection(sectionName) {
       const section = this.configSections[sectionName];
       if (!section) return;
-      const config = {};
+      const lines = [];
+      const varNames = {
+        contentMin: "--content-min",
+        contentBase: "--content-base",
+        contentMax: "--content-max",
+        defaultCol: "--default-col",
+        popoutWidth: "--popout-width",
+        fullLimit: "--full-limit",
+        featureMin: "--feature-min",
+        featureScale: "--feature-scale",
+        featureMax: "--feature-max",
+        baseGap: "--base-gap",
+        maxGap: "--max-gap",
+        breakoutMin: "--breakout-min",
+        breakoutScale: "--breakout-scale"
+      };
       section.keys.forEach((key) => {
+        let value;
         if (this.configOptions[key]) {
-          config[key] = this.editValues[key] || this.configOptions[key].value;
+          value = this.editValues[key] || this.configOptions[key].value;
         } else if (key === "breakoutMin") {
-          config[key] = this.editValues.breakout_min || this.breakoutOptions.min.value;
+          value = this.editValues.breakout_min || this.breakoutOptions.min.value;
         } else if (key === "breakoutScale") {
-          config[key] = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+          value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+        }
+        if (varNames[key]) {
+          lines.push(`${varNames[key]}: ${value};`);
         }
       });
       if (section.nested) {
         Object.keys(section.nested).forEach((nestedKey) => {
-          config[nestedKey] = {};
           section.nested[nestedKey].forEach((subKey) => {
-            config[nestedKey][subKey] = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
+            const value = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
+            lines.push(`--gap-scale-${subKey}: ${value};`);
           });
         });
       }
-      const configStr = this.formatConfigFlat(config);
-      navigator.clipboard.writeText(configStr).then(() => {
+      navigator.clipboard.writeText(lines.join("\n")).then(() => {
         this.sectionCopied = sectionName;
         setTimeout(() => this.sectionCopied = null, 1500);
       });
-    },
-    formatConfigFlat(obj) {
-      const lines = [];
-      const entries = Object.entries(obj);
-      entries.forEach(([key, value], i) => {
-        const comma = i < entries.length - 1 ? "," : ",";
-        if (typeof value === "object" && value !== null) {
-          lines.push(`${key}: ${this.formatConfig(value)}${comma}`);
-        } else {
-          lines.push(`${key}: '${value}'${comma}`);
-        }
-      });
-      return lines.join("\n");
     },
     copyConfig() {
       var _a, _b, _c, _d, _e;
@@ -2308,7 +2298,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             <div>
               <span style="font-size: 11px; color: #374151;">min</span>
               <span style="font-size: 9px; color: #9ca3af; margin-left: 4px;">floor</span>
-              <span style="font-size: 8px; color: #10b981; margin-left: 4px; font-weight: 500;">live</span>
             </div>
             <div style="display: flex; align-items: center; gap: 4px;">
               <input type="number" :value="getNumericValue('baseGap')" @input="updateNumericValue('baseGap', $event.target.value)" step="0.5"
@@ -2325,7 +2314,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             <div>
               <span style="font-size: 11px; color: #374151;">max</span>
               <span style="font-size: 9px; color: #9ca3af; margin-left: 4px;">ceiling</span>
-              <span style="font-size: 8px; color: #10b981; margin-left: 4px; font-weight: 500;">live</span>
             </div>
             <div style="display: flex; align-items: center; gap: 4px;">
               <input type="number" :value="getNumericValue('maxGap')" @input="updateNumericValue('maxGap', $event.target.value)" step="1"
@@ -2339,8 +2327,8 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             </div>
           </div>
 
-          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale <span style="font-size: 8px; color: #10b981; font-weight: 500; text-transform: none;">live preview</span></div>
-          <div style="font-size: 9px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4;">Fluid value (vw) that grows with viewport. Active breakpoint previews live.</div>
+          <div style="font-size: 9px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 2px;">Responsive Scale</div>
+          <div style="font-size: 9px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4;">Fluid value (vw) that grows with viewport.</div>
           <template x-for="key in Object.keys(gapScaleOptions)" :key="'ed_gs_'+key">
             <div :style="{
               display: 'flex',
@@ -2366,7 +2354,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             </div>
           </template>
 
-          <!-- Live formula preview -->
           <div style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 4px; font-family: 'SF Mono', Monaco, monospace; font-size: 9px; line-height: 1.6;">
             <div style="color: #6b7280; margin-bottom: 4px;">Generated CSS:</div>
             <div style="color: #374151;"><span style="color: #9ca3af;">mobile:</span> clamp(<span x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span x-text="editValues.gapScale_default || gapScaleOptions.default.value"></span>, <span x-text="editValues.maxGap || configOptions.maxGap.value"></span>)</div>

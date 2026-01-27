@@ -163,22 +163,6 @@ export const methods = {
     return config;
   },
 
-  formatConfig(obj, indent = 2) {
-    const pad = ' '.repeat(indent);
-    const lines = ['{'];
-    const entries = Object.entries(obj);
-    entries.forEach(([key, value], i) => {
-      const comma = i < entries.length - 1 ? ',' : '';
-      if (typeof value === 'object' && value !== null) {
-        lines.push(`${pad}${key}: ${this.formatConfig(value, indent + 2).replace(/\n/g, '\n' + pad)}${comma}`);
-      } else {
-        lines.push(`${pad}${key}: '${value}'${comma}`);
-      }
-    });
-    lines.push('}');
-    return lines.join('\n');
-  },
-
   configSections: {
     content: { keys: ['contentMin', 'contentBase', 'contentMax'], label: 'Content' },
     defaultCol: { keys: ['defaultCol'], label: 'Default Column' },
@@ -192,45 +176,52 @@ export const methods = {
     const section = this.configSections[sectionName];
     if (!section) return;
 
-    const config = {};
+    const lines = [];
+
+    // Map config keys to CSS variable names
+    const varNames = {
+      contentMin: '--content-min',
+      contentBase: '--content-base',
+      contentMax: '--content-max',
+      defaultCol: '--default-col',
+      popoutWidth: '--popout-width',
+      fullLimit: '--full-limit',
+      featureMin: '--feature-min',
+      featureScale: '--feature-scale',
+      featureMax: '--feature-max',
+      baseGap: '--base-gap',
+      maxGap: '--max-gap',
+      breakoutMin: '--breakout-min',
+      breakoutScale: '--breakout-scale',
+    };
+
     section.keys.forEach(key => {
+      let value;
       if (this.configOptions[key]) {
-        config[key] = this.editValues[key] || this.configOptions[key].value;
+        value = this.editValues[key] || this.configOptions[key].value;
       } else if (key === 'breakoutMin') {
-        config[key] = this.editValues.breakout_min || this.breakoutOptions.min.value;
+        value = this.editValues.breakout_min || this.breakoutOptions.min.value;
       } else if (key === 'breakoutScale') {
-        config[key] = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+        value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
+      }
+      if (varNames[key]) {
+        lines.push(`${varNames[key]}: ${value};`);
       }
     });
 
     if (section.nested) {
       Object.keys(section.nested).forEach(nestedKey => {
-        config[nestedKey] = {};
         section.nested[nestedKey].forEach(subKey => {
-          config[nestedKey][subKey] = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
+          const value = this.editValues[`gapScale_${subKey}`] || this.gapScaleOptions[subKey].value;
+          lines.push(`--gap-scale-${subKey}: ${value};`);
         });
       });
     }
 
-    const configStr = this.formatConfigFlat(config);
-    navigator.clipboard.writeText(configStr).then(() => {
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
       this.sectionCopied = sectionName;
       setTimeout(() => this.sectionCopied = null, 1500);
     });
-  },
-
-  formatConfigFlat(obj) {
-    const lines = [];
-    const entries = Object.entries(obj);
-    entries.forEach(([key, value], i) => {
-      const comma = i < entries.length - 1 ? ',' : ',';
-      if (typeof value === 'object' && value !== null) {
-        lines.push(`${key}: ${this.formatConfig(value)}${comma}`);
-      } else {
-        lines.push(`${key}: '${value}'${comma}`);
-      }
-    });
-    return lines.join('\n');
   },
 
   copyConfig() {
