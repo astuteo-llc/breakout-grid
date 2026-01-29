@@ -16,6 +16,7 @@ export const methods = {
     if (savedConfig) {
       try {
         const config = JSON.parse(savedConfig);
+        this.hasConfigOverride = true;
         this.$nextTick(() => this.applyConfig(config));
       } catch (e) {}
     }
@@ -339,6 +340,7 @@ export const methods = {
   saveConfigToStorage() {
     const config = this.generateConfigExport();
     localStorage.setItem('breakoutGridConfig', JSON.stringify(config));
+    this.hasConfigOverride = true;
   },
 
   applyConfig(config) {
@@ -400,6 +402,7 @@ export const methods = {
     this.restoreCSSVariables();
     this.loadCurrentValues();
     this.configCopied = false;
+    this.hasConfigOverride = false;
   },
 
   updateConfigValue(key, value) {
@@ -648,6 +651,24 @@ export const methods = {
     this.showRestoreModal = false;
     this.restoreInput = '';
     this.restoreError = null;
+  },
+
+  hasStoredOverrides() {
+    return ['breakoutGridConfig', 'breakoutGridEditorOpen', 'breakoutGridEditorPos', 'breakoutGridSpacingPos', 'breakoutGridSpacingCollapsed']
+      .some(key => localStorage.getItem(key) !== null);
+  },
+
+  resetAllStorage() {
+    ['breakoutGridVisualizerVisible', 'breakoutGridEditorOpen', 'breakoutGridConfig', 'breakoutGridEditorPos', 'breakoutGridSpacingPos', 'breakoutGridSpacingCollapsed']
+      .forEach(key => localStorage.removeItem(key));
+    this.restoreCSSVariables();
+    this.showEditor = false;
+    this.editMode = false;
+    this.editorPos = { x: 20, y: 100 };
+    this.spacingPanelPos = { x: 16, y: 16 };
+    this.spacingPanelCollapsed = false;
+    this.hasConfigOverride = false;
+    this.configCopied = false;
   },
 
   restoreConfig() {

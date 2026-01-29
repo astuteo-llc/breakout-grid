@@ -83,6 +83,7 @@ export function createInitialState() {
     restoreInput: '',
     restoreError: null,
     sectionCopied: null,
+    hasConfigOverride: false,
     showCloseWarningModal: false,
     gridOpacity: 0.8,
     backdropOpacity: 0.85,

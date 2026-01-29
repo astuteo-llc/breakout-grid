@@ -77,6 +77,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       restoreInput: "",
       restoreError: null,
       sectionCopied: null,
+      hasConfigOverride: false,
       showCloseWarningModal: false,
       gridOpacity: 0.8,
       backdropOpacity: 0.85
@@ -764,6 +765,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       if (savedConfig) {
         try {
           const config = JSON.parse(savedConfig);
+          this.hasConfigOverride = true;
           this.$nextTick(() => this.applyConfig(config));
         } catch (e) {
         }
@@ -1060,6 +1062,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     saveConfigToStorage() {
       const config = this.generateConfigExport();
       localStorage.setItem("breakoutGridConfig", JSON.stringify(config));
+      this.hasConfigOverride = true;
     },
     applyConfig(config) {
       this.editMode = true;
@@ -1112,6 +1115,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.restoreCSSVariables();
       this.loadCurrentValues();
       this.configCopied = false;
+      this.hasConfigOverride = false;
     },
     updateConfigValue(key, value) {
       this.editValues[key] = value;
@@ -1333,6 +1337,20 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.showRestoreModal = false;
       this.restoreInput = "";
       this.restoreError = null;
+    },
+    hasStoredOverrides() {
+      return ["breakoutGridConfig", "breakoutGridEditorOpen", "breakoutGridEditorPos", "breakoutGridSpacingPos", "breakoutGridSpacingCollapsed"].some((key) => localStorage.getItem(key) !== null);
+    },
+    resetAllStorage() {
+      ["breakoutGridVisualizerVisible", "breakoutGridEditorOpen", "breakoutGridConfig", "breakoutGridEditorPos", "breakoutGridSpacingPos", "breakoutGridSpacingCollapsed"].forEach((key) => localStorage.removeItem(key));
+      this.restoreCSSVariables();
+      this.showEditor = false;
+      this.editMode = false;
+      this.editorPos = { x: 20, y: 100 };
+      this.spacingPanelPos = { x: 16, y: 16 };
+      this.spacingPanelCollapsed = false;
+      this.hasConfigOverride = false;
+      this.configCopied = false;
     },
     restoreConfig() {
       this.restoreError = null;
@@ -2005,6 +2023,14 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
       </div>
 
+      <!-- Config override warning -->
+      <div x-show="hasConfigOverride"
+           style="padding: 6px 10px; background: #fef3c7; border-bottom: 1px solid #fcd34d; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+        <span style="font-size: 9px; font-weight: 600; color: #92400e;">localStorage override active</span>
+        <button @click="resetAllStorage()"
+                style="background: none; border: 1px solid #f59e0b; border-radius: 3px; font-size: 9px; font-weight: 600; color: #92400e; cursor: pointer; padding: 1px 5px; white-space: nowrap;">Clear</button>
+      </div>
+
       <!-- Collapsible Content -->
       <div x-show="!controlPanelCollapsed">
       <!-- Action Buttons -->
@@ -2106,10 +2132,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       </div>
 
       <!-- Footer -->
-      <div style="padding: 6px 12px; background: #f7f7f7; border-top: 1px solid #e5e5e5;">
-        <div style="font-size: 9px; color: #9ca3af; text-align: center;">
+      <div style="padding: 6px 12px; background: #f7f7f7; border-top: 1px solid #e5e5e5; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <div style="font-size: 9px; color: #9ca3af;">
           <kbd style="background: #e5e5e5; padding: 1px 4px; border-radius: 2px; font-size: 9px; font-weight: 600; color: #374151;">⌘G</kbd> toggle
         </div>
+        <button x-show="hasStoredOverrides()"
+                @click="resetAllStorage()"
+                style="background: none; border: none; font-size: 9px; color: #d1d5db; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px;"
+                onmouseenter="this.style.color='#9ca3af'"
+                onmouseleave="this.style.color='#d1d5db'"
+                title="Clear all saved visualizer state from localStorage">reset</button>
       </div>
 
       <!-- Selected Area Info -->
@@ -2521,6 +2553,17 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       </div>
     </div>
 
+  </div>
+
+  <!-- Persistent override indicator - visible even when visualizer is hidden -->
+  <div x-show="hasConfigOverride && !isVisible"
+       x-transition
+       style="position: fixed; bottom: 12px; right: 12px; z-index: 9998; pointer-events: auto; font-family: system-ui, -apple-system, sans-serif;">
+    <div style="display: flex; align-items: center; gap: 8px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 6px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <span style="font-size: 10px; font-weight: 600; color: #92400e;">Grid overridden by visualizer</span>
+      <button @click="resetAllStorage()"
+              style="background: none; border: 1px solid #f59e0b; border-radius: 3px; font-size: 9px; font-weight: 600; color: #92400e; cursor: pointer; padding: 2px 6px;">Clear</button>
+    </div>
   </div>
 `;
   (function() {
