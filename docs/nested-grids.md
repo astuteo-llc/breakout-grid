@@ -4,6 +4,40 @@ When nesting a `grid-cols-breakout` grid inside another layout (such as a sideba
 
 The `breakout-to-*` modifier classes solve this by collapsing the outer tracks, allowing the nested grid to fill its container while preserving the named grid lines so your `col-*` utilities continue to work.
 
+## Full Reset (Nested Breakout Grid)
+
+To nest a fresh `grid-cols-breakout` inside another without any offset, combine `col-full` with `grid-cols-breakout` on the same element:
+
+```html
+<div class="grid-cols-breakout">
+  <div class="col-full grid-cols-breakout bg-white py-16">
+    <!-- Fresh breakout grid, all tracks recalculated from full width -->
+    <h2 class="col-content">Section title</h2>
+    <p class="col-content">Content at reading width.</p>
+    <img class="col-feature" src="hero.jpg" alt="" />
+  </div>
+</div>
+```
+
+`col-full` spans edge-to-edge of the parent grid, and `grid-cols-breakout` re-declares the full track template. No `breakout-to-*` modifier is needed since the element already occupies the full width.
+
+This is useful for alternating background sections within a page that shares a single outer grid:
+
+```html
+<main class="grid-cols-breakout">
+  <h1 class="col-content">Page title</h1>
+  <p class="col-content">Intro paragraph.</p>
+
+  <!-- White band with its own breakout grid -->
+  <section class="col-full grid-cols-breakout bg-white py-16">
+    <h2 class="col-content">Featured section</h2>
+    <div class="col-feature">Wide content here</div>
+  </section>
+
+  <p class="col-content">Back to the outer grid.</p>
+</main>
+```
+
 ## Available Modifiers
 
 | Class | Effect |
