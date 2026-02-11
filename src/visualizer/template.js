@@ -1006,9 +1006,24 @@ export const template = `
               Reset
             </button>
           </div>
-          <button @click="downloadCSS()" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white;">
-            Download CSS
-          </button>
+          <div style="position: relative; width: 100%;">
+            <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              Download CSS <span style="font-size: 9px;">&#9662;</span>
+            </button>
+            <div x-show="cssDropdownOpen" @click.away="cssDropdownOpen = false" x-transition
+                 style="position: absolute; bottom: 100%; left: 0; right: 0; margin-bottom: 4px; background: white; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; z-index: 10;">
+              <button @click="downloadCSS('plain'); cssDropdownOpen = false"
+                      style="display: block; width: 100%; padding: 10px 16px; font-size: 11px; font-weight: 600; border: none; background: white; color: #374151; cursor: pointer; text-align: left;"
+                      @mouseenter="$el.style.background='#f3f4f6'" @mouseleave="$el.style.background='white'">
+                Plain CSS
+              </button>
+              <button @click="downloadCSS('tailwind'); cssDropdownOpen = false"
+                      style="display: block; width: 100%; padding: 10px 16px; font-size: 11px; font-weight: 600; border: none; background: white; color: #374151; cursor: pointer; text-align: left; border-top: 1px solid #f3f4f6;"
+                      @mouseenter="$el.style.background='#f3f4f6'" @mouseleave="$el.style.background='white'">
+                Tailwind v4
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -252,13 +252,19 @@ export const methods = {
     });
   },
 
-  downloadCSS() {
-    const css = this.generateCSSExport(this.generateConfigExport());
+  downloadCSS(format = 'plain') {
+    const config = this.generateConfigExport();
+    const css = format === 'tailwind'
+      ? this.generateTailwindCSSExport(config)
+      : this.generateCSSExport(config);
+    const filename = format === 'tailwind'
+      ? '_objects.breakout-grid.tw.css'
+      : '_objects.breakout-grid.css';
     const blob = new Blob([css], { type: 'text/css' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `_objects.breakout-grid.css`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
   },

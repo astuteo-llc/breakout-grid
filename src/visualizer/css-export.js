@@ -8,6 +8,36 @@ const BUILD_VERSION = typeof __VERSION__ !== 'undefined' ? __VERSION__ : 'dev';
 
 export { BUILD_VERSION as CSS_EXPORT_VERSION };
 
+export function wrapWithTailwindUtilities(css) {
+  return css.replace(
+    /^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm,
+    '@utility $1 {'
+  );
+}
+
+export function generateTailwindCSSExport(c, version = BUILD_VERSION) {
+  const css = generateCSSExport(c, version);
+  const tailwindCss = wrapWithTailwindUtilities(css);
+  return tailwindCss.replace(
+    /INTEGRATION \(ITCSS \+ Tailwind v4\)[\s\S]*?QUICK START/,
+    `INTEGRATION (Tailwind v4 @utility)
+ * ============================================================================
+ *
+ * This file uses @utility directives — requires Tailwind CSS v4+.
+ * All utilities support responsive and state variants:
+ *
+ *   <div class="col-content md:col-feature lg:col-full">...</div>
+ *
+ * Add this file to your CSS imports:
+ *
+ *   @import 'tailwindcss';
+ *   @import './_objects.breakout-grid.tw.css';
+ *
+ * ============================================================================
+ * QUICK START`
+  );
+}
+
 export function generateCSSExport(c, version = BUILD_VERSION) {
   const VERSION = version;
   // Extract config with fallbacks

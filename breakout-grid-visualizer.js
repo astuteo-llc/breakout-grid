@@ -77,6 +77,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       restoreInput: "",
       restoreError: null,
       sectionCopied: null,
+      cssDropdownOpen: false,
       hasConfigOverride: false,
       showCloseWarningModal: false,
       gridOpacity: 0.8,
@@ -84,6 +85,34 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     };
   }
   const BUILD_VERSION = "5.1.5";
+  function wrapWithTailwindUtilities(css) {
+    return css.replace(
+      /^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm,
+      "@utility $1 {"
+    );
+  }
+  function generateTailwindCSSExport(c, version = BUILD_VERSION) {
+    const css = generateCSSExport(c, version);
+    const tailwindCss = wrapWithTailwindUtilities(css);
+    return tailwindCss.replace(
+      /INTEGRATION \(ITCSS \+ Tailwind v4\)[\s\S]*?QUICK START/,
+      `INTEGRATION (Tailwind v4 @utility)
+ * ============================================================================
+ *
+ * This file uses @utility directives — requires Tailwind CSS v4+.
+ * All utilities support responsive and state variants:
+ *
+ *   <div class="col-content md:col-feature lg:col-full">...</div>
+ *
+ * Add this file to your CSS imports:
+ *
+ *   @import 'tailwindcss';
+ *   @import './_objects.breakout-grid.tw.css';
+ *
+ * ============================================================================
+ * QUICK START`
+    );
+  }
   function generateCSSExport(c, version = BUILD_VERSION) {
     var _a, _b, _c, _d, _e;
     const VERSION2 = version;
@@ -979,13 +1008,15 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         setTimeout(() => this.copySuccess = false, 2e3);
       });
     },
-    downloadCSS() {
-      const css = this.generateCSSExport(this.generateConfigExport());
+    downloadCSS(format = "plain") {
+      const config = this.generateConfigExport();
+      const css = format === "tailwind" ? this.generateTailwindCSSExport(config) : this.generateCSSExport(config);
+      const filename = format === "tailwind" ? "_objects.breakout-grid.tw.css" : "_objects.breakout-grid.css";
       const blob = new Blob([css], { type: "text/css" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `_objects.breakout-grid.css`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     },
@@ -2396,9 +2427,24 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
               Reset
             </button>
           </div>
-          <button @click="downloadCSS()" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white;">
-            Download CSS
-          </button>
+          <div style="position: relative; width: 100%;">
+            <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              Download CSS <span style="font-size: 9px;">&#9662;</span>
+            </button>
+            <div x-show="cssDropdownOpen" @click.away="cssDropdownOpen = false" x-transition
+                 style="position: absolute; bottom: 100%; left: 0; right: 0; margin-bottom: 4px; background: white; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; z-index: 10;">
+              <button @click="downloadCSS('plain'); cssDropdownOpen = false"
+                      style="display: block; width: 100%; padding: 10px 16px; font-size: 11px; font-weight: 600; border: none; background: white; color: #374151; cursor: pointer; text-align: left;"
+                      @mouseenter="$el.style.background='#f3f4f6'" @mouseleave="$el.style.background='white'">
+                Plain CSS
+              </button>
+              <button @click="downloadCSS('tailwind'); cssDropdownOpen = false"
+                      style="display: block; width: 100%; padding: 10px 16px; font-size: 11px; font-weight: 600; border: none; background: white; color: #374151; cursor: pointer; text-align: left; border-top: 1px solid #f3f4f6;"
+                      @mouseenter="$el.style.background='#f3f4f6'" @mouseleave="$el.style.background='white'">
+                Tailwind v4
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2584,6 +2630,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         ...methods,
         // CSS export
         generateCSSExport,
+        generateTailwindCSSExport,
         cssExportVersion: BUILD_VERSION,
         // Template
         template

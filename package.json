@@ -7,6 +7,7 @@
   "style": "dist/_objects.breakout-grid.css",
   "files": [
     "dist/_objects.breakout-grid.css",
+    "dist/_objects.breakout-grid.tw.css",
     "breakout-grid-visualizer.js",
     "breakout-grid-visualizer-lite.js",
     "craft-integration.twig",
@@ -16,6 +17,7 @@
   "exports": {
     ".": "./dist/_objects.breakout-grid.css",
     "./css": "./dist/_objects.breakout-grid.css",
+    "./tailwind": "./dist/_objects.breakout-grid.tw.css",
     "./visualizer": "./breakout-grid-visualizer.js",
     "./visualizer-lite": "./breakout-grid-visualizer-lite.js"
   },
