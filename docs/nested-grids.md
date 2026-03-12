@@ -219,7 +219,28 @@ Key points:
 
 ## Disabling Breakout Grid Entirely
 
-Sometimes you need to completely disable breakout behavior rather than just collapse tracks. The `breakout-none` utilities remove the grid display entirely, causing any `col-*` classes on child elements to be ignored.
+Sometimes you need to completely disable breakout behavior rather than just collapse tracks. The `breakout-none` utilities remove the breakout grid template and **reset any `col-*` classes on direct children to `grid-column: auto`**, so they don't reference named grid lines that no longer exist.
+
+### Available Classes
+
+| Class | Effect |
+|-------|--------|
+| `breakout-none` | Sets `display: block` — standard block flow |
+| `breakout-none-flex` | Sets `display: flex` — use with flex utilities |
+| `breakout-none-grid` | Sets `display: grid` — use with your own grid template |
+
+All three also apply:
+```css
+.breakout-none > [class*='col-'],
+.breakout-none-flex > [class*='col-'],
+.breakout-none-grid > [class*='col-'] {
+    grid-column: auto;
+}
+```
+
+This resets breakout `col-*` placement on direct children so they participate in whatever layout you define instead.
+
+> **Note:** The `[class*='col-']` selector also matches Tailwind's `col-span-*` utilities. Avoid using `col-span-*` as direct children of `breakout-none-grid`. Instead, define your column layout with `grid-template-columns` (see sidebar example below).
 
 ### Use Case: Reusable Components
 
@@ -233,51 +254,43 @@ When you have components designed for breakout grids (with embedded `col-*` clas
   </div>
 </main>
 
-<!-- Sidebar layout: breakout disabled, col-* classes ignored -->
+<!-- Sidebar layout: breakout disabled, col-* classes reset -->
 <main class="grid-cols-breakout">
-  <div class="col-feature breakout-none-grid grid-cols-12 gap-8">
-    <aside class="col-span-3">Sidebar</aside>
-    <div class="col-span-9">
-      <!-- Same component, but col-popout is now ignored -->
+  <div class="col-feature breakout-none-grid grid-cols-[250px_1fr] gap-8">
+    <aside>Sidebar</aside>
+    <div>
+      <!-- Same component, col-popout is reset to auto -->
       <div data-component="info-card" class="col-popout bg-amber-50 p-6">
-        Renders as normal block (col-popout ignored)
+        Renders as normal block
       </div>
     </div>
   </div>
 </main>
 ```
 
-### Available Classes
-
-| Class | Effect |
-|-------|--------|
-| `breakout-none` | Sets `display: block` — standard block flow |
-| `breakout-none-flex` | Sets `display: flex` — use with flex utilities |
-| `breakout-none-grid` | Sets `display: grid` — use with CSS grid (e.g., `grid-cols-12`) |
-
 ### Sidebar Layout Pattern
 
-The most common pattern combines `breakout-none-grid` with a 12-column grid:
+The most common pattern combines `breakout-none-grid` with an explicit grid template:
 
 ```html
 <main class="grid-cols-breakout py-12">
-  <div class="col-feature breakout-none-grid grid-cols-12 gap-8">
+  <div class="col-feature breakout-none-grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
 
-    <!-- Sidebar: 3 columns -->
-    <aside class="col-span-12 lg:col-span-3">
+    <aside>
       <nav>Sidebar navigation</nav>
     </aside>
 
-    <!-- Content: 9 columns -->
-    <div class="col-span-12 lg:col-span-9">
+    <div>
       <!-- Components with col-* classes render normally here -->
-      <div class="col-content">This col-content is ignored</div>
-      <div class="col-popout">This col-popout is ignored</div>
+      <div class="col-content">col-content reset to auto</div>
+      <div class="col-popout">col-popout reset to auto</div>
     </div>
 
   </div>
 </main>
 ```
+
+Use `grid-cols-[250px_1fr]` (or any explicit template) instead of `grid-cols-12` + `col-span-*` to avoid conflicts with the `col-*` reset selector.
 
 ### When to Use Each Approach
 

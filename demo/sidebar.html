@@ -40,15 +40,25 @@
   </nav>
 
   <!-- ============================================
-       MAIN LAYOUT: Feature-width with 12-col grid
+       MAIN LAYOUT: Feature-width sidebar layout
+       ============================================
+
+       breakout-none-grid escapes the breakout grid and starts a plain
+       CSS grid. Direct children with breakout col-* classes are
+       automatically reset to grid-column: auto so they don't reference
+       named lines that no longer exist.
+
+       We define the sidebar/content split with grid-template-columns
+       instead of grid-cols-12 + col-span-*, which avoids any selector
+       conflict between the col-* reset and Tailwind's col-span utilities.
        ============================================ -->
   <main class="grid-cols-breakout py-12">
 
-    <!-- Feature-width container with 12-column grid -->
-    <div class="col-feature breakout-none-grid grid-cols-12 gap-8">
+    <!-- Feature-width container with sidebar grid -->
+    <div class="col-feature breakout-none-grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
 
-      <!-- Sidebar: 3 columns on large screens -->
-      <aside class="col-span-12 lg:col-span-3">
+      <!-- Sidebar -->
+      <aside>
         <div class="sticky top-4">
           <div class="bg-slate-800 text-white px-4 py-3 rounded-t font-semibold text-sm">
             Documentation
@@ -76,8 +86,8 @@
         </div>
       </aside>
 
-      <!-- Content area: 9 columns on large screens -->
-      <div class="col-span-12 lg:col-span-9">
+      <!-- Content area -->
+      <div>
 
         <!-- Page Title -->
         <h1 class="text-3xl font-bold text-gray-900 mb-4">Getting Started with CNC-5000</h1>
@@ -86,14 +96,14 @@
         <!-- KEY CLASSES CALLOUT -->
         <div class="bg-slate-900 text-white rounded-lg p-6 mb-8">
           <h2 class="text-lg font-bold mb-4 text-amber-400">Sidebar Layout Pattern</h2>
-          <p class="text-slate-300 text-sm mb-4">This page demonstrates how to use a sidebar within the breakout grid system. The key classes:</p>
+          <p class="text-slate-300 text-sm mb-4">This page demonstrates how to escape the breakout grid for a sidebar layout. The key classes:</p>
           <div class="bg-slate-800 rounded p-4 font-mono text-sm mb-4 overflow-x-auto">
             <div class="text-slate-400">&lt;main class="<span class="text-emerald-400">grid-cols-breakout</span>"&gt;</div>
-            <div class="text-slate-400 pl-4">&lt;div class="<span class="text-amber-400">col-feature</span> <span class="text-pink-400">breakout-none-grid</span> <span class="text-blue-400">grid-cols-12 gap-8</span>"&gt;</div>
-            <div class="text-slate-400 pl-8">&lt;aside class="<span class="text-blue-400">col-span-3</span>"&gt;Sidebar&lt;/aside&gt;</div>
-            <div class="text-slate-400 pl-8">&lt;div class="<span class="text-blue-400">col-span-9</span>"&gt;</div>
-            <div class="text-slate-400 pl-12">&lt;!-- Blocks with col-* classes render normally --&gt;</div>
-            <div class="text-slate-400 pl-12">&lt;div class="<span class="text-slate-500 line-through">col-popout</span>"&gt;Ignored!&lt;/div&gt;</div>
+            <div class="text-slate-400 pl-4">&lt;div class="<span class="text-amber-400">col-feature</span> <span class="text-pink-400">breakout-none-grid</span> <span class="text-blue-400">grid-cols-[250px_1fr] gap-8</span>"&gt;</div>
+            <div class="text-slate-400 pl-8">&lt;aside&gt;Sidebar&lt;/aside&gt;</div>
+            <div class="text-slate-400 pl-8">&lt;div&gt;</div>
+            <div class="text-slate-400 pl-12">&lt;!-- Blocks with col-* classes are reset to auto --&gt;</div>
+            <div class="text-slate-400 pl-12">&lt;div class="<span class="text-slate-500 line-through">col-popout</span>"&gt;Reset to auto&lt;/div&gt;</div>
             <div class="text-slate-400 pl-8">&lt;/div&gt;</div>
             <div class="text-slate-400 pl-4">&lt;/div&gt;</div>
             <div class="text-slate-400">&lt;/main&gt;</div>
@@ -109,7 +119,7 @@
             </div>
             <div>
               <span class="text-pink-400 font-semibold">breakout-none-grid</span>
-              <p class="text-slate-400 mt-1">Disables breakout, enables CSS grid</p>
+              <p class="text-slate-400 mt-1">Escapes breakout, resets col-* to auto</p>
             </div>
           </div>
         </div>

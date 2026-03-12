@@ -723,6 +723,10 @@ const createGridUtilities = (config, templates) => {
     },
     '.breakout-none-grid': {
       'display': 'grid'
+    },
+    // Reset col-* placement inside breakout-none containers
+    '.breakout-none > [class*="col-"], .breakout-none-flex > [class*="col-"], .breakout-none-grid > [class*="col-"]': {
+      'grid-column': 'auto'
     }
   }
 
