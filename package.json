@@ -1,6 +1,6 @@
 {
   "name": "@astuteo/breakout-grid",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "type": "module",
   "description": "CSS Grid breakout layout system with visual configurator",
   "main": "dist/_objects.breakout-grid.css",
@@ -45,7 +45,7 @@
     "@tailwindcss/vite": "^4.0.0",
     "alpinejs": "^3.14.0",
     "tailwindcss": "^4.0.0",
-    "vite": "^6.0.0"
+    "vite": "^7.3.2"
   },
   "engines": {
     "node": ">=14.0.0"
