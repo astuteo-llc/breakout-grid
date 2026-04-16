@@ -25,7 +25,7 @@ Download the CSS file and include it directly:
 ### npm
 
 ```bash
-npm install github:astuteo-llc/breakout-grid
+npm install @astuteo/breakout-grid
 ```
 
 Import the CSS in your build:
