@@ -15,7 +15,9 @@ const expectedVersion = pkg.version;
 const files = [
   { path: 'breakout-grid-visualizer.js', pattern: /const VERSION = `v\$\{"([^"]+)"\}`/ },
   { path: 'breakout-grid-visualizer.js', pattern: /const BUILD_VERSION = "([^"]+)"/ },
-  { path: 'breakout-grid-visualizer-lite.js', pattern: /const VERSION = `v\$\{"([^"]+)"\} lite`/ }
+  { path: 'breakout-grid-visualizer-lite.js', pattern: /const VERSION = `v\$\{"([^"]+)"\} lite`/ },
+  { path: 'dist/_objects.breakout-grid.css', pattern: /Version: ([^\s*]+)/ },
+  { path: 'dist/_objects.breakout-grid.tw.css', pattern: /Version: ([^\s*]+)/ }
 ];
 
 let hasError = false;
