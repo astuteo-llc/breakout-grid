@@ -10,7 +10,7 @@ Version numbers come from `package.json` and get injected into built files durin
 
 ```bash
 # 1. Bump version in package.json FIRST
-npm version patch   # or minor/major (don't use git flags yet)
+npm version patch --no-git-tag-version   # or minor/major
 
 # 2. Build with new version
 npm run build
@@ -20,10 +20,10 @@ npm run check-version
 
 # 4. Commit the version bump + rebuilt files
 git add -A
-git commit -m "5.2.0"  # use your new version
+git commit -m "$(node -p "require('./package.json').version")"
 
-# 5. Tag and push
-git tag v5.2.0
+# 5. Tag the commit you just made, then push
+git tag "v$(node -p "require('./package.json').version")"
 git push && git push --tags
 
 # 6. Publish to npm
