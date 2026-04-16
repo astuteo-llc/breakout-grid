@@ -4,37 +4,52 @@
 
 Version numbers come from `package.json` and get injected into built files during `npm run build`. If you bump the version AFTER building, the built files will have the OLD version.
 
-## Correct Publish Flow
+## Publish (One-Liner)
 
-### Option A: Manual Steps (Recommended)
+Replace `patch` with `minor` or `major` as needed.
 
 ```bash
-# 1. Bump version in package.json FIRST
-npm version patch --no-git-tag-version   # or minor/major
-
-# 2. Build with new version
-npm run build
-
-# 3. Verify versions match
-npm run check-version
-
-# 4. Commit the version bump + rebuilt files
-git add -A
-git commit -m "$(node -p "require('./package.json').version")"
-
-# 5. Tag the commit you just made, then push
-git tag "v$(node -p "require('./package.json').version")"
-git push && git push --tags
-
-# 6. Publish to npm
-npm publish
+npm version patch --no-git-tag-version && npm run build && npm run check-version && git add -A && git commit -m "$(node -p "require('./package.json').version")" && git tag "v$(node -p "require('./package.json').version")" && git push && git push --tags && npm publish
 ```
 
-### Option B: All-in-One Command
+## Step by Step
+
+If you prefer to run each step individually:
+
+**1. Bump version**
 
 ```bash
-# Bump version, rebuild, commit, tag, push, publish
-npm version patch --no-git-tag-version && npm run build && npm run check-version && git add -A && git commit -m "$(node -p "require('./package.json').version")" && git tag "v$(node -p "require('./package.json').version")" && git push && git push --tags && npm publish
+npm version patch --no-git-tag-version
+```
+
+**2. Build**
+
+```bash
+npm run build
+```
+
+**3. Verify**
+
+```bash
+npm run check-version
+```
+
+**4. Commit**
+
+```bash
+git add -A && git commit -m "$(node -p "require('./package.json').version")"
+```
+
+**5. Tag and push**
+
+```bash
+git tag "v$(node -p "require('./package.json').version")" && git push && git push --tags
+```
+
+**6. Publish**
+
+```bash
+npm publish
 ```
 
 ## Version Locations
