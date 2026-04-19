@@ -87,7 +87,7 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 
 ### Changed
 
-- **`.p-breakout` / `.m-breakout` are now aliases for `.p-popout` / `.m-popout`** — both emit `var(--popout-width)` (the fixed popout track width). The fluid clamp they previously used (`clamp(--breakout-min, --breakout-scale, --popout-width)`) was too close to `--popout-width` to justify carrying both systems. The `--breakout-padding`, `--breakout-min`, `--breakout-scale` CSS variables and the `breakoutMin`/`breakoutScale`/`breakoutPadding` plugin config options are removed. If you need a custom fluid clamp, drop to Tailwind's arbitrary value syntax: `p-[clamp(1rem,5vw,var(--popout-width))]`.
+- **`.p-breakout` / `.m-breakout` now use a hardcoded fluid clamp** — `clamp(1rem, 5vw, var(--popout-width))`, exposed as `--breakout-padding`. They collapse to `1rem` on small screens (where the fixed `var(--popout-width)` = 5rem would eat most of the viewport) and scale up to the full popout width on desktop. The `--breakout-min`, `--breakout-scale` CSS variables and the `breakoutMin`/`breakoutScale`/`breakoutPadding` plugin config options are removed — the clamp is no longer configurable. If you need a custom clamp, drop to arbitrary values: `p-[clamp(1.5rem,6vw,8rem)]`. `.p-popout` / `.m-popout` remain fixed at `var(--popout-width)` for cases where you want the exact track width.
 - **Combined CSS** is **17.9 KB raw / 3.2 KB gzip** (Tailwind flavor: 19.3 KB / 3.4 KB gzip), down from ~26 KB / 5.7 KB gzip in v5
 - **dist output** collapsed from four files (core + extras × plain/Tailwind) to two (single unified output × plain/Tailwind)
 - **Removed stale `style` field** from `package.json` — superseded by the `exports` map

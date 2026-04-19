@@ -114,7 +114,7 @@ From narrowest to widest:
 #### Spacing
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
-- `.p-breakout`, `.m-breakout`, etc. - Legacy/fallback aliases for `.p-popout` / `.m-popout` (kept to avoid breaking existing markup)
+- `.p-breakout`, `.m-breakout`, etc. - Fluid inset padding (`clamp(1rem, 5vw, var(--popout-width))`) — collapses on mobile so edge-bleed bands stay readable
 - Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`
 
 > Need to align content inside a wider column with the content column edge? Compose with Tailwind arbitrary values — the grid vars (`--popout-width`, `--feature-min/scale/max`) are already available:

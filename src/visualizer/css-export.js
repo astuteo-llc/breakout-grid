@@ -98,11 +98,11 @@ function gridCSS(c, version) {
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   POPOUT PADDING ....... .p-popout / .p-breakout (alias, sized to --popout-width)
+ *   POPOUT PADDING ....... .p-popout (fixed --popout-width), .p-breakout (fluid clamp)
  *
  * Full build adds:
  *   GAP SPACING .......... .p-gap, .m-gap (+ axes + negatives)
- *   POPOUT MARGINS ....... .m-popout / .m-breakout (alias, + axes + negatives)
+ *   POPOUT MARGINS ....... .m-popout (fixed), .m-breakout (fluid) (+ axes + negatives)
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -139,6 +139,11 @@ ${configRootCSS(c)}
   --full: minmax(var(--gap), 1fr);
   --feature: minmax(0, clamp(var(--feature-min), var(--feature-scale), var(--feature-max)));
   --popout: minmax(0, var(--popout-width));
+
+  /* Fluid inset padding for .p-breakout / .m-breakout — floor 1rem, scale 5vw,
+     ceiling = popout-width. Collapses on mobile so edge-bleed bands don't crush
+     their own content. See usage notes above .p-popout / .p-breakout below. */
+  --breakout-padding: clamp(1rem, 5vw, var(--popout-width));
 }
 
 /* Responsive gap scaling */
@@ -306,8 +311,14 @@ ${configRootCSS(c)}
 .col-narrow-right { grid-column: content-start / full-end; }
 
 /* ============================================================================
-   POPOUT PADDING — sized to --popout-width (unique to the grid; no Tailwind equivalent)
-   .p-breakout is an alias for .p-popout, kept for backward compatibility.
+   POPOUT PADDING  — fixed, = var(--popout-width) (the exact popout track width).
+                     Use when the padding MUST match the track (e.g. pulling a
+                     feature-width element's inner content to content-width edges).
+   BREAKOUT PADDING — fluid clamp(1rem, 5vw, --popout-width). Use on edge-bleed
+                     bands (col-full / col-feature) so the inset collapses to
+                     1rem on mobile instead of eating half the viewport with 5rem.
+                     Pick .p-breakout for full-bleed CTAs, hero bands, inset
+                     sections. Pick .p-popout when exact track alignment matters.
    ============================================================================ */
 
 .p-popout { padding: var(--popout-width); }
@@ -318,14 +329,13 @@ ${configRootCSS(c)}
 .pt-popout { padding-top: var(--popout-width); }
 .pb-popout { padding-bottom: var(--popout-width); }
 
-/* Legacy/fallback aliases — duplicate .p-popout to avoid breaking existing markup */
-.p-breakout { padding: var(--popout-width); }
-.px-breakout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
-.py-breakout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
-.pl-breakout { padding-left: var(--popout-width); }
-.pr-breakout { padding-right: var(--popout-width); }
-.pt-breakout { padding-top: var(--popout-width); }
-.pb-breakout { padding-bottom: var(--popout-width); }
+.p-breakout { padding: var(--breakout-padding); }
+.px-breakout { padding-left: var(--breakout-padding); padding-right: var(--breakout-padding); }
+.py-breakout { padding-top: var(--breakout-padding); padding-bottom: var(--breakout-padding); }
+.pl-breakout { padding-left: var(--breakout-padding); }
+.pr-breakout { padding-right: var(--breakout-padding); }
+.pt-breakout { padding-top: var(--breakout-padding); }
+.pb-breakout { padding-bottom: var(--breakout-padding); }
 `;
 }
 
@@ -364,8 +374,11 @@ function spacingCSS(c) {
 .-mb-gap { margin-bottom: calc(var(--gap) * -1); }
 
 /* ============================================================================
-   POPOUT MARGINS — sized to --popout-width
-   .m-breakout / .-m-breakout are aliases, kept for backward compatibility.
+   POPOUT MARGINS  — fixed, = var(--popout-width). Mirror of .p-popout for
+                     negative margins that need to bleed exactly one popout track.
+   BREAKOUT MARGINS — fluid, = var(--breakout-padding). Mirror of .p-breakout;
+                     use for negative margins on bands that should collapse on
+                     mobile (e.g. -mx-breakout to pull a child past its edges).
    ============================================================================ */
 
 .m-popout { margin: var(--popout-width); }
@@ -384,22 +397,21 @@ function spacingCSS(c) {
 .-mt-popout { margin-top: calc(var(--popout-width) * -1); }
 .-mb-popout { margin-bottom: calc(var(--popout-width) * -1); }
 
-/* Legacy/fallback aliases — duplicate .m-popout / .-m-popout to avoid breaking existing markup */
-.m-breakout { margin: var(--popout-width); }
-.mx-breakout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
-.my-breakout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }
-.ml-breakout { margin-left: var(--popout-width); }
-.mr-breakout { margin-right: var(--popout-width); }
-.mt-breakout { margin-top: var(--popout-width); }
-.mb-breakout { margin-bottom: var(--popout-width); }
+.m-breakout { margin: var(--breakout-padding); }
+.mx-breakout { margin-left: var(--breakout-padding); margin-right: var(--breakout-padding); }
+.my-breakout { margin-top: var(--breakout-padding); margin-bottom: var(--breakout-padding); }
+.ml-breakout { margin-left: var(--breakout-padding); }
+.mr-breakout { margin-right: var(--breakout-padding); }
+.mt-breakout { margin-top: var(--breakout-padding); }
+.mb-breakout { margin-bottom: var(--breakout-padding); }
 
-.-m-breakout { margin: calc(var(--popout-width) * -1); }
-.-mx-breakout { margin-left: calc(var(--popout-width) * -1); margin-right: calc(var(--popout-width) * -1); }
-.-my-breakout { margin-top: calc(var(--popout-width) * -1); margin-bottom: calc(var(--popout-width) * -1); }
-.-ml-breakout { margin-left: calc(var(--popout-width) * -1); }
-.-mr-breakout { margin-right: calc(var(--popout-width) * -1); }
-.-mt-breakout { margin-top: calc(var(--popout-width) * -1); }
-.-mb-breakout { margin-bottom: calc(var(--popout-width) * -1); }
+.-m-breakout { margin: calc(var(--breakout-padding) * -1); }
+.-mx-breakout { margin-left: calc(var(--breakout-padding) * -1); margin-right: calc(var(--breakout-padding) * -1); }
+.-my-breakout { margin-top: calc(var(--breakout-padding) * -1); margin-bottom: calc(var(--breakout-padding) * -1); }
+.-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
+.-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
+.-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
+.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }
 `;
 }
 

@@ -217,6 +217,8 @@ const createRootCSS = (pluginConfig) => {
       '--popout': `minmax(0, ${pluginConfig.popoutWidth})`,
       '--content': 'min(clamp(var(--content-min), var(--content-base), var(--content-max)), 100% - var(--gap) * 2)',
       '--content-half': 'calc(var(--content) / 2)',
+      // Fluid inset padding for .p-breakout / .m-breakout — collapses on small viewports
+      '--breakout-padding': `clamp(1rem, 5vw, ${pluginConfig.popoutWidth})`,
     }
   } catch (error) {
     console.warn(`Tailwind Breakout Grid Plugin - Error creating CSS custom properties: ${error.message}. This may be due to invalid or malformed configuration values (e.g., invalid CSS units or property names). Please check your plugin configuration for errors. Using fallback values.`)
@@ -279,17 +281,14 @@ const createSpacingUtilities = () => {
 
   return Object.entries(spacingTypes)
     .reduce((acc, [key, properties]) => {
-      const popoutBody = [properties].flat()
-        .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--config-popout)' }), {});
       const utilities = {
         [`.${key}-gap`]: [properties].flat()
-          .reduce((styles, prop) => ({
-            ...styles,
-            [prop]: 'var(--gap)'
-          }), {}),
-        [`.${key}-popout`]: popoutBody,
-        // .p-breakout / .m-breakout kept as aliases of -popout for backward compatibility
-        [`.${key}-breakout`]: popoutBody
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--gap)' }), {}),
+        [`.${key}-popout`]: [properties].flat()
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--config-popout)' }), {}),
+        // .p-breakout / .m-breakout: fluid clamp, collapses to 1rem on small screens
+        [`.${key}-breakout`]: [properties].flat()
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--breakout-padding)' }), {})
       }
 
       return { ...acc, ...utilities }
@@ -656,7 +655,7 @@ module.exports = (config = {}) => {
         const matchValues = {
           gap: 'var(--gap)',
           popout: 'var(--config-popout)',
-          breakout: 'var(--config-popout)'
+          breakout: 'var(--breakout-padding)'
         }
 
         Object.entries(marginDirections).forEach(([key, properties]) => {
