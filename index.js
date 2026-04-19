@@ -165,8 +165,33 @@ const defaultConfig = {
   breakoutMin: '1rem',   // Minimum breakout padding (floor)
   breakoutScale: '5vw',  // Fluid breakout padding scaling
   // Legacy responsive breakout padding (overrides clamp if provided)
-  breakoutPadding: null  // null = use clamp, or provide { base, md, lg } for fixed values
+  breakoutPadding: null, // null = use clamp, or provide { base, md, lg } for fixed values
+  // Include the "extras" utility layer (breakout-none, p-breakout, m-breakout,
+  // p-full-gap, p-*-to-content alignment utilities, and extras-only CSS vars).
+  // Set to false for a slim core-only build.
+  extras: true
 }
+
+// Keys emitted by the extras layer — used to omit them when extras: false.
+// Kept as arrays so adding a future extras selector is a one-line change.
+const EXTRAS_ROOT_CSS_KEYS = [
+  '--popout-to-content',
+  '--feature-to-content',
+  '--computed-gap',
+  '--breakout-padding',
+  '--config-breakout-min',
+  '--config-breakout-scale'
+]
+
+const EXTRAS_UTILITY_KEYS = [
+  // breakout-none (in createGridUtilities)
+  '.breakout-none',
+  '.breakout-none-flex',
+  '.breakout-none-grid',
+  '.breakout-none > [class*="col-"], .breakout-none-flex > [class*="col-"], .breakout-none-grid > [class*="col-"]'
+]
+
+const EXTRAS_SPACING_SUFFIXES = ['full-gap']
 
 /**
  * Creates CSS Custom Properties for the grid system.
@@ -793,6 +818,8 @@ module.exports = (config = {}) => {
       breakoutPadding: config.breakoutPadding !== undefined ? config.breakoutPadding : defaultConfig.breakoutPadding
     }
 
+    const { extras } = pluginConfig
+
     return ({
       addBase,
       theme,
@@ -803,6 +830,11 @@ module.exports = (config = {}) => {
         const screens = theme('screens', {})
         const templates = generateTemplates(pluginConfig)
         const rootCSS = createRootCSS(pluginConfig)
+
+        // Omit extras-only CSS custom properties when the extras layer is off
+        if (!extras) {
+          for (const key of EXTRAS_ROOT_CSS_KEYS) delete rootCSS[key]
+        }
 
         // Add responsive gap scaling and breakout padding media queries
         const mediaQueries = Object.entries(screens)
@@ -818,8 +850,8 @@ module.exports = (config = {}) => {
               acc[mediaQuery]['--gap'] = `clamp(var(--base-gap), ${pluginConfig.gapScale[breakpoint]}, var(--max-gap))`;
             }
 
-            // Add breakout padding for this breakpoint (only if using fixed values)
-            if (pluginConfig.breakoutPadding?.[breakpoint]) {
+            // Add breakout padding for this breakpoint (extras only, fixed values)
+            if (extras && pluginConfig.breakoutPadding?.[breakpoint]) {
               acc[mediaQuery]['--breakout-padding'] = pluginConfig.breakoutPadding[breakpoint];
             }
 
@@ -834,12 +866,26 @@ module.exports = (config = {}) => {
           }
         })
 
-        // Add all utility classes
+        // Build the full utility set, then drop extras entries if disabled.
+        const spacingUtilities = createSpacingUtilities()
+        const gridUtilities = createGridUtilities(pluginConfig, templates)
+
+        if (!extras) {
+          // full-gap spacing lives in extras — drop every direction key
+          for (const key of Object.keys(spacingUtilities)) {
+            if (EXTRAS_SPACING_SUFFIXES.some(suffix => key.endsWith(`-${suffix}`))) {
+              delete spacingUtilities[key]
+            }
+          }
+          // breakout-none* lives in extras
+          for (const key of EXTRAS_UTILITY_KEYS) delete gridUtilities[key]
+        }
+
         addUtilities({
-          ...createSpacingUtilities(),
-          ...createBreakoutPaddingUtilities(),
-          ...createBreakoutMarginUtilities(),
-          ...createGridUtilities(pluginConfig, templates),
+          ...spacingUtilities,
+          ...(extras ? createBreakoutPaddingUtilities() : {}),
+          ...(extras ? createBreakoutMarginUtilities() : {}),
+          ...gridUtilities,
           ...createColumnUtilities(templates),
           '.col-full-limit': {
             'grid-column': 'full',
@@ -862,19 +908,15 @@ module.exports = (config = {}) => {
           ml: ['margin-left']
         }
 
-        // Negative margins for gap-based spacing
+        // Negative margins for gap-based spacing (full-gap + breakout are extras-only)
+        const matchValues = extras
+          ? { gap: 'var(--gap)', 'full-gap': 'var(--computed-gap)', popout: 'var(--popout)', breakout: 'var(--breakout-padding)' }
+          : { gap: 'var(--gap)', popout: 'var(--popout)' }
+
         Object.entries(marginDirections).forEach(([key, properties]) => {
           matchUtilities(
             { [key]: (value) => properties.reduce((acc, prop) => ({ ...acc, [prop]: value }), {}) },
-            {
-              values: {
-                gap: 'var(--gap)',
-                'full-gap': 'var(--computed-gap)',
-                popout: 'var(--popout)',
-                breakout: 'var(--breakout-padding)'
-              },
-              supportsNegativeValues: true
-            }
+            { values: matchValues, supportsNegativeValues: true }
           )
         })
       } catch (error) {

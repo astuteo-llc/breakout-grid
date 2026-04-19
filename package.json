@@ -4,10 +4,11 @@
   "type": "module",
   "description": "CSS Grid breakout layout system with visual configurator",
   "main": "dist/_objects.breakout-grid.css",
-  "style": "dist/_objects.breakout-grid.css",
   "files": [
     "dist/_objects.breakout-grid.css",
     "dist/_objects.breakout-grid.tw.css",
+    "dist/_objects.breakout-grid-extras.css",
+    "dist/_objects.breakout-grid-extras.tw.css",
     "breakout-grid-visualizer.js",
     "breakout-grid-visualizer-lite.js",
     "craft-integration.twig",
@@ -18,6 +19,8 @@
     ".": "./dist/_objects.breakout-grid.css",
     "./css": "./dist/_objects.breakout-grid.css",
     "./tailwind": "./dist/_objects.breakout-grid.tw.css",
+    "./extras": "./dist/_objects.breakout-grid-extras.css",
+    "./extras/tailwind": "./dist/_objects.breakout-grid-extras.tw.css",
     "./visualizer": "./breakout-grid-visualizer.js",
     "./visualizer-lite": "./breakout-grid-visualizer-lite.js"
   },
