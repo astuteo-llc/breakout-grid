@@ -222,9 +222,6 @@ const createRootCSS = (pluginConfig) => {
       // Breakout padding config values (for visualizer)
       '--config-breakout-min': pluginConfig.breakoutMin,
       '--config-breakout-scale': pluginConfig.breakoutScale,
-      // Padding to align content with inner columns
-      '--popout-to-content': `clamp(${pluginConfig.breakoutMin}, ${pluginConfig.breakoutScale}, ${pluginConfig.popoutWidth})`,
-      '--feature-to-content': `calc(clamp(${pluginConfig.featureMin}, ${pluginConfig.featureScale}, ${pluginConfig.featureMax}) + ${pluginConfig.popoutWidth})`,
       // Computed values
       '--base-gap': pluginConfig.baseGap,
       '--max-gap': pluginConfig.maxGap,
@@ -343,28 +340,11 @@ const createBreakoutPaddingMediaQueries = (config, screens) => {
 };
 
 /**
- * Generates edge-to-column padding utilities for full-width sections.
- * Use these when you have a full-bleed section but want content to align with grid columns.
+ * Generates the `.p-breakout` / `.px-breakout` / etc. family — fluid edge
+ * padding sized to `--breakout-padding` (clamp of breakout min, scale,
+ * and popout width).
  *
- * Generated classes:
- * - .p-breakout / .px-breakout: Default (aligns with popout column)
- * - .p-to-feature / .px-to-feature: Aligns content with feature column edge
- * - .p-to-popout / .px-to-popout: Aligns content with popout column edge
- * - .p-to-content / .px-to-content: Aligns content with content column edge
- *
- * Example usage:
- * ```html
- * <div class="col-full bg-blue-900 px-to-popout">
- *   <p>This text aligns with col-popout content above/below</p>
- * </div>
- * ```
- *
- * How it works:
- * - p-to-feature: gap (aligns with feature column start)
- * - p-to-popout: gap + feature track (aligns with popout column start)
- * - p-to-content: gap + feature track + popoutWidth (aligns with content column start)
- *
- * @returns {Object} Edge padding utility classes
+ * @returns {Object} Padding utility classes
  * @private
  */
 const createBreakoutPaddingUtilities = () => {
@@ -381,21 +361,9 @@ const createBreakoutPaddingUtilities = () => {
   const utilities = {};
 
   Object.entries(spacingDirections).forEach(([key, properties]) => {
-    // p-breakout: default (aligns with popout column)
+    // p-breakout: fluid edge padding matching the popout track
     utilities[`.${key}-breakout`] = properties.reduce((acc, prop) => {
       acc[prop] = 'var(--breakout-padding)';
-      return acc;
-    }, {});
-
-    // px-popout-to-content: padding to align popout content with content column
-    utilities[`.${key}-popout-to-content`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--popout-to-content)';
-      return acc;
-    }, {});
-
-    // px-feature-to-content: padding to align feature content with content column
-    utilities[`.${key}-feature-to-content`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--feature-to-content)';
       return acc;
     }, {});
   });

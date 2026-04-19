@@ -115,8 +115,17 @@ From narrowest to widest:
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
 - `.p-breakout`, `.m-breakout` - Fluid edge padding that matches the popout track
-- `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
 - Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`
+
+> Need to align content inside a wider column with the content column edge? Compose with Tailwind arbitrary values — the grid vars (`--popout-width`, `--breakout-min`, `--breakout-scale`, `--feature-min/scale/max`) are already available:
+>
+> ```html
+> <!-- popout-column content aligned to content column edge -->
+> <div class="col-popout px-[clamp(var(--breakout-min),var(--breakout-scale),var(--popout-width))]">...</div>
+>
+> <!-- feature-column content aligned to content column edge -->
+> <div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
+> ```
 
 > Need a partial span between non-adjacent tracks — e.g. a split layout where content reaches the grid's center line? Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value:
 >

@@ -54,6 +54,28 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 </main>
 ```
 
+**5. Removed the `.p-popout-to-content` and `.p-feature-to-content` alignment utilities** (14 rules) along with the `--popout-to-content` and `--feature-to-content` computed CSS variables. Rarely used — when you do need to align content inside a wider column with the content column edge, compose it with Tailwind arbitrary values using the grid vars that are still exposed:
+
+```html
+<!-- before -->
+<div class="col-popout px-popout-to-content">...</div>
+
+<!-- after -->
+<div class="col-popout px-[clamp(var(--breakout-min),var(--breakout-scale),var(--popout-width))]">...</div>
+
+<!-- feature-to-content equivalent -->
+<div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
+```
+
+For reusable tokens, register them in your Tailwind theme:
+
+```css
+@theme {
+  --spacing-popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
+  --spacing-feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
+}
+```
+
 **4. Removed the `full-gap` spacing family** (`.p-full-gap`, `.m-full-gap`, `.-m-full-gap`, and all their axis variants) and the `--computed-gap` CSS variable. The "larger gap for full-width" pattern was niche and adequately served by Tailwind's arbitrary value syntax when it's actually needed:
 
 ```html
@@ -82,7 +104,7 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 
 ### What ships
 
-All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, breakout padding, and alignment paddings. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
+All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, and breakout padding. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
 
 ## [5.0.0] - 2025-01-26
 

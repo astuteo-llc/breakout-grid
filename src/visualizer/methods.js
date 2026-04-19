@@ -429,7 +429,6 @@ export const methods = {
     document.documentElement.style.removeProperty('--feature');
     document.documentElement.style.removeProperty('--content');
     document.documentElement.style.removeProperty('--breakout-padding');
-    document.documentElement.style.removeProperty('--popout-to-content');
     this.editValues = {};
     this.configCopied = false;
   },

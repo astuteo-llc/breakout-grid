@@ -81,8 +81,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       gridOpacity: 0.8,
       backdropOpacity: 0.85,
       // When true, "Download CSS" emits grid + column placement + p-popout
-      // padding only. Skips gap/margin spacing, breakout-padding, and
-      // alignment paddings.
+      // padding only. Skips gap/margin spacing and breakout-padding.
       coreOnly: false
     };
   }
@@ -159,7 +158,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  * Full build adds:
  *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
- *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -438,10 +436,6 @@ ${configRootCSS(c)}
 :root {
   /* Breakout padding clamps between min and popout-width */
   --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-
-  /* Alignment paddings to reach the content column edge */
-  --popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-  --feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
 }
 
 /* ============================================================================
@@ -470,27 +464,7 @@ ${configRootCSS(c)}
 .-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
 .-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
 .-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
-.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }
-
-/* ============================================================================
-   ALIGNMENT PADDING — align content inside wider columns
-   ============================================================================ */
-
-.p-popout-to-content { padding: var(--popout-to-content); }
-.px-popout-to-content { padding-left: var(--popout-to-content); padding-right: var(--popout-to-content); }
-.py-popout-to-content { padding-top: var(--popout-to-content); padding-bottom: var(--popout-to-content); }
-.pt-popout-to-content { padding-top: var(--popout-to-content); }
-.pr-popout-to-content { padding-right: var(--popout-to-content); }
-.pb-popout-to-content { padding-bottom: var(--popout-to-content); }
-.pl-popout-to-content { padding-left: var(--popout-to-content); }
-
-.p-feature-to-content { padding: var(--feature-to-content); }
-.px-feature-to-content { padding-left: var(--feature-to-content); padding-right: var(--feature-to-content); }
-.py-feature-to-content { padding-top: var(--feature-to-content); padding-bottom: var(--feature-to-content); }
-.pt-feature-to-content { padding-top: var(--feature-to-content); }
-.pr-feature-to-content { padding-right: var(--feature-to-content); }
-.pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }`;
+.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }`;
   }
   const methods = {
     init() {
@@ -874,7 +848,6 @@ ${configRootCSS(c)}
       document.documentElement.style.removeProperty("--feature");
       document.documentElement.style.removeProperty("--content");
       document.documentElement.style.removeProperty("--breakout-padding");
-      document.documentElement.style.removeProperty("--popout-to-content");
       this.editValues = {};
       this.configCopied = false;
     },
