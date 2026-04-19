@@ -1,12 +1,11 @@
 (function() {
   "use strict";
-  const VERSION = `v${"5.2.6"}`;
+  const VERSION = `v${"6.0.2"}`;
   const LOREM_CONTENT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
 
 Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.`;
   const GRID_AREAS = [
     { name: "full", label: "Full", className: ".col-full", color: "rgba(239, 68, 68, 0.25)", borderColor: "rgb(239, 68, 68)" },
-    { name: "full-limit", label: "Full Limit", className: ".col-full-limit", color: "rgba(220, 38, 38, 0.25)", borderColor: "rgb(220, 38, 38)" },
     { name: "feature", label: "Feature", className: ".col-feature", color: "rgba(6, 182, 212, 0.25)", borderColor: "rgb(6, 182, 212)" },
     { name: "popout", label: "Popout", className: ".col-popout", color: "rgba(34, 197, 94, 0.25)", borderColor: "rgb(34, 197, 94)" },
     { name: "content", label: "Content", className: ".col-content", color: "rgba(168, 85, 247, 0.25)", borderColor: "rgb(168, 85, 247)" }
@@ -21,18 +20,12 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     featureMin: { value: "0rem", desc: "Minimum feature track width (floor)", cssVar: "--config-feature-min", liveVar: "--feature-min" },
     featureScale: { value: "12vw", desc: "Fluid feature track scaling", cssVar: "--config-feature-scale", liveVar: "--feature-scale" },
     featureMax: { value: "12rem", desc: "Maximum feature track width (ceiling)", cssVar: "--config-feature-max", liveVar: "--feature-max" },
-    fullLimit: { value: "115rem", desc: "Max width for col-full-limit. Use rem.", cssVar: "--config-full-limit", liveVar: "--full-limit" },
     defaultCol: { value: "content", desc: "Default column when no col-* class", type: "select", options: ["content", "popout", "feature", "full"], cssVar: "--config-default-col", liveVar: "--default-col" }
   };
   const GAP_SCALE_OPTIONS = {
     default: { value: "4vw", desc: "Mobile/default gap scaling. Use vw.", cssVar: "--config-gap-scale-default", liveVar: "--gap-scale-default" },
     lg: { value: "5vw", desc: "Large screens (1024px+). Use vw.", cssVar: "--config-gap-scale-lg", liveVar: "--gap-scale-lg" },
     xl: { value: "6vw", desc: "Extra large (1280px+). Use vw.", cssVar: "--config-gap-scale-xl", liveVar: "--gap-scale-xl" }
-  };
-  const BREAKOUT_OPTIONS = {
-    min: { value: "1rem", desc: "Minimum breakout padding (floor)", cssVar: "--config-breakout-min", liveVar: "--breakout-min" },
-    scale: { value: "5vw", desc: "Fluid breakout scaling", cssVar: "--config-breakout-scale", liveVar: "--breakout-scale" }
-    // max is popoutWidth
   };
   const BREAKPOINT_OPTIONS = {
     lg: { value: "1024", desc: "Large breakpoint (px)", cssVar: "--config-breakpoint-lg" },
@@ -46,7 +39,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       showMeasurements: true,
       showPixelWidths: false,
       showGapPadding: false,
-      showBreakoutPadding: false,
       showAdvanced: false,
       showLoremIpsum: false,
       showEditor: false,
@@ -67,7 +59,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       controlPanelCollapsed: false,
       configEditorCollapsed: false,
       // Pre-initialized for Alpine reactivity
-      columnWidths: { full: 0, "full-limit": 0, feature: 0, popout: 0, content: 0, center: 0 },
+      columnWidths: { full: 0, feature: 0, popout: 0, content: 0, center: 0 },
       currentBreakpoint: "mobile",
       spacingPanelCollapsed: false,
       spacingPanelPos: { x: 16, y: 16 },
@@ -81,129 +73,18 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       hasConfigOverride: false,
       showCloseWarningModal: false,
       gridOpacity: 0.8,
-      backdropOpacity: 0.85
+      backdropOpacity: 0.85,
+      // When true, "Download CSS" emits grid + column placement + p-popout
+      // padding only. Skips gap/margin spacing utilities.
+      coreOnly: false
     };
   }
-  const BUILD_VERSION = "5.2.6";
+  const BUILD_VERSION = "6.0.2";
   function wrapWithTailwindUtilities(css) {
-    return css.replace(
-      /^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm,
-      "@utility $1 {"
-    );
+    return css.replace(/^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm, "@utility $1 {");
   }
-  function generateTailwindCSSExport(c, version = BUILD_VERSION) {
-    const css = generateCSSExport(c, version);
-    const tailwindCss = wrapWithTailwindUtilities(css);
-    return tailwindCss.replace(
-      /INTEGRATION \(ITCSS \+ Tailwind v4\)[\s\S]*?QUICK START/,
-      `INTEGRATION (Tailwind v4 @utility)
- * ============================================================================
- *
- * This file uses @utility directives — requires Tailwind CSS v4+.
- * All utilities support responsive and state variants:
- *
- *   <div class="col-content md:col-feature lg:col-full">...</div>
- *
- * Add this file to your CSS imports:
- *
- *   @import 'tailwindcss';
- *   @import './_objects.breakout-grid.tw.css';
- *
- * ============================================================================
- * QUICK START`
-    ).replace(
-      " *   and import it right after this file",
-      ` *   and import it right after this file:
- *
- *     @import './_objects.breakout-grid.tw.css';
- *     @import './_objects.breakout-grid-extensions.css';`
-    );
-  }
-  function generateCSSExport(c, version = BUILD_VERSION) {
-    const VERSION2 = version;
-    const breakoutMin = c.breakoutMin || "1rem";
-    const breakoutScale = c.breakoutScale || "5vw";
-    const breakpointLg = c.breakpoints?.lg || "1024";
-    const breakpointXl = c.breakpoints?.xl || "1280";
-    return `/*!
- * ⚠ GENERATED FILE — DO NOT EDIT
- * Re-generated by Breakout Grid Visualizer.
- * Your changes will be lost on next export.
- *
- * To extend the grid, create _objects.breakout-grid-extensions.css
- *   and import it right after this file
- */
-
-/**
- * Breakout Grid - Objects Layer (ITCSS)
- * Version: ${VERSION2}
- *
- * Documentation: https://github.com/astuteo-llc/breakout-grid
- *
- * ============================================================================
- * TABLE OF CONTENTS
- * ============================================================================
- *
- * CONFIGURATION
- *   - Configuration Variables ........... Customizable :root variables
- *   - Computed Values ................... Auto-calculated (do not edit)
- *
- * GRID CONTAINERS
- *   - Grid Container - Main ............. .grid-cols-breakout
- *   - Subgrid ........................... .grid-cols-breakout-subgrid
- *   - Left/Right Aligned Variants ....... .grid-cols-{area}-{left|right}
- *   - Breakout Modifiers ................ .breakout-to-{content|popout|feature}
- *   - Breakout None ..................... .breakout-none, .breakout-none-flex
- *
- * COLUMN UTILITIES
- *   - Basic ............................. .col-{full|feature|popout|content|center}
- *   - Start/End ......................... .col-start-*, .col-end-*
- *   - Left/Right Spans .................. .col-*-left, .col-*-right
- *   - Advanced Spans .................... .col-*-to-*
- *   - Full Limit ........................ .col-full-limit
- *
- * SPACING UTILITIES
- *   - Padding ........................... .p-breakout, .p-gap, .p-*-to-content
- *   - Margins ........................... .m-breakout, .m-gap, .-m-*
- *
- * ============================================================================
- * INTEGRATION (ITCSS + Tailwind v4)
- * ============================================================================
- *
- * Add this file to your Objects layer. In your main CSS file:
- *
- *   @import 'tailwindcss';
- *
- *   @import './_settings.fonts.css';
- *   @import './_objects.breakout-grid.css';   <-- Add here (Objects layer)
- *   @import './_utilities.global.css';
- *
- *   @layer components {
- *       @import './_components.hero.css';
- *       ...
- *   }
- *
- * ============================================================================
- * QUICK START
- * ============================================================================
- *
- *   <main class="grid-cols-breakout">
- *     <article class="col-content">Reading width</article>
- *     <figure class="col-feature">Wider for images</figure>
- *     <div class="col-full">Edge to edge</div>
- *   </main>
- *
- */
-
-/* ============================================================================
-   CONFIGURATION VARIABLES
-   ============================================================================
-   To restore this grid in the visualizer, copy from here to END CONFIGURATION.
-   Paste into the "Restore" dialog at:
-   https://github.com/astuteo-llc/breakout-grid
-   ============================================================================ */
-
-:root {
+  function configRootCSS(c) {
+    return `:root {
   /* Content (text width) */
   --content-min: ${c.contentMin};
   --content-base: ${c.contentBase};
@@ -214,7 +95,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 
   /* Track widths */
   --popout-width: ${c.popoutWidth};
-  --full-limit: ${c.fullLimit};
 
   /* Feature track */
   --feature-min: ${c.featureMin};
@@ -229,34 +109,77 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   --gap-scale-default: ${c.gapScale?.default || "4vw"};
   --gap-scale-lg: ${c.gapScale?.lg || "5vw"};
   --gap-scale-xl: ${c.gapScale?.xl || "6vw"};
-
-  /* Breakout padding */
-  --breakout-min: ${breakoutMin};
-  --breakout-scale: ${breakoutScale};
-
-  /* Breakpoints (used in media queries below) */
-  /* --breakpoint-lg: ${breakpointLg}px; */
-  /* --breakpoint-xl: ${breakpointXl}px; */
-}
+}`;
+  }
+  const TAILWIND_FLAVOR_NOTE = `/*!
+ * Tailwind v4 flavor — each rule wrapped in \`@utility\` so Tailwind
+ * variants work (\`md:col-feature\`, \`hover:col-full\`, etc.). Chained
+ * selectors like \`.grid-cols-breakout.breakout-to-content\` stay as
+ * plain classes because \`@utility\` only accepts single-class selectors.
+ */
+`;
+  const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
+  function generateCSSExport(config, options = {}) {
+    const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
+    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS();
+    const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
+    return NO_FORMAT_PRAGMA + body;
+  }
+  function gridCSS(c, version) {
+    const breakpointLg = c.breakpoints?.lg || "1024";
+    const breakpointXl = c.breakpoints?.xl || "1280";
+    return `/*!
+ * Breakout Grid
+ * Version: ${version}
+ * Documentation: https://github.com/astuteo-llc/breakout-grid
+ *
+ * Inspired by:
+ *   Kevin Powell — https://www.youtube.com/watch?v=c13gpBrnGEw
+ *   Ryan Mulligan, Layout Breakouts — https://ryanmulligan.dev/blog/layout-breakouts/
+ *   Viget, Fluid Breakout Layout — https://www.viget.com/articles/fluid-breakout-layout-css-grid/
+ *
+ * TABLE OF CONTENTS
+ *   CONFIGURATION ........ Customizable :root variables
+ *   COMPUTED ............. Auto-calculated (do not edit)
+ *   GRID CONTAINERS ...... .grid-cols-breakout, left/right variants
+ *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
+ *   POPOUT PADDING ....... .p-popout (fixed --popout-width), .p-breakout (fluid clamp)
+ *
+ * Full build adds:
+ *   GAP SPACING .......... .p-gap, .m-gap (+ axes + negatives)
+ *   POPOUT MARGINS ....... .m-popout (fixed), .m-breakout (fluid) (+ axes + negatives)
+ *
+ * NESTED ALIGNMENT
+ *   For a column element whose children should align to the outer grid's
+ *   named tracks, use CSS subgrid (Tailwind: grid grid-cols-subgrid):
+ *
+ *     <section class="col-feature grid grid-cols-subgrid">
+ *       <div class="col-content">Aligns with outer .col-content</div>
+ *     </section>
+ *
+ *   Plain CSS equivalent: display: grid; grid-template-columns: subgrid;
+ *
+ * QUICK START
+ *   <main class="grid-cols-breakout">
+ *     <article class="col-content">Reading width</article>
+ *     <figure class="col-feature">Wider for images</figure>
+ *     <div class="col-full">Edge to edge</div>
+ *   </main>
+ */
 
 /* ============================================================================
-   END CONFIGURATION
+   CONFIGURATION
    ============================================================================ */
 
+${configRootCSS(c)}
 
 /* ============================================================================
-   COMPUTED VALUES - DO NOT EDIT
-   ============================================================================
-   These are calculated from the customizable variables above.
-   Editing these directly will break the grid calculations.
+   COMPUTED - DO NOT EDIT
    ============================================================================ */
 
 :root {
   /* Responsive gap: scales between base and max based on viewport */
   --gap: clamp(var(--base-gap), var(--gap-scale-default), var(--max-gap));
-
-  /* Computed gap: larger value for full-width spacing */
-  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
 
   /* Content width: fluid between min/max, respects gap on both sides */
   --content: min(clamp(var(--content-min), var(--content-base), var(--content-max)), 100% - var(--gap) * 2);
@@ -272,10 +195,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   --feature: minmax(0, clamp(var(--feature-min), var(--feature-scale), var(--feature-max)));
   --popout: minmax(0, var(--popout-width));
 
-  /* Alignment padding: for aligning content inside wider columns */
-  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-  --popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-  --feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
+  /* Fluid inset padding for .p-breakout / .m-breakout — floor 1rem, scale 5vw,
+     ceiling = popout-width. Collapses on mobile so edge-bleed bands don't crush
+     their own content. See usage notes above .p-popout / .p-breakout below. */
+  --breakout-padding: clamp(1rem, 5vw, var(--popout-width));
 }
 
 /* Responsive gap scaling */
@@ -291,21 +214,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   }
 }
 
-/* ========================================
-   Grid Container - Main
-   ========================================
+/* ============================================================================
+   GRID CONTAINERS
+   ============================================================================ */
 
-   The primary grid container. Apply to any element that should use
-   the breakout grid system. All direct children default to the
-   content column unless given a col-* class.
-
-   Basic usage:
-   <main class="grid-cols-breakout">
-     <article>Default content width</article>
-     <figure class="col-feature">Wider for images</figure>
-     <div class="col-full">Edge to edge</div>
-   </main>
-*/
+/* Main centered grid — all direct children default to var(--default-col) */
 .grid-cols-breakout {
   display: grid;
   grid-template-columns:
@@ -326,49 +239,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   grid-column: var(--default-col, content);
 }
 
-/* ----------------------------------------
-   Subgrid - Nested Alignment
-   ----------------------------------------
+/* ----------------------------------------------------------------------------
+   Left / Right aligned variants
+   ---------------------------------------------------------------------------- */
 
-   Use subgrid when you need children of a spanning element to align
-   with the parent grid's tracks. The child inherits the parent's
-   column lines.
-
-   Example - Card grid inside a feature-width container:
-   <div class="col-feature grid-cols-breakout-subgrid">
-     <h2 class="col-content">Title aligns with content</h2>
-     <div class="col-feature">Full width of parent</div>
-   </div>
-
-   Browser support: ~93% (check caniuse.com/css-subgrid)
-*/
-.grid-cols-breakout-subgrid {
-  display: grid;
-  grid-template-columns: subgrid;
-}
-
-/* ========================================
-   Grid Container - Left/Right Aligned Variants
-   ========================================
-
-   Use these when content should anchor to one side instead of centering.
-   Common for asymmetric layouts, sidebars, or split-screen designs.
-
-   Left variants: Content anchors to left edge, right side has outer tracks
-   Right variants: Content anchors to right edge, left side has outer tracks
-
-   Example - Image left, text right:
-   <section class="grid-cols-feature-left">
-     <figure class="col-feature">Image anchored left</figure>
-     <div class="col-content">Text in content area</div>
-   </section>
-
-   Example - Sidebar layout:
-   <div class="grid-cols-content-right">
-     <aside class="col-full">Sidebar fills left</aside>
-     <main class="col-content">Main content right-aligned</main>
-   </div>
-*/
 .grid-cols-feature-left {
   display: grid;
   grid-template-columns:
@@ -399,9 +273,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     [content-start] var(--content-inset) [content-end full-end];
 }
 
-/* ========================================
-   Grid Container - Right Aligned Variants
-   ======================================== */
 .grid-cols-feature-right {
   display: grid;
   grid-template-columns:
@@ -432,85 +303,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     var(--full) [full-end];
 }
 
-/* ========================================
-   Breakout Modifiers (for nested grids)
-   ========================================
+/* ============================================================================
+   COLUMN UTILITIES
+   ============================================================================ */
 
-   When you nest a grid inside another element (like inside col-feature),
-   the nested grid doesn't know about the parent's constraints. Use these
-   modifiers to "reset" the grid to fit its container.
-
-   breakout-to-content: Collapses all tracks - nested grid fills container
-   breakout-to-popout:  Keeps popout tracks, collapses feature/full
-   breakout-to-feature: Keeps feature+popout tracks, collapses full
-
-   Example - Full-width hero with nested content grid:
-   <div class="col-full bg-blue-500">
-     <div class="grid-cols-breakout breakout-to-content">
-       <h1>This h1 fills the blue container</h1>
-       <p class="col-content">But content still works!</p>
-     </div>
-   </div>
-
-   Example - Feature-width card with internal grid:
-   <article class="col-feature">
-     <div class="grid-cols-breakout breakout-to-feature">
-       <img class="col-feature">Full width of card</img>
-       <p class="col-content">Padded text inside</p>
-     </div>
-   </article>
-*/
-.grid-cols-breakout.breakout-to-content {
-  grid-template-columns: [full-start feature-start popout-start content-start center-start] minmax(0, 1fr) [center-end content-end popout-end feature-end full-end];
-}
-
-.grid-cols-breakout.breakout-to-popout {
-  grid-template-columns: [full-start feature-start popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end feature-end full-end];
-}
-
-.grid-cols-breakout.breakout-to-feature {
-  grid-template-columns: [full-start feature-start] var(--feature) [popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end] var(--feature) [feature-end full-end];
-}
-
-/* ----------------------------------------
-   Breakout None - Disable Grid
-   ----------------------------------------
-
-   Use when you need to escape the grid entirely. Useful for:
-   - Sidebar layouts where one column shouldn't use grid
-   - Components that manage their own layout
-   - CMS blocks that shouldn't inherit grid behavior
-
-   Example - Two-column layout with sidebar:
-   <div class="grid grid-cols-[300px_1fr]">
-     <aside class="breakout-none">Sidebar - no grid here</aside>
-     <main class="grid-cols-breakout">Main content uses grid</main>
-   </div>
-*/
-.breakout-none { display: block; }
-.breakout-none-flex { display: flex; }
-.breakout-none-grid { display: grid; }
-
-/* Reset col-* placement inside breakout-none containers */
-.breakout-none > [class*='col-'],
-.breakout-none-flex > [class*='col-'],
-.breakout-none-grid > [class*='col-'] {
-    grid-column: auto;
-}
-
-/* ========================================
-   Column Utilities - Basic
-   ========================================
-
-   Place elements in specific grid tracks. These are the core utilities
-   you'll use most often.
-
-   col-full:    Edge to edge (viewport width minus gap)
-   col-feature: Wide content (images, videos, heroes)
-   col-popout:  Slightly wider than content (pull quotes, callouts)
-   col-content: Standard reading width (articles, text)
-   col-center:  Centered within content (rare, for precise centering)
-*/
 .col-full { grid-column: full; }
 .col-feature { grid-column: feature; }
 .col-popout { grid-column: popout; }
@@ -520,25 +316,12 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 /* Backward compatibility: col-narrow maps to content */
 .col-narrow { grid-column: content; }
 
-/* ========================================
-   Column Utilities - Start/End
-   ========================================
-
-   Fine-grained control for custom spans. Combine start and end
-   utilities to create any span you need.
-
-   Example - Span from popout to feature on right:
-   <div class="col-start-popout col-end-feature">
-     Custom span
-   </div>
-*/
+/* Start / End */
 .col-start-full { grid-column-start: full-start; }
 .col-start-feature { grid-column-start: feature-start; }
 .col-start-popout { grid-column-start: popout-start; }
 .col-start-content { grid-column-start: content-start; }
 .col-start-center { grid-column-start: center-start; }
-
-/* Backward compatibility */
 .col-start-narrow { grid-column-start: content-start; }
 
 .col-end-full { grid-column-end: full-end; }
@@ -546,32 +329,9 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .col-end-popout { grid-column-end: popout-end; }
 .col-end-content { grid-column-end: content-end; }
 .col-end-center { grid-column-end: center-end; }
-
-/* Backward compatibility */
 .col-end-narrow { grid-column-end: content-end; }
 
-/* ========================================
-   Column Utilities - Left/Right Spans
-   ========================================
-
-   Asymmetric spans that anchor to one edge. Perfect for:
-   - Split layouts (image left, text right)
-   - Overlapping elements
-   - Pull quotes that bleed to one edge
-
-   Pattern: col-{track}-left  = full-start → {track}-end
-            col-{track}-right = {track}-start → full-end
-
-   Example - Image bleeds left, caption stays in content:
-   <figure class="col-content-left">
-     <img class="w-full">Spans from left edge to content</img>
-   </figure>
-
-   Example - Quote pulls right:
-   <blockquote class="col-popout-right">
-     Spans from popout through to right edge
-   </blockquote>
-*/
+/* Left / Right spans */
 .col-feature-left { grid-column: full-start / feature-end; }
 .col-feature-right { grid-column: feature-start / full-end; }
 .col-popout-left { grid-column: full-start / popout-end; }
@@ -580,84 +340,28 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .col-content-right { grid-column: content-start / full-end; }
 .col-center-left { grid-column: full-start / center-end; }
 .col-center-right { grid-column: center-start / full-end; }
-
-/* Backward compatibility */
 .col-narrow-left { grid-column: full-start / content-end; }
 .col-narrow-right { grid-column: content-start / full-end; }
 
-/* ========================================
-   Column Utilities - Advanced Spans
-   ========================================
+/* ============================================================================
+   POPOUT PADDING  — fixed, = var(--popout-width) (the exact popout track width).
+                     Use when the padding MUST match the track (e.g. pulling a
+                     feature-width element's inner content to content-width edges).
+   BREAKOUT PADDING — fluid clamp(1rem, 5vw, --popout-width). Use on edge-bleed
+                     bands (col-full / col-feature) so the inset collapses to
+                     1rem on mobile instead of eating half the viewport with 5rem.
+                     Pick .p-breakout for full-bleed CTAs, hero bands, inset
+                     sections. Pick .p-popout when exact track alignment matters.
+   ============================================================================ */
 
-   Partial spans between non-adjacent tracks. Use when you need
-   elements that span from an inner track outward but not all
-   the way to the edge.
+.p-popout { padding: var(--popout-width); }
+.px-popout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
+.py-popout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
+.pl-popout { padding-left: var(--popout-width); }
+.pr-popout { padding-right: var(--popout-width); }
+.pt-popout { padding-top: var(--popout-width); }
+.pb-popout { padding-bottom: var(--popout-width); }
 
-   Example - Card that spans feature to content (not to edge):
-   <div class="col-feature-to-content">
-     Wide but doesn't bleed to viewport edge
-   </div>
-*/
-/* Feature to other columns */
-.col-feature-to-popout { grid-column: feature-start / popout-end; }
-.col-feature-to-content { grid-column: feature-start / content-end; }
-.col-feature-to-center { grid-column: feature-start / center-end; }
-
-/* Popout to other columns */
-.col-popout-to-content { grid-column: popout-start / content-end; }
-.col-popout-to-center { grid-column: popout-start / center-end; }
-.col-popout-to-feature { grid-column: popout-start / feature-end; }
-
-/* Content to other columns */
-.col-content-to-center { grid-column: content-start / center-end; }
-.col-content-to-popout { grid-column: content-start / popout-end; }
-.col-content-to-feature { grid-column: content-start / feature-end; }
-
-/* ----------------------------------------
-   Full Limit - Capped Full Width
-   ----------------------------------------
-
-   Goes edge-to-edge like col-full, but caps at --full-limit on
-   ultra-wide screens. Prevents content from becoming too wide
-   on large monitors while still being full-width on normal screens.
-
-   Example - Hero that doesn't get absurdly wide:
-   <section class="col-full-limit">
-     Full width up to ${c.fullLimit}, then centered
-   </section>
-*/
-.col-full-limit {
-  grid-column: full;
-  width: 100%;
-  max-width: var(--full-limit);
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}
-
-/* ========================================
-   Padding Utilities
-   ========================================
-
-   Match padding to grid measurements for alignment. These utilities
-   help content inside non-grid elements align with the grid.
-
-   --breakout-padding: Fluid padding that matches popout track behavior
-   --gap:              Matches the outer grid gap
-   --computed-gap:     Larger gap for full-width elements
-   --popout-to-content: Align edges with content track from popout
-   --feature-to-content: Align edges with content track from feature
-
-   Example - Full-width section with content-aligned padding:
-   <section class="col-full bg-gray-100 px-feature-to-content">
-     <p>This text aligns with content column above/below</p>
-   </section>
-
-   Example - Card with consistent internal spacing:
-   <div class="col-popout p-breakout">
-     Padding scales with the grid
-   </div>
-*/
 .p-breakout { padding: var(--breakout-padding); }
 .px-breakout { padding-left: var(--breakout-padding); padding-right: var(--breakout-padding); }
 .py-breakout { padding-top: var(--breakout-padding); padding-bottom: var(--breakout-padding); }
@@ -665,8 +369,14 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .pr-breakout { padding-right: var(--breakout-padding); }
 .pt-breakout { padding-top: var(--breakout-padding); }
 .pb-breakout { padding-bottom: var(--breakout-padding); }
+`;
+  }
+  function spacingCSS(c) {
+    return `
+/* ============================================================================
+   GAP — sized to --gap
+   ============================================================================ */
 
-/* Gap-based padding */
 .p-gap { padding: var(--gap); }
 .px-gap { padding-left: var(--gap); padding-right: var(--gap); }
 .py-gap { padding-top: var(--gap); padding-bottom: var(--gap); }
@@ -675,76 +385,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .pt-gap { padding-top: var(--gap); }
 .pb-gap { padding-bottom: var(--gap); }
 
-/* Full-gap padding (computed, for full-width elements) */
-.p-full-gap { padding: var(--computed-gap); }
-.px-full-gap { padding-left: var(--computed-gap); padding-right: var(--computed-gap); }
-.py-full-gap { padding-top: var(--computed-gap); padding-bottom: var(--computed-gap); }
-.pl-full-gap { padding-left: var(--computed-gap); }
-.pr-full-gap { padding-right: var(--computed-gap); }
-.pt-full-gap { padding-top: var(--computed-gap); }
-.pb-full-gap { padding-bottom: var(--computed-gap); }
-
-/* Popout-width padding */
-.p-popout { padding: var(--popout); }
-.px-popout { padding-left: var(--popout); padding-right: var(--popout); }
-.py-popout { padding-top: var(--popout); padding-bottom: var(--popout); }
-.pl-popout { padding-left: var(--popout); }
-.pr-popout { padding-right: var(--popout); }
-.pt-popout { padding-top: var(--popout); }
-.pb-popout { padding-bottom: var(--popout); }
-
-/* Alignment padding - align content inside wider columns */
-.p-popout-to-content { padding: var(--popout-to-content); }
-.px-popout-to-content { padding-left: var(--popout-to-content); padding-right: var(--popout-to-content); }
-.py-popout-to-content { padding-top: var(--popout-to-content); padding-bottom: var(--popout-to-content); }
-.pt-popout-to-content { padding-top: var(--popout-to-content); }
-.pr-popout-to-content { padding-right: var(--popout-to-content); }
-.pb-popout-to-content { padding-bottom: var(--popout-to-content); }
-.pl-popout-to-content { padding-left: var(--popout-to-content); }
-
-.p-feature-to-content { padding: var(--feature-to-content); }
-.px-feature-to-content { padding-left: var(--feature-to-content); padding-right: var(--feature-to-content); }
-.py-feature-to-content { padding-top: var(--feature-to-content); padding-bottom: var(--feature-to-content); }
-.pt-feature-to-content { padding-top: var(--feature-to-content); }
-.pr-feature-to-content { padding-right: var(--feature-to-content); }
-.pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }
-
-/* ========================================
-   Margin Utilities
-   ========================================
-
-   Same values as padding utilities, but for margins. Includes
-   negative variants for pulling elements outside their container.
-
-   Example - Pull image outside its container:
-   <div class="col-content">
-     <img class="-mx-breakout">Bleeds into popout area</img>
-   </div>
-
-   Example - Overlap previous section:
-   <section class="-mt-gap">
-     Pulls up into the section above
-   </section>
-*/
-.m-breakout { margin: var(--breakout-padding); }
-.mx-breakout { margin-left: var(--breakout-padding); margin-right: var(--breakout-padding); }
-.my-breakout { margin-top: var(--breakout-padding); margin-bottom: var(--breakout-padding); }
-.ml-breakout { margin-left: var(--breakout-padding); }
-.mr-breakout { margin-right: var(--breakout-padding); }
-.mt-breakout { margin-top: var(--breakout-padding); }
-.mb-breakout { margin-bottom: var(--breakout-padding); }
-
-/* Negative margins */
-.-m-breakout { margin: calc(var(--breakout-padding) * -1); }
-.-mx-breakout { margin-left: calc(var(--breakout-padding) * -1); margin-right: calc(var(--breakout-padding) * -1); }
-.-my-breakout { margin-top: calc(var(--breakout-padding) * -1); margin-bottom: calc(var(--breakout-padding) * -1); }
-.-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
-.-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
-.-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
-.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }
-
-/* Gap-based margins */
 .m-gap { margin: var(--gap); }
 .mx-gap { margin-left: var(--gap); margin-right: var(--gap); }
 .my-gap { margin-top: var(--gap); margin-bottom: var(--gap); }
@@ -753,7 +393,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .mt-gap { margin-top: var(--gap); }
 .mb-gap { margin-bottom: var(--gap); }
 
-/* Negative margins */
 .-m-gap { margin: calc(var(--gap) * -1); }
 .-mx-gap { margin-left: calc(var(--gap) * -1); margin-right: calc(var(--gap) * -1); }
 .-my-gap { margin-top: calc(var(--gap) * -1); margin-bottom: calc(var(--gap) * -1); }
@@ -762,41 +401,45 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .-mt-gap { margin-top: calc(var(--gap) * -1); }
 .-mb-gap { margin-bottom: calc(var(--gap) * -1); }
 
-/* Full-gap margins */
-.m-full-gap { margin: var(--computed-gap); }
-.mx-full-gap { margin-left: var(--computed-gap); margin-right: var(--computed-gap); }
-.my-full-gap { margin-top: var(--computed-gap); margin-bottom: var(--computed-gap); }
-.ml-full-gap { margin-left: var(--computed-gap); }
-.mr-full-gap { margin-right: var(--computed-gap); }
-.mt-full-gap { margin-top: var(--computed-gap); }
-.mb-full-gap { margin-bottom: var(--computed-gap); }
+/* ============================================================================
+   POPOUT MARGINS  — fixed, = var(--popout-width). Mirror of .p-popout for
+                     negative margins that need to bleed exactly one popout track.
+   BREAKOUT MARGINS — fluid, = var(--breakout-padding). Mirror of .p-breakout;
+                     use for negative margins on bands that should collapse on
+                     mobile (e.g. -mx-breakout to pull a child past its edges).
+   ============================================================================ */
 
-/* Negative margins */
-.-m-full-gap { margin: calc(var(--computed-gap) * -1); }
-.-mx-full-gap { margin-left: calc(var(--computed-gap) * -1); margin-right: calc(var(--computed-gap) * -1); }
-.-my-full-gap { margin-top: calc(var(--computed-gap) * -1); margin-bottom: calc(var(--computed-gap) * -1); }
-.-ml-full-gap { margin-left: calc(var(--computed-gap) * -1); }
-.-mr-full-gap { margin-right: calc(var(--computed-gap) * -1); }
-.-mt-full-gap { margin-top: calc(var(--computed-gap) * -1); }
-.-mb-full-gap { margin-bottom: calc(var(--computed-gap) * -1); }
+.m-popout { margin: var(--popout-width); }
+.mx-popout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
+.my-popout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }
+.ml-popout { margin-left: var(--popout-width); }
+.mr-popout { margin-right: var(--popout-width); }
+.mt-popout { margin-top: var(--popout-width); }
+.mb-popout { margin-bottom: var(--popout-width); }
 
-/* Popout-width margins */
-.m-popout { margin: var(--popout); }
-.mx-popout { margin-left: var(--popout); margin-right: var(--popout); }
-.my-popout { margin-top: var(--popout); margin-bottom: var(--popout); }
-.ml-popout { margin-left: var(--popout); }
-.mr-popout { margin-right: var(--popout); }
-.mt-popout { margin-top: var(--popout); }
-.mb-popout { margin-bottom: var(--popout); }
+.-m-popout { margin: calc(var(--popout-width) * -1); }
+.-mx-popout { margin-left: calc(var(--popout-width) * -1); margin-right: calc(var(--popout-width) * -1); }
+.-my-popout { margin-top: calc(var(--popout-width) * -1); margin-bottom: calc(var(--popout-width) * -1); }
+.-ml-popout { margin-left: calc(var(--popout-width) * -1); }
+.-mr-popout { margin-right: calc(var(--popout-width) * -1); }
+.-mt-popout { margin-top: calc(var(--popout-width) * -1); }
+.-mb-popout { margin-bottom: calc(var(--popout-width) * -1); }
 
-/* Negative margins */
-.-m-popout { margin: calc(var(--popout) * -1); }
-.-mx-popout { margin-left: calc(var(--popout) * -1); margin-right: calc(var(--popout) * -1); }
-.-my-popout { margin-top: calc(var(--popout) * -1); margin-bottom: calc(var(--popout) * -1); }
-.-ml-popout { margin-left: calc(var(--popout) * -1); }
-.-mr-popout { margin-right: calc(var(--popout) * -1); }
-.-mt-popout { margin-top: calc(var(--popout) * -1); }
-.-mb-popout { margin-bottom: calc(var(--popout) * -1); }
+.m-breakout { margin: var(--breakout-padding); }
+.mx-breakout { margin-left: var(--breakout-padding); margin-right: var(--breakout-padding); }
+.my-breakout { margin-top: var(--breakout-padding); margin-bottom: var(--breakout-padding); }
+.ml-breakout { margin-left: var(--breakout-padding); }
+.mr-breakout { margin-right: var(--breakout-padding); }
+.mt-breakout { margin-top: var(--breakout-padding); }
+.mb-breakout { margin-bottom: var(--breakout-padding); }
+
+.-m-breakout { margin: calc(var(--breakout-padding) * -1); }
+.-mx-breakout { margin-left: calc(var(--breakout-padding) * -1); margin-right: calc(var(--breakout-padding) * -1); }
+.-my-breakout { margin-top: calc(var(--breakout-padding) * -1); margin-bottom: calc(var(--breakout-padding) * -1); }
+.-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
+.-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
+.-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
+.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }
 `;
   }
   const methods = {
@@ -927,7 +570,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     loadCurrentValues() {
       this.loadOptionsFromCSS(this.configOptions);
       this.loadOptionsFromCSS(this.gapScaleOptions, "gapScale");
-      this.loadOptionsFromCSS(this.breakoutOptions, "breakout");
     },
     generateConfigExport() {
       const config = {};
@@ -938,8 +580,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       Object.keys(this.gapScaleOptions).forEach((key) => {
         config.gapScale[key] = this.editValues[`gapScale_${key}`] || this.gapScaleOptions[key].value;
       });
-      config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
-      config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
       config.breakpoints = {
         lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || "1024",
         xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || "1280"
@@ -949,10 +589,9 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     configSections: {
       content: { keys: ["contentMin", "contentBase", "contentMax"], label: "Content" },
       defaultCol: { keys: ["defaultCol"], label: "Default Column" },
-      tracks: { keys: ["popoutWidth", "fullLimit"], label: "Track Widths" },
+      tracks: { keys: ["popoutWidth"], label: "Track Widths" },
       feature: { keys: ["featureMin", "featureScale", "featureMax"], label: "Feature" },
-      gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" },
-      breakout: { keys: ["breakoutMin", "breakoutScale"], label: "Breakout" }
+      gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" }
     },
     copySection(sectionName) {
       const section = this.configSections[sectionName];
@@ -963,12 +602,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         if (this.configOptions[key]) {
           value = this.editValues[key] || this.configOptions[key].value;
           varName = this.configOptions[key].liveVar;
-        } else if (key === "breakoutMin") {
-          value = this.editValues.breakout_min || this.breakoutOptions.min.value;
-          varName = this.breakoutOptions.min.liveVar;
-        } else if (key === "breakoutScale") {
-          value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-          varName = this.breakoutOptions.scale.liveVar;
         }
         if (varName) {
           lines.push(`${varName}: ${value};`);
@@ -990,37 +623,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     },
     copyConfig() {
       const config = this.generateConfigExport();
-      const lines = [
-        ":root {",
-        `  /* Content (text width) */`,
-        `  --content-min: ${config.contentMin};`,
-        `  --content-base: ${config.contentBase};`,
-        `  --content-max: ${config.contentMax};`,
-        `  /* Default column */`,
-        `  --default-col: ${config.defaultCol || "content"};`,
-        `  /* Track widths */`,
-        `  --popout-width: ${config.popoutWidth};`,
-        `  --full-limit: ${config.fullLimit};`,
-        `  /* Feature track */`,
-        `  --feature-min: ${config.featureMin};`,
-        `  --feature-scale: ${config.featureScale};`,
-        `  --feature-max: ${config.featureMax};`,
-        `  /* Outer margins */`,
-        `  --base-gap: ${config.baseGap};`,
-        `  --max-gap: ${config.maxGap};`,
-        `  /* Responsive scale */`,
-        `  --gap-scale-default: ${config.gapScale?.default || "4vw"};`,
-        `  --gap-scale-lg: ${config.gapScale?.lg || "5vw"};`,
-        `  --gap-scale-xl: ${config.gapScale?.xl || "6vw"};`,
-        `  /* Breakout padding */`,
-        `  --breakout-min: ${config.breakoutMin || "1rem"};`,
-        `  --breakout-scale: ${config.breakoutScale || "5vw"};`,
-        `  /* Breakpoints */`,
-        `  /* --breakpoint-lg: ${config.breakpoints?.lg || "1024"}px; */`,
-        `  /* --breakpoint-xl: ${config.breakpoints?.xl || "1280"}px; */`,
-        "}"
-      ];
-      const configStr = lines.join("\n");
+      const configStr = this.configRootCSS(config);
       navigator.clipboard.writeText(configStr).then(() => {
         this.copySuccess = true;
         this.configCopied = true;
@@ -1029,8 +632,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     },
     downloadCSS(format = "plain") {
       const config = this.generateConfigExport();
-      const css = format === "tailwind" ? this.generateTailwindCSSExport(config) : this.generateCSSExport(config);
-      const filename = format === "tailwind" ? "_objects.breakout-grid.tw.css" : "_objects.breakout-grid.css";
+      const tailwind = format === "tailwind";
+      const css = this.generateCSSExport(config, { tailwind, coreOnly: this.coreOnly });
+      const suffix = this.coreOnly ? "-core" : "";
+      const filename = tailwind ? `_objects.breakout-grid${suffix}.tw.css` : `_objects.breakout-grid${suffix}.css`;
       const blob = new Blob([css], { type: "text/css" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1091,24 +696,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       this.updateGapLive();
       this.saveConfigToStorage();
     },
-    getBreakoutNumeric(key) {
-      return this.getPrefixedNumeric("breakout", this.breakoutOptions, key);
-    },
-    getBreakoutUnit(key) {
-      return this.getPrefixedUnit("breakout", this.breakoutOptions, key);
-    },
-    updateBreakoutNumeric(key, num) {
-      this.editValues[`breakout_${key}`] = num + this.getBreakoutUnit(key);
-      this.configCopied = false;
-      this.updateBreakoutLive();
-      this.saveConfigToStorage();
-    },
-    updateBreakoutLive() {
-      const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
-      const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-      const max = this.editValues.popoutWidth || this.configOptions.popoutWidth.value;
-      document.documentElement.style.setProperty("--breakout-padding", `clamp(${min}, ${scale}, ${max})`);
-    },
     saveConfigToStorage() {
       const config = this.generateConfigExport();
       localStorage.setItem("breakoutGridConfig", JSON.stringify(config));
@@ -1142,13 +729,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         });
         this.updateGapLive();
       }
-      if (config.breakoutMin !== void 0) {
-        this.editValues.breakout_min = config.breakoutMin;
-      }
-      if (config.breakoutScale !== void 0) {
-        this.editValues.breakout_scale = config.breakoutScale;
-      }
-      this.updateBreakoutLive();
       if (config.breakpoints) {
         if (config.breakpoints.lg !== void 0) {
           this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -1177,7 +757,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       }
       if (key === "popoutWidth") {
         document.documentElement.style.setProperty("--popout", `minmax(0, ${value})`);
-        this.updateBreakoutLive();
       }
       if (key === "featureMin" || key === "featureScale" || key === "featureMax") {
         const featureMin = this.editValues.featureMin || this.configOptions.featureMin.value;
@@ -1208,8 +787,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       document.documentElement.style.removeProperty("--popout");
       document.documentElement.style.removeProperty("--feature");
       document.documentElement.style.removeProperty("--content");
-      document.documentElement.style.removeProperty("--breakout-padding");
-      document.documentElement.style.removeProperty("--popout-to-content");
       this.editValues = {};
       this.configCopied = false;
     },
@@ -1325,7 +902,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     },
     getResizeConfig(colName) {
       const map = {
-        "full-limit": "fullLimit",
         "feature": "featureScale",
         "popout": "popoutWidth"
       };
@@ -1344,9 +920,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         "--feature-min": "featureMin",
         "--feature-scale": "featureScale",
         "--feature-max": "featureMax",
-        "--full-limit": "fullLimit",
-        "--breakout-min": "breakoutMin",
-        "--breakout-scale": "breakoutScale",
         "--default-col": "defaultCol"
       };
       const gapScaleMap = {
@@ -1420,13 +993,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
           });
           this.updateGapLive();
         }
-        if (config.breakoutMin !== void 0) {
-          this.editValues.breakout_min = config.breakoutMin;
-        }
-        if (config.breakoutScale !== void 0) {
-          this.editValues.breakout_scale = config.breakoutScale;
-        }
-        this.updateBreakoutLive();
         if (config.breakpoints) {
           if (config.breakpoints.lg !== void 0) {
             this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -1547,50 +1113,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
       </div>
 
-      <!-- Nested grid example: breakout-to-feature inside col-feature -->
-      <div x-data="{ hovered: false }"
-           @mouseenter="hovered = true"
-           @mouseleave="hovered = false"
-           :style="{
-             gridColumn: 'feature',
-             border: '3px dashed rgb(59, 130, 246)',
-             margin: '1rem 0',
-             background: hovered ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.05)',
-             transition: 'background 0.2s ease',
-             padding: '0.5rem'
-           }">
-        <div style="font-size: 0.625rem; font-family: monospace; color: rgb(30, 64, 175); margin-bottom: 0.5rem; padding: 0.25rem;">
-          Parent: .col-feature container
-        </div>
-        <div class="grid-cols-breakout breakout-to-feature"
-             style="background: rgba(59, 130, 246, 0.1);">
-          <div style="grid-column: feature;
-                      background: rgba(59, 130, 246, 0.3);
-                      padding: 0.5rem;
-                      font-size: 0.625rem;
-                      font-family: monospace;
-                      color: rgb(30, 64, 175);">
-            .col-feature → fills container
-          </div>
-          <div style="grid-column: content;
-                      background: rgb(59, 130, 246);
-                      color: white;
-                      padding: 0.75rem 1rem;
-                      font-size: 0.75rem;
-                      font-weight: 700;
-                      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-            <div style="font-family: monospace; margin-bottom: 0.5rem;">.col-content → has margins</div>
-            <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">breakout-to-feature collapses outer tracks</div>
-            <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature"&gt;
-  &lt;div class="grid-cols-breakout breakout-to-feature"&gt;
-    &lt;div class="col-feature"&gt;Fills container&lt;/div&gt;
-    &lt;p class="col-content"&gt;Has margins&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre>
-          </div>
-        </div>
-      </div>
-
       <!-- Subgrid example: child aligns to parent grid tracks -->
       <div x-data="{ hovered: false }"
            @mouseenter="hovered = true"
@@ -1611,7 +1133,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                     color: rgb(157, 23, 77);
                     padding: 0.5rem;
                     background: rgba(236, 72, 153, 0.1);">
-          Parent: .col-feature-right .grid-cols-breakout-subgrid
+          Parent: .col-feature-right .grid .grid-cols-subgrid
         </div>
         <!-- Child spanning feature (wider, lighter) -->
         <div style="grid-column: feature;
@@ -1634,7 +1156,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
           <div style="font-family: monospace; margin-bottom: 0.5rem;">Child: .col-content</div>
           <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">Subgrid lets children align to parent's named lines</div>
-          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid-cols-breakout-subgrid"&gt;
+          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;Aligns to feature!&lt;/div&gt;
   &lt;div class="col-content"&gt;Aligns to content!&lt;/div&gt;
 &lt;/div&gt;</pre>
@@ -1690,40 +1212,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
           <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
-        </div>
-        <!-- Breakout Padding -->
-        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
-            <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
-          </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px;">
-            <div style="width: var(--breakout-padding); height: 24px; background: #8b5cf6; min-width: 20px;"></div>
-            <div style="width: 24px; height: var(--breakout-padding); background: #8b5cf6; min-height: 20px;"></div>
-          </div>
-          <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
-            clamp(<span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_min || breakoutOptions.min.value"></span>, <span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_scale || breakoutOptions.scale.value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span>)
-          </div>
-          <!-- Editable breakout values -->
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">min</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('min')" @input="updateBreakoutNumeric('min', $event.target.value)" step="0.5"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('min')"></span>
-              </div>
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">scale</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('scale')" @input="updateBreakoutNumeric('scale', $event.target.value)" step="1"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('scale')"></span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 8px; color: #9ca3af; font-style: italic;">max = popout width</div>
         </div>
       </div>
     </div>
@@ -1796,7 +1284,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                :style="{
                  position: 'absolute',
                  inset: '0',
-                 padding: showGapPadding ? 'var(--gap)' : (showBreakoutPadding ? 'var(--breakout-padding)' : '1.5rem 0'),
+                 padding: showGapPadding ? 'var(--gap)' : '1.5rem 0',
                  boxSizing: 'border-box',
                  overflow: 'hidden',
                  whiteSpace: 'pre-line',
@@ -1831,32 +1319,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
               borderRadius: '0.25rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }">p-gap</div>
-          </div>
-
-          <!-- p-breakout / px-breakout Padding Overlay -->
-          <div x-show="showBreakoutPadding"
-               :style="{
-                 position: 'absolute',
-                 inset: 'var(--breakout-padding)',
-                 border: '3px dashed ' + area.borderColor,
-                 backgroundColor: area.color.replace('0.1', '0.25'),
-                 pointerEvents: 'none',
-                 zIndex: '10'
-               }">
-            <div :style="{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              fontSize: '0.625rem',
-              fontWeight: '700',
-              color: area.borderColor,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }">p-breakout</div>
           </div>
 
           <!-- Drag Handle - Left (edit mode only, for resizable columns) -->
@@ -2166,10 +1628,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
             <input type="checkbox" x-model="showGapPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
             p-gap
           </label>
-          <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
-            <input type="checkbox" x-model="showBreakoutPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
-            p-breakout
-          </label>
         </div>
       </div>
 
@@ -2309,7 +1767,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         <!-- Track Widths Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('tracks')" style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer;" :style="{ color: sectionCopied === 'tracks' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'tracks' ? '✓ Copied' : 'Track Widths'"></div>
-          <template x-for="key in ['popoutWidth', 'fullLimit']" :key="'ed_'+key">
+          <template x-for="key in ['popoutWidth']" :key="'ed_'+key">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f3f4f6;">
               <span style="font-size: 11px; color: #374151;" x-text="key.replace('Width', '')"></span>
               <div style="display: flex; align-items: center; gap: 4px;">
@@ -2446,6 +1904,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
               Reset
             </button>
           </div>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid structure, column placement, and p-popout padding only. Bring your own padding/margin via Tailwind for everything else.">
+            <input type="checkbox" x-model="coreOnly" style="cursor: pointer; margin: 0;">
+            <span>Core only</span>
+            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(grid + columns + p-popout)</span>
+          </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
               Download CSS <span style="font-size: 9px;">&#9662;</span>
@@ -2612,7 +2075,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
         <!-- Padding explanation -->
         <div style="margin-top: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 0.25rem; font-size: 0.5625rem; color: #4b5563;">
-          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-breakout aligns full-width content:</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-popout aligns full-width content:</div>
           <div>Uses <span style="color: #3b82f6;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span> padding so content aligns with .col-content edge</div>
         </div>
       </div>
@@ -2641,7 +2104,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         gridAreas: GRID_AREAS,
         configOptions: CONFIG_OPTIONS,
         gapScaleOptions: GAP_SCALE_OPTIONS,
-        breakoutOptions: BREAKOUT_OPTIONS,
         breakpointOptions: BREAKPOINT_OPTIONS,
         // State
         ...createInitialState(),
@@ -2649,7 +2111,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         ...methods,
         // CSS export
         generateCSSExport,
-        generateTailwindCSSExport,
+        configRootCSS,
         cssExportVersion: BUILD_VERSION,
         // Template
         template

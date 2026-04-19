@@ -129,7 +129,7 @@ The visualizer auto-injects into the DOM—no manual HTML markup required.
 - **Class Names** - Show CSS class names (`.col-full`, `.col-feature`, etc.)
 - **Values** - Display live CSS variable measurements
 - **Lorem** - Fill columns with lorem ipsum text
-- **p-gap / p-breakout** - Visualize padding utilities
+- **p-gap** - Visualize padding utilities
 - **Advanced Spans** - Show start/end utility examples
 
 ### Column Selection

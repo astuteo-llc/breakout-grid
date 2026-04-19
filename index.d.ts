@@ -59,28 +59,10 @@ export interface BreakoutGridConfig {
   featureMax?: string;
 
   /**
-   * Minimum breakout padding (floor)
-   * @default '1rem'
-   */
-  breakoutMin?: string;
-
-  /**
-   * Fluid breakout padding scaling
-   * @default '5vw'
-   */
-  breakoutScale?: string;
-
-  /**
    * Default column for elements without a col-* class
    * @default 'content'
    */
   defaultCol?: 'content' | 'popout' | 'feature' | 'full';
-
-  /**
-   * Maximum width for col-full-limit sections
-   * @default '90rem'
-   */
-  fullLimit?: string;
 
   /**
    * Responsive gap scaling configuration
@@ -102,29 +84,6 @@ export interface BreakoutGridConfig {
    * @default false
    */
   debug?: boolean;
-
-  /**
-   * Fixed responsive padding values for legacy project integration
-   * Creates utilities like p-breakout, px-breakout, etc. with built-in responsive breakpoints
-   * @default { base: '1.5rem', md: '4rem', lg: '5rem' }
-   * @example
-   * ```js
-   * breakoutPadding: {
-   *   base: '1.5rem',  // Mobile (equivalent to p-6)
-   *   md: '4rem',      // Medium screens (equivalent to p-16)
-   *   lg: '5rem'       // Large screens (equivalent to p-20)
-   * }
-   * ```
-   */
-  breakoutPadding?: {
-    base?: string;
-    sm?: string;
-    md?: string;
-    lg?: string;
-    xl?: string;
-    '2xl'?: string;
-    [key: string]: string | undefined;
-  };
 }
 
 /**

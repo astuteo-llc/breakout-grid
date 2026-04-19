@@ -5,6 +5,125 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2026-04-19
+
+### Primary consumption pattern
+
+The package is now oriented around the **visualizer download** as the primary way to consume the grid. Generate the CSS once with the settings you want, drop it into your project source, and import it directly. npm install still works for loading the visualizer (and as a legacy CSS-import path), but it's no longer the intended production flow.
+
+### ⚠ Breaking
+
+**1. Removed `.col-full-limit` utility.** Use Tailwind's own `max-w-*` utilities with `mx-auto` on `col-full` instead. The `fullLimit` plugin config option and the `--full-limit` CSS variable are also removed.
+
+```html
+<!-- before -->
+<div class="col-full-limit">...</div>
+
+<!-- after -->
+<div class="col-full max-w-[115rem] mx-auto">...</div>
+```
+
+For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115rem`) and use `max-w-breakout`.
+
+**2. Removed `.col-*-to-*` partial-span utilities** (`col-feature-to-popout`, `col-feature-to-content`, `col-feature-to-center`, `col-popout-to-content`, `col-popout-to-center`, `col-popout-to-feature`, `col-content-to-center`, `col-content-to-popout`, `col-content-to-feature`). Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value — the center-line patterns (the main use case) stay straightforward:
+
+```html
+<!-- before -->
+<div class="col-feature-to-center">...</div>
+
+<!-- after -->
+<div class="col-start-feature col-end-center">...</div>
+<!-- or -->
+<div class="[grid-column:feature-start/center-end]">...</div>
+
+<!-- Symmetric split around the grid's center line -->
+<section class="grid-cols-breakout">
+  <div class="col-start-feature col-end-center">Left half</div>
+  <div class="col-start-center col-end-feature">Right half</div>
+</section>
+```
+
+**3. Removed `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid`** and the `col-*` descendant reset. The three display classes are 1-to-1 with Tailwind's `block`, `flex`, `grid`. For sidebar-style layouts, use a native Tailwind grid on a `col-feature` (or similar) container and keep the inner content free of `col-*` classes:
+
+```html
+<main class="grid-cols-breakout">
+  <div class="col-feature grid grid-cols-[250px_1fr] gap-8">
+    <aside>...</aside>
+    <div>...</div>
+  </div>
+</main>
+```
+
+**5. Removed the `.p-popout-to-content` and `.p-feature-to-content` alignment utilities** (14 rules) along with the `--popout-to-content` and `--feature-to-content` computed CSS variables. Rarely used — when you do need to align content inside a wider column with the content column edge, compose it with Tailwind arbitrary values using the grid vars that are still exposed:
+
+```html
+<!-- before -->
+<div class="col-popout px-popout-to-content">...</div>
+
+<!-- after -->
+<div class="col-popout px-[var(--popout-width)]">...</div>
+
+<!-- feature-to-content equivalent -->
+<div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
+```
+
+**7. Removed `.grid-cols-breakout-subgrid`.** Use Tailwind's native `grid grid-cols-subgrid` (or the plain CSS equivalent `display: grid; grid-template-columns: subgrid;`). Identical output, one fewer bespoke utility.
+
+```html
+<!-- before -->
+<div class="col-feature grid-cols-breakout-subgrid">...</div>
+
+<!-- after -->
+<div class="col-feature grid grid-cols-subgrid">...</div>
+```
+
+**8. Removed the `.breakout-to-content` / `.breakout-to-popout` / `.breakout-to-feature` modifiers.** They produced misaligned tracks when nested inside an outer breakout grid (the outer's `minmax(0, X)` tracks shrink at narrow viewports; the nested grid doesn't know, so the nested tracks end up different sizes). Subgrid is the correct tool for that case. If you need a mini-breakout grid inside a non-breakout parent, just wrap with `grid-cols-breakout` to create a full breakout grid.
+
+```html
+<!-- before: nested breakout with modifier -->
+<div class="col-feature">
+  <div class="grid-cols-breakout breakout-to-feature">
+    <div class="col-content">...</div>
+  </div>
+</div>
+
+<!-- after: subgrid (aligns to outer tracks exactly) -->
+<div class="col-feature grid grid-cols-subgrid">
+  <div class="col-content">...</div>
+</div>
+```
+
+**4. Removed the `full-gap` spacing family** (`.p-full-gap`, `.m-full-gap`, `.-m-full-gap`, and all their axis variants) and the `--computed-gap` CSS variable. The "larger gap for full-width" pattern was niche and adequately served by Tailwind's arbitrary value syntax when it's actually needed:
+
+```html
+<!-- before -->
+<section class="col-full py-full-gap">...</section>
+
+<!-- after (arbitrary value) -->
+<section class="col-full py-[max(var(--gap),calc((100vw-var(--content))/10))]">...</section>
+
+<!-- or register a token in your Tailwind theme -->
+<!--   @theme { --spacing-full-gap: max(var(--gap), calc((100vw - var(--content)) / 10)); } -->
+<section class="col-full py-full-gap">...</section>
+```
+
+### Added
+
+- **`/* @formatter:off */` pragma** at the top of every generated CSS file so JetBrains-family IDEs don't auto-reformat on save
+
+### Changed
+
+- **`.p-breakout` / `.m-breakout` now use a hardcoded fluid clamp** — `clamp(1rem, 5vw, var(--popout-width))`, exposed as `--breakout-padding`. They collapse to `1rem` on small screens (where the fixed `var(--popout-width)` = 5rem would eat most of the viewport) and scale up to the full popout width on desktop. The `--breakout-min`, `--breakout-scale` CSS variables and the `breakoutMin`/`breakoutScale`/`breakoutPadding` plugin config options are removed — the clamp is no longer configurable. If you need a custom clamp, drop to arbitrary values: `p-[clamp(1.5rem,6vw,8rem)]`. `.p-popout` / `.m-popout` remain fixed at `var(--popout-width)` for cases where you want the exact track width.
+- **Combined CSS** is **17.9 KB raw / 3.2 KB gzip** (Tailwind flavor: 19.3 KB / 3.4 KB gzip), down from ~26 KB / 5.7 KB gzip in v5
+- **dist output** collapsed from four files (core + extras × plain/Tailwind) to two (single unified output × plain/Tailwind)
+- **Removed stale `style` field** from `package.json` — superseded by the `exports` map
+- **CSS generator** simplified to a single parameterized `generateCSSExport(config, { tailwind })` entry point
+- **Primary consumption pattern** is now the visualizer download — copy the generated file into your project source rather than importing from `node_modules`. npm install still works for loading the visualizer itself
+
+### What ships
+
+All utilities live in one unified layer — grid containers, column placement, and gap/popout spacing. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
+
 ## [5.0.0] - 2025-01-26
 
 ### Breaking Changes

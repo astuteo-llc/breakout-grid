@@ -66,7 +66,7 @@ const validateConfig = (config) => {
   // Validate CSS unit properties
   const cssUnitProperties = [
     'baseGap', 'maxGap', 'contentMin', 'contentMax', 'contentBase',
-    'featureMin', 'featureScale', 'featureMax', 'popoutWidth', 'fullLimit'
+    'featureMin', 'featureScale', 'featureMax', 'popoutWidth'
   ]
   
   cssUnitProperties.forEach(prop => {
@@ -85,16 +85,7 @@ const validateConfig = (config) => {
   } else if (config.gapScale && typeof config.gapScale === 'string' && !isValidCSSUnit(config.gapScale)) {
     warnings.push(`Invalid CSS unit for gapScale: '${config.gapScale}'. Expected a valid CSS unit like '4vw', '2rem', etc.`)
   }
-  
-  // Validate breakoutPadding values
-  if (config.breakoutPadding && typeof config.breakoutPadding === 'object') {
-    Object.entries(config.breakoutPadding).forEach(([breakpoint, value]) => {
-      if (!isValidCSSUnit(value)) {
-        warnings.push(`Invalid CSS unit for breakoutPadding.${breakpoint}: '${value}'. Expected a valid CSS unit like '1.5rem', '4rem', etc.`)
-      }
-    })
-  }
-  
+
   // Validate defaultCol is a valid grid area
   if (config.defaultCol && !GRID_AREAS.includes(config.defaultCol)) {
     warnings.push(`Invalid defaultCol: '${config.defaultCol}'. Must be one of: ${GRID_AREAS.join(', ')}`)
@@ -125,7 +116,6 @@ const validateConfig = (config) => {
  *       featureScale: '12vw',   // Fluid feature track scaling
  *       featureMax: '12rem',    // Maximum feature track width
  *       popoutWidth: '2rem',    // How far popout sections extend
- *       fullLimit: '120rem',    // Maximum width for full sections
  *
  *       // Responsive gap scaling
  *       gapScale: {
@@ -148,7 +138,6 @@ const defaultConfig = {
   contentMax: '61rem', // Max width for content column (~976px)
   contentBase: '75vw', // Preferred width for content (fluid)
   defaultCol: 'content',  // Default column for elements without a col-* class
-  fullLimit: '115rem',  // Maximum width for full-limit sections
   popoutWidth: '5rem', // How far "popout" sections stick out
   debug: false,        // Enable debug logging
   gapScale: {
@@ -159,13 +148,7 @@ const defaultConfig = {
   // Feature track: clamp(featureMin, featureScale, featureMax)
   featureMin: '0rem',    // Minimum feature track width (floor)
   featureScale: '12vw',  // Fluid feature track scaling
-  featureMax: '12rem',   // Maximum feature track width (ceiling)
-  // Breakout padding: clamp(breakoutMin, breakoutScale, popoutWidth)
-  // Used by p-breakout, px-breakout, m-breakout utilities
-  breakoutMin: '1rem',   // Minimum breakout padding (floor)
-  breakoutScale: '5vw',  // Fluid breakout padding scaling
-  // Legacy responsive breakout padding (overrides clamp if provided)
-  breakoutPadding: null  // null = use clamp, or provide { base, md, lg } for fixed values
+  featureMax: '12rem'    // Maximum feature track width (ceiling)
 }
 
 /**
@@ -212,7 +195,6 @@ const createRootCSS = (pluginConfig) => {
       '--config-content-max': pluginConfig.contentMax,
       '--config-content-base': pluginConfig.contentBase,
       '--config-popout': pluginConfig.popoutWidth,
-      '--config-full-limit': pluginConfig.fullLimit,
       '--config-default-col': pluginConfig.defaultCol,
       // Gap scale values (for visualizer)
       '--config-gap-scale-default': pluginConfig.gapScale.default,
@@ -222,12 +204,6 @@ const createRootCSS = (pluginConfig) => {
       '--config-feature-min': pluginConfig.featureMin,
       '--config-feature-scale': pluginConfig.featureScale,
       '--config-feature-max': pluginConfig.featureMax,
-      // Breakout padding config values (for visualizer)
-      '--config-breakout-min': pluginConfig.breakoutMin,
-      '--config-breakout-scale': pluginConfig.breakoutScale,
-      // Padding to align content with inner columns
-      '--popout-to-content': `clamp(${pluginConfig.breakoutMin}, ${pluginConfig.breakoutScale}, ${pluginConfig.popoutWidth})`,
-      '--feature-to-content': `calc(clamp(${pluginConfig.featureMin}, ${pluginConfig.featureScale}, ${pluginConfig.featureMax}) + ${pluginConfig.popoutWidth})`,
       // Computed values
       '--base-gap': pluginConfig.baseGap,
       '--max-gap': pluginConfig.maxGap,
@@ -235,16 +211,14 @@ const createRootCSS = (pluginConfig) => {
       '--content-max': pluginConfig.contentMax,
       '--content-base': pluginConfig.contentBase,
       '--gap': `clamp(var(--base-gap), ${pluginConfig.gapScale.default}, var(--max-gap))`,
-      '--computed-gap': 'max(var(--gap), calc((100vw - var(--content)) / 10))',
-      '--full-limit': pluginConfig.fullLimit,
       '--content-inset': 'min(clamp(var(--content-min), var(--content-base), var(--content-max)), calc(100% - var(--gap)))',
       '--full': 'minmax(var(--gap), 1fr)',
       '--feature': `minmax(0, clamp(${pluginConfig.featureMin}, ${pluginConfig.featureScale}, ${pluginConfig.featureMax}))`,
       '--popout': `minmax(0, ${pluginConfig.popoutWidth})`,
       '--content': 'min(clamp(var(--content-min), var(--content-base), var(--content-max)), 100% - var(--gap) * 2)',
       '--content-half': 'calc(var(--content) / 2)',
-      // Breakout padding - scales with viewport, breakoutMin floor, popoutWidth ceiling
-      '--breakout-padding': pluginConfig.breakoutPadding?.base || `clamp(${pluginConfig.breakoutMin}, ${pluginConfig.breakoutScale}, ${pluginConfig.popoutWidth})`,
+      // Fluid inset padding for .p-breakout / .m-breakout — collapses on small viewports
+      '--breakout-padding': `clamp(1rem, 5vw, ${pluginConfig.popoutWidth})`,
     }
   } catch (error) {
     console.warn(`Tailwind Breakout Grid Plugin - Error creating CSS custom properties: ${error.message}. This may be due to invalid or malformed configuration values (e.g., invalid CSS units or property names). Please check your plugin configuration for errors. Using fallback values.`)
@@ -255,8 +229,7 @@ const createRootCSS = (pluginConfig) => {
       '--max-gap': '15rem',
       '--gap': '4vw',
       '--content': '50rem',
-      '--full': 'minmax(var(--gap), 1fr)',
-      '--breakout-padding': '1.5rem'
+      '--full': 'minmax(var(--gap), 1fr)'
     }
   }
 }
@@ -282,8 +255,6 @@ const debugLog = (config, ...args) => {
  * Generated classes:
  * - .p-gap, .px-gap, .py-gap, .pt-gap, .pr-gap, .pb-gap, .pl-gap
  * - .m-gap, .mx-gap, .my-gap, .mt-gap, .mr-gap, .mb-gap, .ml-gap
- * - .p-full-gap, .px-full-gap, etc. (using computed gap)
- * - .m-full-gap, etc. (using computed gap)
  * - .p-popout, .px-popout, etc. (using popout width)
  * - .m-popout, etc. (using popout width)
  *
@@ -312,157 +283,17 @@ const createSpacingUtilities = () => {
     .reduce((acc, [key, properties]) => {
       const utilities = {
         [`.${key}-gap`]: [properties].flat()
-          .reduce((styles, prop) => ({
-            ...styles,
-            [prop]: 'var(--gap)'
-          }), {}),
-        [`.${key}-full-gap`]: [properties].flat()
-          .reduce((styles, prop) => ({
-            ...styles,
-            [prop]: 'var(--computed-gap)'
-          }), {}),
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--gap)' }), {}),
         [`.${key}-popout`]: [properties].flat()
-          .reduce((styles, prop) => ({
-            ...styles,
-            [prop]: 'var(--popout)'
-          }), {})
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--config-popout)' }), {}),
+        // .p-breakout / .m-breakout: fluid clamp, collapses to 1rem on small screens
+        [`.${key}-breakout`]: [properties].flat()
+          .reduce((styles, prop) => ({ ...styles, [prop]: 'var(--breakout-padding)' }), {})
       }
 
       return { ...acc, ...utilities }
     }, {})
 }
-
-/**
- * Generates responsive media queries for breakout padding.
- * Updates --breakout-padding CSS variable at different breakpoints.
- *
- * @param {Object} config - Plugin configuration
- * @param {Object} screens - Tailwind breakpoint configuration
- * @returns {Object} Media query rules for :root
- * @private
- */
-const createBreakoutPaddingMediaQueries = (config, screens) => {
-  const { breakoutPadding } = config;
-
-  return Object.entries(screens).reduce((acc, [breakpoint, minWidth]) => {
-    if (breakoutPadding[breakpoint]) {
-      acc[`@media (min-width: ${minWidth})`] = {
-        '--breakout-padding': breakoutPadding[breakpoint]
-      };
-    }
-    return acc;
-  }, {});
-};
-
-/**
- * Generates edge-to-column padding utilities for full-width sections.
- * Use these when you have a full-bleed section but want content to align with grid columns.
- *
- * Generated classes:
- * - .p-breakout / .px-breakout: Default (aligns with popout column)
- * - .p-to-feature / .px-to-feature: Aligns content with feature column edge
- * - .p-to-popout / .px-to-popout: Aligns content with popout column edge
- * - .p-to-content / .px-to-content: Aligns content with content column edge
- *
- * Example usage:
- * ```html
- * <div class="col-full bg-blue-900 px-to-popout">
- *   <p>This text aligns with col-popout content above/below</p>
- * </div>
- * ```
- *
- * How it works:
- * - p-to-feature: gap (aligns with feature column start)
- * - p-to-popout: gap + feature track (aligns with popout column start)
- * - p-to-content: gap + feature track + popoutWidth (aligns with content column start)
- *
- * @returns {Object} Edge padding utility classes
- * @private
- */
-const createBreakoutPaddingUtilities = () => {
-  const spacingDirections = {
-    p: ['padding'],
-    px: ['padding-left', 'padding-right'],
-    py: ['padding-top', 'padding-bottom'],
-    pt: ['padding-top'],
-    pr: ['padding-right'],
-    pb: ['padding-bottom'],
-    pl: ['padding-left']
-  };
-
-  const utilities = {};
-
-  Object.entries(spacingDirections).forEach(([key, properties]) => {
-    // p-breakout: default (aligns with popout column)
-    utilities[`.${key}-breakout`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--breakout-padding)';
-      return acc;
-    }, {});
-
-    // px-popout-to-content: padding to align popout content with content column
-    utilities[`.${key}-popout-to-content`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--popout-to-content)';
-      return acc;
-    }, {});
-
-    // px-feature-to-content: padding to align feature content with content column
-    utilities[`.${key}-feature-to-content`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--feature-to-content)';
-      return acc;
-    }, {});
-  });
-
-  return utilities;
-};
-
-/**
- * Generates responsive breakout margin utilities.
- * Creates utilities for consistent edge margins that align with the breakout grid.
- *
- * Use case: When you need margins that match the breakout padding spacing,
- * especially useful for negative margins to break out of containers.
- *
- * Generated classes:
- * - .m-breakout: Responsive margin on all sides
- * - .mx-breakout: Responsive horizontal margin
- * - .my-breakout: Responsive vertical margin
- * - .mt-breakout, .mr-breakout, .mb-breakout, .ml-breakout: Individual sides
- * - Negative versions: -m-breakout, -mx-breakout, etc.
- *
- * These utilities use --breakout-padding which updates at breakpoints,
- * providing consistent spacing that matches p-breakout utilities.
- *
- * Example: mx-breakout is equivalent to:
- *   mx-6 md:mx-16 lg:mx-20
- *
- * Example: -mx-breakout is equivalent to:
- *   -mx-6 md:-mx-16 lg:-mx-20
- *
- * @returns {Object} Breakout margin utility classes (positive and negative)
- * @private
- */
-const createBreakoutMarginUtilities = () => {
-  const spacingDirections = {
-    m: ['margin'],
-    mx: ['margin-left', 'margin-right'],
-    my: ['margin-top', 'margin-bottom'],
-    mt: ['margin-top'],
-    mr: ['margin-right'],
-    mb: ['margin-bottom'],
-    ml: ['margin-left']
-  };
-
-  const utilities = {};
-
-  Object.entries(spacingDirections).forEach(([key, properties]) => {
-    utilities[`.${key}-breakout`] = properties.reduce((acc, prop) => {
-      acc[prop] = 'var(--breakout-padding)';
-      return acc;
-    }, {});
-  });
-
-  return utilities;
-};
 
 /**
  * Generates grid templates for different section types and alignments.
@@ -687,51 +518,11 @@ const createGridUtilities = (config, templates) => {
     '.grid-cols-breakout': {
       'display': 'grid',
       'grid-template-columns': templates.default
-    },
-    // Subgrid utility for nested elements that need to align to parent's grid lines
-    '.grid-cols-breakout-subgrid': {
-      'display': 'grid',
-      'grid-template-columns': 'subgrid'
     }
   })
 
-  // Modifier classes that constrain nested breakout grids to a specific level
-  // These redefine grid-template-columns with collapsed outer tracks
-  // while maintaining named grid lines for col-* utilities
-  // Uses minmax(0, 1fr) for the center column to fill available space
-  const breakoutModifiers = {
-    // Constrain to content - collapses all outer tracks, content spans full width
-    '.grid-cols-breakout.breakout-to-content': {
-      'grid-template-columns': `[full-start feature-start popout-start content-start center-start] minmax(0, 1fr) [center-end content-end popout-end feature-end full-end]`
-    },
-    // Constrain to popout - keeps popout margins only
-    '.grid-cols-breakout.breakout-to-popout': {
-      'grid-template-columns': `[full-start feature-start popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end feature-end full-end]`
-    },
-    // Constrain to feature - keeps feature and popout margins
-    '.grid-cols-breakout.breakout-to-feature': {
-      'grid-template-columns': `[full-start feature-start] var(--feature) [popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end] var(--feature) [feature-end full-end]`
-    },
-    // None - removes grid entirely for sections that opt out of breakout behavior
-    // Useful for sidebar layouts where content blocks or components with col-* classes should be ignored
-    // Use alone for block flow, or combine with `flex` or `grid` classes
-    '.breakout-none': {
-      'display': 'block'
-    },
-    '.breakout-none-flex': {
-      'display': 'flex'
-    },
-    '.breakout-none-grid': {
-      'display': 'grid'
-    },
-    // Reset col-* placement inside breakout-none containers
-    '.breakout-none > [class*="col-"], .breakout-none-flex > [class*="col-"], .breakout-none-grid > [class*="col-"]': {
-      'grid-column': 'auto'
-    }
-  }
-
-  debugLog(config, 'Generated utilities:', { ...utilities, ...breakoutModifiers })
-  return { ...utilities, ...breakoutModifiers }
+  debugLog(config, 'Generated utilities:', utilities)
+  return utilities
 }
 
 /**
@@ -749,7 +540,6 @@ const createGridUtilities = (config, templates) => {
  * @param {string} [config.featureScale='12vw'] - Fluid feature track scaling
  * @param {string} [config.featureMax='12rem'] - Maximum feature track width
  * @param {string} [config.defaultCol='content'] - Default column for items without col-* class
- * @param {string} [config.fullLimit='115rem'] - Maximum width for col-full-limit
  * @param {Object|string} [config.gapScale] - Responsive gap scaling
  * @param {string} [config.gapScale.default='4vw'] - Mobile/default gap
  * @param {string} [config.gapScale.lg='5vw'] - Large screens (1024px+)
@@ -788,9 +578,7 @@ module.exports = (config = {}) => {
       gapScale: {
         ...defaultConfig.gapScale,
         ...(typeof config.gapScale === 'string' ? { default: config.gapScale } : config.gapScale || {})
-      },
-      // breakoutPadding: null = use var(--gap), object = fixed responsive values
-      breakoutPadding: config.breakoutPadding !== undefined ? config.breakoutPadding : defaultConfig.breakoutPadding
+      }
     }
 
     return ({
@@ -804,25 +592,14 @@ module.exports = (config = {}) => {
         const templates = generateTemplates(pluginConfig)
         const rootCSS = createRootCSS(pluginConfig)
 
-        // Add responsive gap scaling and breakout padding media queries
+        // Responsive gap scaling media queries
         const mediaQueries = Object.entries(screens)
           .reduce((acc, [breakpoint, minWidth]) => {
-            const mediaQuery = `@media (min-width: ${minWidth})`;
-
-            if (!acc[mediaQuery]) {
-              acc[mediaQuery] = {};
-            }
-
-            // Add gap scaling for this breakpoint
             if (pluginConfig.gapScale[breakpoint]) {
-              acc[mediaQuery]['--gap'] = `clamp(var(--base-gap), ${pluginConfig.gapScale[breakpoint]}, var(--max-gap))`;
+              acc[`@media (min-width: ${minWidth})`] = {
+                '--gap': `clamp(var(--base-gap), ${pluginConfig.gapScale[breakpoint]}, var(--max-gap))`
+              };
             }
-
-            // Add breakout padding for this breakpoint (only if using fixed values)
-            if (pluginConfig.breakoutPadding?.[breakpoint]) {
-              acc[mediaQuery]['--breakout-padding'] = pluginConfig.breakoutPadding[breakpoint];
-            }
-
             return acc;
           }, {})
 
@@ -834,21 +611,10 @@ module.exports = (config = {}) => {
           }
         })
 
-        // Add all utility classes
         addUtilities({
           ...createSpacingUtilities(),
-          ...createBreakoutPaddingUtilities(),
-          ...createBreakoutMarginUtilities(),
           ...createGridUtilities(pluginConfig, templates),
-          ...createColumnUtilities(templates),
-          '.col-full-limit': {
-            'grid-column': 'full',
-            'width': '100%',
-            'max-width': 'var(--full-limit)',
-            'margin-left': 'auto',
-            'margin-right': 'auto',
-            'box-sizing': 'border-box'
-          }
+          ...createColumnUtilities(templates)
         })
 
         // Add negative margin utilities using matchUtilities for proper Tailwind support
@@ -862,19 +628,16 @@ module.exports = (config = {}) => {
           ml: ['margin-left']
         }
 
-        // Negative margins for gap-based spacing
+        const matchValues = {
+          gap: 'var(--gap)',
+          popout: 'var(--config-popout)',
+          breakout: 'var(--breakout-padding)'
+        }
+
         Object.entries(marginDirections).forEach(([key, properties]) => {
           matchUtilities(
             { [key]: (value) => properties.reduce((acc, prop) => ({ ...acc, [prop]: value }), {}) },
-            {
-              values: {
-                gap: 'var(--gap)',
-                'full-gap': 'var(--computed-gap)',
-                popout: 'var(--popout)',
-                breakout: 'var(--breakout-padding)'
-              },
-              supportsNegativeValues: true
-            }
+            { values: matchValues, supportsNegativeValues: true }
           )
         })
       } catch (error) {

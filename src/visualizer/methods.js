@@ -143,7 +143,6 @@ export const methods = {
   loadCurrentValues() {
     this.loadOptionsFromCSS(this.configOptions);
     this.loadOptionsFromCSS(this.gapScaleOptions, 'gapScale');
-    this.loadOptionsFromCSS(this.breakoutOptions, 'breakout');
   },
 
   generateConfigExport() {
@@ -155,8 +154,6 @@ export const methods = {
     Object.keys(this.gapScaleOptions).forEach(key => {
       config.gapScale[key] = this.editValues[`gapScale_${key}`] || this.gapScaleOptions[key].value;
     });
-    config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
-    config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
     config.breakpoints = {
       lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || '1024',
       xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || '1280',
@@ -167,10 +164,9 @@ export const methods = {
   configSections: {
     content: { keys: ['contentMin', 'contentBase', 'contentMax'], label: 'Content' },
     defaultCol: { keys: ['defaultCol'], label: 'Default Column' },
-    tracks: { keys: ['popoutWidth', 'fullLimit'], label: 'Track Widths' },
+    tracks: { keys: ['popoutWidth'], label: 'Track Widths' },
     feature: { keys: ['featureMin', 'featureScale', 'featureMax'], label: 'Feature' },
     gap: { keys: ['baseGap', 'maxGap'], nested: { gapScale: ['default', 'lg', 'xl'] }, label: 'Gap' },
-    breakout: { keys: ['breakoutMin', 'breakoutScale'], label: 'Breakout' }
   },
 
   copySection(sectionName) {
@@ -184,12 +180,6 @@ export const methods = {
       if (this.configOptions[key]) {
         value = this.editValues[key] || this.configOptions[key].value;
         varName = this.configOptions[key].liveVar;
-      } else if (key === 'breakoutMin') {
-        value = this.editValues.breakout_min || this.breakoutOptions.min.value;
-        varName = this.breakoutOptions.min.liveVar;
-      } else if (key === 'breakoutScale') {
-        value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-        varName = this.breakoutOptions.scale.liveVar;
       }
       if (varName) {
         lines.push(`${varName}: ${value};`);
@@ -214,37 +204,9 @@ export const methods = {
 
   copyConfig() {
     const config = this.generateConfigExport();
-    const lines = [
-      ':root {',
-      `  /* Content (text width) */`,
-      `  --content-min: ${config.contentMin};`,
-      `  --content-base: ${config.contentBase};`,
-      `  --content-max: ${config.contentMax};`,
-      `  /* Default column */`,
-      `  --default-col: ${config.defaultCol || 'content'};`,
-      `  /* Track widths */`,
-      `  --popout-width: ${config.popoutWidth};`,
-      `  --full-limit: ${config.fullLimit};`,
-      `  /* Feature track */`,
-      `  --feature-min: ${config.featureMin};`,
-      `  --feature-scale: ${config.featureScale};`,
-      `  --feature-max: ${config.featureMax};`,
-      `  /* Outer margins */`,
-      `  --base-gap: ${config.baseGap};`,
-      `  --max-gap: ${config.maxGap};`,
-      `  /* Responsive scale */`,
-      `  --gap-scale-default: ${config.gapScale?.default || '4vw'};`,
-      `  --gap-scale-lg: ${config.gapScale?.lg || '5vw'};`,
-      `  --gap-scale-xl: ${config.gapScale?.xl || '6vw'};`,
-      `  /* Breakout padding */`,
-      `  --breakout-min: ${config.breakoutMin || '1rem'};`,
-      `  --breakout-scale: ${config.breakoutScale || '5vw'};`,
-      `  /* Breakpoints */`,
-      `  /* --breakpoint-lg: ${config.breakpoints?.lg || '1024'}px; */`,
-      `  /* --breakpoint-xl: ${config.breakpoints?.xl || '1280'}px; */`,
-      '}'
-    ];
-    const configStr = lines.join('\n');
+    // Matches the first :root block inside the downloaded CSS exactly —
+    // sourced from the same helper in css-export.js.
+    const configStr = this.configRootCSS(config);
     navigator.clipboard.writeText(configStr).then(() => {
       this.copySuccess = true;
       this.configCopied = true;
@@ -254,12 +216,12 @@ export const methods = {
 
   downloadCSS(format = 'plain') {
     const config = this.generateConfigExport();
-    const css = format === 'tailwind'
-      ? this.generateTailwindCSSExport(config)
-      : this.generateCSSExport(config);
-    const filename = format === 'tailwind'
-      ? '_objects.breakout-grid.tw.css'
-      : '_objects.breakout-grid.css';
+    const tailwind = format === 'tailwind';
+    const css = this.generateCSSExport(config, { tailwind, coreOnly: this.coreOnly });
+    const suffix = this.coreOnly ? '-core' : '';
+    const filename = tailwind
+      ? `_objects.breakout-grid${suffix}.tw.css`
+      : `_objects.breakout-grid${suffix}.css`;
     const blob = new Blob([css], { type: 'text/css' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -327,22 +289,6 @@ export const methods = {
     this.saveConfigToStorage();
   },
 
-  getBreakoutNumeric(key) { return this.getPrefixedNumeric('breakout', this.breakoutOptions, key); },
-  getBreakoutUnit(key) { return this.getPrefixedUnit('breakout', this.breakoutOptions, key); },
-  updateBreakoutNumeric(key, num) {
-    this.editValues[`breakout_${key}`] = num + this.getBreakoutUnit(key);
-    this.configCopied = false;
-    this.updateBreakoutLive();
-    this.saveConfigToStorage();
-  },
-
-  updateBreakoutLive() {
-    const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
-    const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-    const max = this.editValues.popoutWidth || this.configOptions.popoutWidth.value;
-    document.documentElement.style.setProperty('--breakout-padding', `clamp(${min}, ${scale}, ${max})`);
-  },
-
   saveConfigToStorage() {
     const config = this.generateConfigExport();
     localStorage.setItem('breakoutGridConfig', JSON.stringify(config));
@@ -382,14 +328,6 @@ export const methods = {
       this.updateGapLive();
     }
 
-    if (config.breakoutMin !== undefined) {
-      this.editValues.breakout_min = config.breakoutMin;
-    }
-    if (config.breakoutScale !== undefined) {
-      this.editValues.breakout_scale = config.breakoutScale;
-    }
-    this.updateBreakoutLive();
-
     if (config.breakpoints) {
       if (config.breakpoints.lg !== undefined) {
         this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -422,7 +360,6 @@ export const methods = {
     // Track widths need minmax wrapper for CSS grid
     if (key === 'popoutWidth') {
       document.documentElement.style.setProperty('--popout', `minmax(0, ${value})`);
-      this.updateBreakoutLive();
     }
     if (key === 'featureMin' || key === 'featureScale' || key === 'featureMax') {
       const featureMin = this.editValues.featureMin || this.configOptions.featureMin.value;
@@ -456,8 +393,6 @@ export const methods = {
     document.documentElement.style.removeProperty('--popout');
     document.documentElement.style.removeProperty('--feature');
     document.documentElement.style.removeProperty('--content');
-    document.documentElement.style.removeProperty('--breakout-padding');
-    document.documentElement.style.removeProperty('--popout-to-content');
     this.editValues = {};
     this.configCopied = false;
   },
@@ -583,7 +518,6 @@ export const methods = {
 
   getResizeConfig(colName) {
     const map = {
-      'full-limit': 'fullLimit',
       'feature': 'featureScale',
       'popout': 'popoutWidth'
     };
@@ -604,9 +538,6 @@ export const methods = {
       '--feature-min': 'featureMin',
       '--feature-scale': 'featureScale',
       '--feature-max': 'featureMax',
-      '--full-limit': 'fullLimit',
-      '--breakout-min': 'breakoutMin',
-      '--breakout-scale': 'breakoutScale',
       '--default-col': 'defaultCol',
     };
 
@@ -698,14 +629,6 @@ export const methods = {
         });
         this.updateGapLive();
       }
-
-      if (config.breakoutMin !== undefined) {
-        this.editValues.breakout_min = config.breakoutMin;
-      }
-      if (config.breakoutScale !== undefined) {
-        this.editValues.breakout_scale = config.breakoutScale;
-      }
-      this.updateBreakoutLive();
 
       if (config.breakpoints) {
         if (config.breakpoints.lg !== undefined) {

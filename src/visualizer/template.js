@@ -107,50 +107,6 @@ export const template = `
         </div>
       </div>
 
-      <!-- Nested grid example: breakout-to-feature inside col-feature -->
-      <div x-data="{ hovered: false }"
-           @mouseenter="hovered = true"
-           @mouseleave="hovered = false"
-           :style="{
-             gridColumn: 'feature',
-             border: '3px dashed rgb(59, 130, 246)',
-             margin: '1rem 0',
-             background: hovered ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.05)',
-             transition: 'background 0.2s ease',
-             padding: '0.5rem'
-           }">
-        <div style="font-size: 0.625rem; font-family: monospace; color: rgb(30, 64, 175); margin-bottom: 0.5rem; padding: 0.25rem;">
-          Parent: .col-feature container
-        </div>
-        <div class="grid-cols-breakout breakout-to-feature"
-             style="background: rgba(59, 130, 246, 0.1);">
-          <div style="grid-column: feature;
-                      background: rgba(59, 130, 246, 0.3);
-                      padding: 0.5rem;
-                      font-size: 0.625rem;
-                      font-family: monospace;
-                      color: rgb(30, 64, 175);">
-            .col-feature → fills container
-          </div>
-          <div style="grid-column: content;
-                      background: rgb(59, 130, 246);
-                      color: white;
-                      padding: 0.75rem 1rem;
-                      font-size: 0.75rem;
-                      font-weight: 700;
-                      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-            <div style="font-family: monospace; margin-bottom: 0.5rem;">.col-content → has margins</div>
-            <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">breakout-to-feature collapses outer tracks</div>
-            <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature"&gt;
-  &lt;div class="grid-cols-breakout breakout-to-feature"&gt;
-    &lt;div class="col-feature"&gt;Fills container&lt;/div&gt;
-    &lt;p class="col-content"&gt;Has margins&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre>
-          </div>
-        </div>
-      </div>
-
       <!-- Subgrid example: child aligns to parent grid tracks -->
       <div x-data="{ hovered: false }"
            @mouseenter="hovered = true"
@@ -171,7 +127,7 @@ export const template = `
                     color: rgb(157, 23, 77);
                     padding: 0.5rem;
                     background: rgba(236, 72, 153, 0.1);">
-          Parent: .col-feature-right .grid-cols-breakout-subgrid
+          Parent: .col-feature-right .grid .grid-cols-subgrid
         </div>
         <!-- Child spanning feature (wider, lighter) -->
         <div style="grid-column: feature;
@@ -194,7 +150,7 @@ export const template = `
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
           <div style="font-family: monospace; margin-bottom: 0.5rem;">Child: .col-content</div>
           <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">Subgrid lets children align to parent's named lines</div>
-          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid-cols-breakout-subgrid"&gt;
+          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;Aligns to feature!&lt;/div&gt;
   &lt;div class="col-content"&gt;Aligns to content!&lt;/div&gt;
 &lt;/div&gt;</pre>
@@ -250,40 +206,6 @@ export const template = `
           <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
-        </div>
-        <!-- Breakout Padding -->
-        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
-            <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
-          </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px;">
-            <div style="width: var(--breakout-padding); height: 24px; background: #8b5cf6; min-width: 20px;"></div>
-            <div style="width: 24px; height: var(--breakout-padding); background: #8b5cf6; min-height: 20px;"></div>
-          </div>
-          <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
-            clamp(<span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_min || breakoutOptions.min.value"></span>, <span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_scale || breakoutOptions.scale.value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span>)
-          </div>
-          <!-- Editable breakout values -->
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">min</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('min')" @input="updateBreakoutNumeric('min', $event.target.value)" step="0.5"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('min')"></span>
-              </div>
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">scale</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('scale')" @input="updateBreakoutNumeric('scale', $event.target.value)" step="1"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('scale')"></span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 8px; color: #9ca3af; font-style: italic;">max = popout width</div>
         </div>
       </div>
     </div>
@@ -356,7 +278,7 @@ export const template = `
                :style="{
                  position: 'absolute',
                  inset: '0',
-                 padding: showGapPadding ? 'var(--gap)' : (showBreakoutPadding ? 'var(--breakout-padding)' : '1.5rem 0'),
+                 padding: showGapPadding ? 'var(--gap)' : '1.5rem 0',
                  boxSizing: 'border-box',
                  overflow: 'hidden',
                  whiteSpace: 'pre-line',
@@ -391,32 +313,6 @@ export const template = `
               borderRadius: '0.25rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }">p-gap</div>
-          </div>
-
-          <!-- p-breakout / px-breakout Padding Overlay -->
-          <div x-show="showBreakoutPadding"
-               :style="{
-                 position: 'absolute',
-                 inset: 'var(--breakout-padding)',
-                 border: '3px dashed ' + area.borderColor,
-                 backgroundColor: area.color.replace('0.1', '0.25'),
-                 pointerEvents: 'none',
-                 zIndex: '10'
-               }">
-            <div :style="{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              fontSize: '0.625rem',
-              fontWeight: '700',
-              color: area.borderColor,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }">p-breakout</div>
           </div>
 
           <!-- Drag Handle - Left (edit mode only, for resizable columns) -->
@@ -726,10 +622,6 @@ export const template = `
             <input type="checkbox" x-model="showGapPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
             p-gap
           </label>
-          <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
-            <input type="checkbox" x-model="showBreakoutPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
-            p-breakout
-          </label>
         </div>
       </div>
 
@@ -869,7 +761,7 @@ export const template = `
         <!-- Track Widths Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('tracks')" style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer;" :style="{ color: sectionCopied === 'tracks' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'tracks' ? '✓ Copied' : 'Track Widths'"></div>
-          <template x-for="key in ['popoutWidth', 'fullLimit']" :key="'ed_'+key">
+          <template x-for="key in ['popoutWidth']" :key="'ed_'+key">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f3f4f6;">
               <span style="font-size: 11px; color: #374151;" x-text="key.replace('Width', '')"></span>
               <div style="display: flex; align-items: center; gap: 4px;">
@@ -1006,6 +898,11 @@ export const template = `
               Reset
             </button>
           </div>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid structure, column placement, and p-popout padding only. Bring your own padding/margin via Tailwind for everything else.">
+            <input type="checkbox" x-model="coreOnly" style="cursor: pointer; margin: 0;">
+            <span>Core only</span>
+            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(grid + columns + p-popout)</span>
+          </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
               Download CSS <span style="font-size: 9px;">&#9662;</span>
@@ -1172,7 +1069,7 @@ export const template = `
         </div>
         <!-- Padding explanation -->
         <div style="margin-top: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 0.25rem; font-size: 0.5625rem; color: #4b5563;">
-          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-breakout aligns full-width content:</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-popout aligns full-width content:</div>
           <div>Uses <span style="color: #3b82f6;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span> padding so content aligns with .col-content edge</div>
         </div>
       </div>

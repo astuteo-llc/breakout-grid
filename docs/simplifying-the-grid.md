@@ -1,7 +1,5 @@
 # Simplifying the Grid
 
-The breakout grid includes 5 column levels by default. If your project doesn't need all of them, you can collapse unused tracks to zero width. The grid lines still exist (so utilities won't break), but they take no space.
-
 ## Collapsing Unused Tracks
 
 Set any track width to `'0px'` in your config:

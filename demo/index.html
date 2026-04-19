@@ -13,7 +13,7 @@
        MASTHEAD
        ============================================ -->
   <header class="grid-cols-breakout bg-slate-900 text-white">
-    <div class="col-full-limit px-gap py-4 flex items-center justify-between">
+    <div class="col-full max-w-[115rem] mx-auto px-gap py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-lg">BG</div>
         <span class="font-semibold text-lg">Breakout Grid</span>
@@ -33,13 +33,13 @@
       <details class="text-left max-w-xl mx-auto bg-white/10 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-blue-100 text-sm font-medium hover:bg-white/10 transition-colors">View masthead markup</summary>
         <pre class="p-4 text-sm text-blue-100 overflow-x-auto"><code>&lt;header class="grid-cols-breakout bg-slate-900"&gt;
-  &lt;div class="col-full-limit px-gap py-4 flex justify-between"&gt;
+  &lt;div class="col-full max-w-[115rem] mx-auto px-gap py-4 flex justify-between"&gt;
     &lt;div&gt;Logo&lt;/div&gt;
     &lt;nav&gt;Links...&lt;/nav&gt;
   &lt;/div&gt;
 &lt;/header&gt;
 
-&lt;!-- col-full-limit: full width with max-width cap
+&lt;!-- col-full + max-w-[...] + mx-auto: full width, capped on ultra-wide
      px-gap: responsive padding that matches grid gaps --&gt;</code></pre>
       </details>
     </div>
@@ -59,9 +59,9 @@
       <span class="text-red-600 ml-2">Edge to edge</span>
     </div>
 
-    <!-- Full Limit -->
-    <div class="col-full-limit bg-red-50 border-2 border-red-200 py-4 px-gap text-center mt-2">
-      <code class="text-red-600 font-mono text-sm">.col-full-limit</code>
+    <!-- Full with max-width cap (use Tailwind's max-w + mx-auto) -->
+    <div class="col-full max-w-[115rem] mx-auto bg-red-50 border-2 border-red-200 py-4 px-gap text-center mt-2">
+      <code class="text-red-600 font-mono text-sm">col-full max-w-[115rem] mx-auto</code>
       <span class="text-red-500 ml-2">Full width with max-width constraint</span>
     </div>
 
@@ -92,7 +92,7 @@
 
   &lt;!-- Column utilities (widest to narrowest) --&gt;
   &lt;div class="col-full"&gt;Edge to edge&lt;/div&gt;
-  &lt;div class="col-full-limit"&gt;Full with max-width&lt;/div&gt;
+  &lt;div class="col-full max-w-[115rem] mx-auto"&gt;Full with max-width&lt;/div&gt;
   &lt;div class="col-feature"&gt;Extra wide&lt;/div&gt;
   &lt;div class="col-popout"&gt;Slightly wider&lt;/div&gt;
   &lt;div class="col-content"&gt;Reading width (default)&lt;/div&gt;
@@ -122,11 +122,11 @@
       </div>
     </div>
 
-    <!-- p-breakout example -->
-    <div class="col-full bg-sky-600 text-white p-breakout mt-4">
+    <!-- p-popout example -->
+    <div class="col-full bg-sky-600 text-white p-popout mt-4">
       <div class="border-2 border-dashed border-sky-300 p-4">
-        <code class="font-mono text-sm bg-sky-500 px-2 py-1 rounded">.col-full .p-breakout</code>
-        <p class="text-sky-100 mt-2">Larger padding that aligns inner content with .col-content edges.</p>
+        <code class="font-mono text-sm bg-sky-500 px-2 py-1 rounded">.col-full .p-popout</code>
+        <p class="text-sky-100 mt-2">Padding sized to the popout track width.</p>
       </div>
     </div>
 
@@ -140,7 +140,8 @@
 
     <!-- Comparison -->
     <div class="col-content mt-8 mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Comparison: No padding vs p-gap vs p-breakout</h3>
+      <h3 class="text-lg font-semibold text-gray-800">Comparison: No padding vs p-gap vs p-breakout vs p-popout</h3>
+      <p class="text-sm text-gray-600 mt-1">Resize the viewport — <code class="bg-gray-100 px-1 rounded">p-breakout</code> is fluid (1rem on mobile, up to popout-width on desktop); <code class="bg-gray-100 px-1 rounded">p-popout</code> stays fixed.</p>
     </div>
 
     <div class="col-full bg-amber-500 text-white text-center py-4">
@@ -156,6 +157,14 @@
     <div class="col-full bg-amber-500 text-white text-center p-breakout mt-2">
       <div class="border-2 border-dashed border-amber-300 py-2">
         <code class="font-mono text-sm">.col-full .p-breakout</code>
+        <span class="text-amber-100 text-xs ml-2">(fluid — collapses on mobile)</span>
+      </div>
+    </div>
+
+    <div class="col-full bg-amber-500 text-white text-center p-popout mt-2">
+      <div class="border-2 border-dashed border-amber-300 py-2">
+        <code class="font-mono text-sm">.col-full .p-popout</code>
+        <span class="text-amber-100 text-xs ml-2">(fixed — always --popout-width)</span>
       </div>
     </div>
 
@@ -163,10 +172,10 @@
     <div class="col-content mt-6">
       <details class="bg-slate-800 rounded-lg overflow-hidden" open>
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- Full width with breakout padding --&gt;
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- Full width with popout-width padding --&gt;
 &lt;div class="col-full bg-blue-500"&gt;
-  &lt;div class="px-breakout py-6"&gt;
-    Content aligns with .col-content edges
+  &lt;div class="px-popout py-6"&gt;
+    Padding matches the popout track width
   &lt;/div&gt;
 &lt;/div&gt;
 
@@ -176,10 +185,10 @@
 &lt;/div&gt;
 
 &lt;!-- Padding utilities:
-     px-breakout  - Aligns inner content to content column
-     px-gap       - Uses the responsive --gap value
-     p-breakout   - All sides
-     py-breakout  - Top and bottom only
+     px-popout  - Popout-width on left/right
+     px-gap     - Uses the responsive --gap value
+     p-popout   - All sides
+     py-popout  - Top and bottom only
 --&gt;</code></pre>
       </details>
     </div>
@@ -249,10 +258,10 @@
   <section id="subgrid" class="grid-cols-breakout py-12 bg-gray-100">
 
     <h2 class="col-content text-2xl font-bold mb-2">CSS Subgrid</h2>
-    <p class="col-content text-gray-600 mb-8">Use .grid-cols-breakout-subgrid on nested elements to inherit the parent grid's tracks. Children can align to any named line.</p>
+    <p class="col-content text-gray-600 mb-8">Use Tailwind's <code class="bg-gray-100 px-1 rounded text-sm">grid grid-cols-subgrid</code> on a nested element to inherit the parent grid's tracks. Children can align to any named line.</p>
 
     <!-- Subgrid Example 1 -->
-    <div class="col-feature-right grid-cols-breakout-subgrid bg-amber-100 border-2 border-amber-400">
+    <div class="col-feature-right grid grid-cols-subgrid bg-amber-100 border-2 border-amber-400">
       <div class="col-feature py-3 px-4 bg-amber-200 border-b border-amber-300">
         <code class="font-mono text-sm text-amber-800">.col-feature</code> - spans the feature area
       </div>
@@ -268,7 +277,7 @@
     <div class="col-content mt-4 mb-8">
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-right grid-cols-breakout-subgrid"&gt;
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-right grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;
     Spans the feature area
   &lt;/div&gt;
@@ -283,7 +292,7 @@
     </div>
 
     <!-- Subgrid Example 2 -->
-    <div class="col-feature-left grid-cols-breakout-subgrid bg-sky-100 border-2 border-sky-400">
+    <div class="col-feature-left grid grid-cols-subgrid bg-sky-100 border-2 border-sky-400">
       <div class="col-popout py-3 px-4 bg-sky-200 border-b border-sky-300">
         <code class="font-mono text-sm text-sky-800">.col-popout</code> - popout width
       </div>
@@ -296,7 +305,7 @@
     <div class="col-content mt-4 mb-6">
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-left grid-cols-breakout-subgrid"&gt;
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-left grid grid-cols-subgrid"&gt;
   &lt;div class="col-popout"&gt;
     Popout width
   &lt;/div&gt;
@@ -323,48 +332,39 @@
   <section class="grid-cols-breakout py-12">
 
     <h2 class="col-content text-2xl font-bold mb-2">Nested Grids</h2>
-    <p class="col-content text-gray-600 mb-8">Use breakout-to-* modifiers when nesting grids inside constrained containers.</p>
+    <p class="col-content text-gray-600 mb-8">Use <code class="bg-gray-100 px-1 rounded text-sm">grid grid-cols-subgrid</code> on a column element so its children align to the outer grid's named tracks.</p>
 
-    <!-- Feature container with nested grid -->
-    <div class="col-feature bg-indigo-50 border-2 border-indigo-200 p-4">
-      <p class="text-indigo-600 text-sm mb-3">Parent: <code class="bg-indigo-100 px-1 rounded">.col-feature</code></p>
+    <!-- Feature container as a subgrid — inherits the outer grid's tracks exactly -->
+    <div class="col-feature grid grid-cols-subgrid bg-indigo-50">
+      <p class="col-content text-indigo-600 text-sm pt-3">Parent: <code class="bg-indigo-100 px-1 rounded">.col-feature</code></p>
 
-      <div class="grid-cols-breakout breakout-to-feature bg-white border border-indigo-200 rounded">
-        <div class="col-feature bg-indigo-100 py-2 px-3 text-sm text-indigo-700 border-b border-indigo-200">
-          .col-feature fills the container
-        </div>
-        <div class="col-content bg-indigo-200 py-2 px-3 text-sm text-indigo-800">
-          .col-content has proper margins
-        </div>
-        <div class="col-content bg-indigo-300 py-2 px-3 text-sm text-indigo-900">
-          .col-content for readable text
-        </div>
+      <div class="col-feature bg-indigo-100 py-2 px-3 mt-3 text-sm text-indigo-700">
+        .col-feature fills the container
+      </div>
+      <div class="col-content bg-indigo-200 py-2 px-3 text-sm text-indigo-800">
+        .col-content aligns with the outer .col-content
+      </div>
+      <div class="col-content bg-indigo-300 py-2 px-3 text-sm text-indigo-900">
+        .col-content for readable text
       </div>
 
-      <p class="text-indigo-500 text-xs mt-3">Nested: <code class="bg-indigo-100 px-1 rounded">.grid-cols-breakout .breakout-to-feature</code></p>
+      <p class="col-content text-indigo-500 text-xs py-3">Nested: <code class="bg-indigo-100 px-1 rounded">col-feature grid grid-cols-subgrid</code></p>
     </div>
 
     <!-- Code Example -->
     <div class="col-content mt-4">
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- Parent container constrains width --&gt;
-&lt;div class="col-feature"&gt;
-
-  &lt;!-- Nested grid collapses outer tracks --&gt;
-  &lt;div class="grid-cols-breakout breakout-to-feature"&gt;
-    &lt;div class="col-feature"&gt;Fills the container&lt;/div&gt;
-    &lt;div class="col-content"&gt;Has proper margins&lt;/div&gt;
-    &lt;div class="col-content"&gt;For readable text&lt;/div&gt;
-  &lt;/div&gt;
-
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- Feature column that's also a subgrid --&gt;
+&lt;div class="col-feature grid grid-cols-subgrid"&gt;
+  &lt;div class="col-feature"&gt;Fills the container&lt;/div&gt;
+  &lt;div class="col-content"&gt;Aligns with outer .col-content&lt;/div&gt;
+  &lt;div class="col-content"&gt;Any named line from the outer grid works&lt;/div&gt;
 &lt;/div&gt;
 
-&lt;!-- Available modifiers:
-     breakout-to-content  - Collapse all tracks
-     breakout-to-popout   - Keep popout margins
-     breakout-to-feature  - Keep feature + popout margins
---&gt;</code></pre>
+&lt;!-- Subgrid inherits the outer grid's track sizes exactly, so named
+     lines (content-start, popout-end, etc.) resolve the same at every
+     viewport width. Browser support: ~93% as of 4/2026. --&gt;</code></pre>
       </details>
     </div>
 
@@ -418,7 +418,20 @@
       Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit.
     </p>
 
-    <!-- Full-width CTA -->
+    <!-- Feature-width inset — colored band bleeds to feature, inner text stays at content via subgrid -->
+    <aside class="col-feature grid grid-cols-subgrid bg-emerald-900 text-white rounded-lg my-8">
+      <div class="col-content py-8">
+        <p class="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">Key takeaway</p>
+        <p class="text-emerald-50 text-lg">Inset breakouts let a colored background bleed wider than the content column while the text stays at reading width. The wider the band, the stronger the visual pause.</p>
+      </div>
+    </aside>
+
+    <!-- More text -->
+    <p class="col-content text-gray-700 leading-relaxed mb-6">
+      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.
+    </p>
+
+    <!-- Full-width CTA — full-bleed background with fluid inset padding (collapses on mobile) -->
     <div class="col-full bg-slate-900 text-white">
       <div class="px-breakout py-12 text-center">
         <h3 class="text-2xl font-bold mb-3">Ready to try the breakout grid?</h3>
@@ -438,10 +451,8 @@
     &lt;h1&gt;Article Title&lt;/h1&gt;
   &lt;/header&gt;
 
-  &lt;!-- Body text at narrow (reading width) --&gt;
-  &lt;p class="col-content"&gt;
-    Readable paragraph text...
-  &lt;/p&gt;
+  &lt;!-- Body text at reading width --&gt;
+  &lt;p class="col-content"&gt;Readable paragraph text...&lt;/p&gt;
 
   &lt;!-- Wide image at feature width --&gt;
   &lt;figure class="col-feature"&gt;
@@ -449,15 +460,16 @@
   &lt;/figure&gt;
 
   &lt;!-- Blockquote pops out slightly --&gt;
-  &lt;blockquote class="col-popout bg-blue-50"&gt;
-    "Pull quote for emphasis..."
-  &lt;/blockquote&gt;
+  &lt;blockquote class="col-popout bg-blue-50"&gt;Pull quote...&lt;/blockquote&gt;
 
-  &lt;!-- Full-width CTA band --&gt;
+  &lt;!-- Inset breakout (subgrid): feature-width band, content-width text --&gt;
+  &lt;aside class="col-feature grid grid-cols-subgrid bg-emerald-900"&gt;
+    &lt;div class="col-content py-8"&gt;Key takeaway...&lt;/div&gt;
+  &lt;/aside&gt;
+
+  &lt;!-- Inset breakout (padding): full-bleed band, popout-inset content --&gt;
   &lt;div class="col-full bg-slate-900"&gt;
-    &lt;div class="px-breakout py-12"&gt;
-      Inner content aligns with col-content
-    &lt;/div&gt;
+    &lt;div class="px-popout py-12"&gt;Edge-to-edge band, text inset by popout-width&lt;/div&gt;
   &lt;/div&gt;
 
 &lt;/article&gt;</code></pre>

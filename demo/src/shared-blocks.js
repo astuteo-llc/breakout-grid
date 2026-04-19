@@ -1,7 +1,7 @@
 /**
- * Shared content blocks that can be used in both breakout grid
- * and breakout-none contexts. The col-* classes work in breakout
- * grid but are ignored inside breakout-none containers.
+ * Shared content blocks used across demo pages that sit inside a
+ * `grid-cols-breakout` container. The col-* classes position each
+ * block at the right width inside that grid.
  */
 
 // Navigation component - injected into all pages

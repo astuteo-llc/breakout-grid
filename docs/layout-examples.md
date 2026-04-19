@@ -259,13 +259,13 @@ A docs-style layout with navigation sidebar.
 </div>
 ```
 
-## Sidebar with Reusable Components
+## Sidebar Layout
 
-A sidebar layout using `breakout-none-grid` to disable breakout behavior. Components with `col-*` classes are reused but their widths are ignored.
+Size the outer container with `col-feature`, then switch to a native Tailwind grid for the sidebar/content split. Keep the inner content free of `col-*` classes.
 
 ```html
 <main class="grid-cols-breakout py-12">
-  <div class="col-feature breakout-none-grid grid-cols-12 gap-8">
+  <div class="col-feature grid grid-cols-12 gap-8">
 
     <!-- Sidebar -->
     <aside class="col-span-12 lg:col-span-3">

@@ -15,7 +15,7 @@
        MASTHEAD
        ============================================ -->
   <header class="grid-cols-breakout bg-slate-900 text-white">
-    <div class="col-full-limit px-gap py-4 flex items-center justify-between">
+    <div class="col-full max-w-[115rem] mx-auto px-gap py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div class="w-10 h-10 bg-amber-500 rounded flex items-center justify-center font-bold text-lg text-slate-900">AP</div>
@@ -107,7 +107,7 @@
 
     <!-- Full-bleed carousel with content-aligned padding -->
     <div class="col-full">
-      <div class="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory px-breakout" style="-webkit-overflow-scrolling: touch;">
+      <div class="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory px-popout" style="-webkit-overflow-scrolling: touch;">
         <div class="flex-none w-80 snap-start">
           <img src="https://picsum.photos/400/300?random=21" alt="Machine overview" class="w-full h-60 object-cover rounded">
           <p class="text-sm text-gray-600 mt-2">Full machine overview</p>
@@ -310,7 +310,7 @@
     <div class="col-content mb-8">
       <p class="text-amber-600 font-semibold text-sm uppercase tracking-wide mb-2">Reusable Components</p>
       <h2 class="text-2xl font-bold text-gray-900 mb-2">Shared Blocks Demo</h2>
-      <p class="text-gray-600">These blocks are loaded from <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">shared-blocks.js</code> and rendered identically on the <a href="/sidebar.html" class="text-amber-600 hover:underline">Docs page</a>. Compare how <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">col-*</code> classes work here vs. inside <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">breakout-none</code>.</p>
+      <p class="text-gray-600">These blocks are loaded from <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">shared-blocks.js</code>. Each uses a <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">col-*</code> class to sit at a specific breakout width inside the page's <code class="bg-gray-200 px-1.5 py-0.5 rounded text-sm">grid-cols-breakout</code> container.</p>
     </div>
 
     <!-- Shared blocks injected via JS -->
