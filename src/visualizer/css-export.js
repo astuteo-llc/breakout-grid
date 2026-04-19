@@ -1,19 +1,14 @@
 /**
  * Breakout Grid Visualizer - CSS Export
  *
- * Generates CSS output for the core layer, the optional extras layer,
- * or a combined concatenation. Tailwind-flavor wraps every single-class
- * selector in `@utility` blocks.
+ * Single unified generator. Produces the full utility set (grid, columns,
+ * spacing, alignment helpers, grid-escape) as one CSS file. Tailwind flavor
+ * wraps every single-class selector in `@utility` blocks so consumers can
+ * use responsive/state variants (md:col-feature, hover:col-full, etc.).
  *
- * Entry point:
- *   generateCSSExport(config, { layer, tailwind, version })
- *     layer:    'core' | 'extras' | 'combined'  (default 'combined')
- *     tailwind: boolean                         (default false)
- *     version:  string                          (default BUILD_VERSION)
- *
- * The core/extras split is enforced by one rule: extras may depend on
- * core; core must not depend on extras. The release build greps the
- * core output for extras tokens as a CI gate.
+ *   generateCSSExport(config, { tailwind, version })
+ *     tailwind: boolean  (default false)
+ *     version:  string   (default BUILD_VERSION)
  */
 
 const BUILD_VERSION = typeof __VERSION__ !== 'undefined' ? __VERSION__ : 'dev';
@@ -37,31 +32,23 @@ const TAILWIND_FLAVOR_NOTE = `/*!
 const NO_FORMAT_PRAGMA = '/* @formatter:off */\n';
 
 export function generateCSSExport(config, options = {}) {
-  const { layer = 'combined', tailwind = false, version = BUILD_VERSION } = options;
+  const { tailwind = false, version = BUILD_VERSION } = options;
 
-  let css;
-  if (layer === 'core') {
-    css = coreCSS(config, version);
-  } else if (layer === 'extras') {
-    css = extrasCSS(config, version, { wrapInLayer: !tailwind });
-  } else {
-    css = coreCSS(config, version) + '\n' + extrasCSS(config, version, { wrapInLayer: !tailwind });
-  }
-
+  const css = baseCSS(config, version) + '\n' + advancedCSS(config, version);
   const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
   return NO_FORMAT_PRAGMA + body;
 }
 
 /* ========================================================================
-   CORE LAYER
+   BASE — grid, columns, core spacing
    ======================================================================== */
 
-function coreCSS(c, version) {
+function baseCSS(c, version) {
   const breakpointLg = c.breakpoints?.lg || '1024';
   const breakpointXl = c.breakpoints?.xl || '1280';
 
   return `/*!
- * Breakout Grid — Core
+ * Breakout Grid
  * Version: ${version}
  * Documentation: https://github.com/astuteo-llc/breakout-grid
  *
@@ -70,17 +57,16 @@ function coreCSS(c, version) {
  *   Ryan Mulligan, Layout Breakouts — https://ryanmulligan.dev/blog/layout-breakouts/
  *   Viget, Fluid Breakout Layout — https://www.viget.com/articles/fluid-breakout-layout-css-grid/
  *
- * Advanced utilities — breakout-none, p-breakout, p-full-gap, and the
- * *-to-content alignment paddings — live in a companion extras layer.
- * Re-generate with "Include extras layer" on in the visualizer to get
- * them bundled in, or concatenate the extras file after this one.
- *
  * TABLE OF CONTENTS
  *   CONFIGURATION ........ Customizable :root variables
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
  *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
+ *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
+ *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
+ *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
+ *   GRID ESCAPE .......... .breakout-none, .breakout-none-flex, .breakout-none-grid
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -367,89 +353,41 @@ function coreCSS(c, version) {
 }
 
 /* ========================================================================
-   EXTRAS LAYER
-   ========================================================================
-   Optional advanced utilities. Extras depends on core; never the reverse.
+   ADVANCED — breakout padding, full-gap, alignment helpers, grid escape
+   ======================================================================== */
 
-   wrapInLayer: when true (plain .css path), wraps extras in
-   `@layer breakout-extras` so import order is irrelevant. When false
-   (Tailwind .tw.css path), no wrapping — Tailwind v4 handles layering
-   natively and sorts @utility blocks by property count.
-*/
-
-function extrasCSS(c, version, { wrapInLayer = false } = {}) {
-  const breakpointLg = c.breakpoints?.lg || '1024';
-  const breakpointXl = c.breakpoints?.xl || '1280';
+function advancedCSS(c, version) {
   const breakoutPaddingMin = c.breakoutMin || '1rem';
   const breakoutPaddingScale = c.breakoutScale || '5vw';
-
-  const body = extrasBody(c, breakoutPaddingMin, breakoutPaddingScale, breakpointLg, breakpointXl);
-
-  const header = `/*!
- * Breakout Grid — Extras layer
- * Version: ${version}
- *
- * Requires the core Breakout Grid file to be loaded first — this
- * layer reuses the core's :root variables and named grid lines.
- *
- * Adds: breakout-none, p-breakout / m-breakout, p-full-gap / m-full-gap,
- * and the p-popout-to-content / p-feature-to-content alignment paddings.
- */
-`;
-
-  if (wrapInLayer) {
-    return `${header}
-@layer breakout-extras {
-${body}
-}
-`;
-  }
-
-  return `${header}
-${body}
-`;
+  return advancedBody(c, breakoutPaddingMin, breakoutPaddingScale);
 }
 
-function extrasBody(c, breakoutPaddingMin, breakoutPaddingScale, breakpointLg, breakpointXl) {
-  return `/* ============================================================================
-   EXTRAS CONFIGURATION
+function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
+  return `
+/* ============================================================================
+   BREAKOUT PADDING — config inputs
    ============================================================================ */
 
 :root {
-  /* Breakout-padding clamp inputs (extras only) */
+  /* Clamp inputs for --breakout-padding */
   --breakout-min: ${breakoutPaddingMin};
   --breakout-scale: ${breakoutPaddingScale};
 }
 
 /* ============================================================================
-   EXTRAS COMPUTED — graceful fallbacks if core is missing
+   ADVANCED COMPUTED
    ============================================================================ */
 
 :root {
   /* Larger gap for full-width elements */
-  --computed-gap: max(var(--gap, 1rem), calc((100vw - var(--content, 50rem)) / 10));
+  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
 
   /* Breakout padding clamps between min and popout-width */
-  --breakout-padding: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
+  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
 
   /* Alignment paddings to reach the content column edge */
-  --popout-to-content: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
-  --feature-to-content: calc(clamp(var(--feature-min, 0rem), var(--feature-scale, 12vw), var(--feature-max, 12rem)) + var(--popout-width, 5rem));
-}
-
-/* ============================================================================
-   BREAKOUT-NONE — escape the grid entirely
-   ============================================================================ */
-
-.breakout-none { display: block; }
-.breakout-none-flex { display: flex; }
-.breakout-none-grid { display: grid; }
-
-/* Reset col-* placement inside breakout-none containers */
-.breakout-none > [class*='col-'],
-.breakout-none-flex > [class*='col-'],
-.breakout-none-grid > [class*='col-'] {
-  grid-column: auto;
+  --popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
+  --feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
 }
 
 /* ============================================================================
@@ -526,5 +464,20 @@ function extrasBody(c, breakoutPaddingMin, breakoutPaddingScale, breakpointLg, b
 .pt-feature-to-content { padding-top: var(--feature-to-content); }
 .pr-feature-to-content { padding-right: var(--feature-to-content); }
 .pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }`;
+.pl-feature-to-content { padding-left: var(--feature-to-content); }
+
+/* ============================================================================
+   GRID ESCAPE — breakout-none opts out of the grid entirely
+   ============================================================================ */
+
+.breakout-none { display: block; }
+.breakout-none-flex { display: flex; }
+.breakout-none-grid { display: grid; }
+
+/* Reset col-* placement inside breakout-none containers */
+.breakout-none > [class*='col-'],
+.breakout-none-flex > [class*='col-'],
+.breakout-none-grid > [class*='col-'] {
+  grid-column: auto;
+}`;
 }

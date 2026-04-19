@@ -119,15 +119,6 @@ export interface BreakoutGridConfig {
     '2xl'?: string;
     [key: string]: string | undefined;
   };
-
-  /**
-   * Include the "extras" utility layer: `breakout-none*`, `col-*-to-*`
-   * spans, `p-breakout` / `m-breakout`, `p-full-gap` / `m-full-gap`,
-   * and `p-*-to-content` alignment utilities. Defaults to `true` for
-   * backward compatibility. Set to `false` for a slim core-only build.
-   * @default true
-   */
-  extras?: boolean;
 }
 
 /**

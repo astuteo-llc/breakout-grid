@@ -1,28 +1,5 @@
 # Simplifying the Grid
 
-Two ways to slim the grid down:
-
-1. **Drop the extras layer** (v6+) — get just core grid utilities and skip the advanced `breakout-none`, `p-breakout`, `p-full-gap`, and `p-*-to-content` helpers.
-2. **Collapse unused tracks** — keep all utilities but set feature/popout widths to `0` so they take no space.
-
-## Dropping the Extras Layer
-
-If you only need the grid, basic `col-*` placement, and gap/popout spacing, skip the extras layer entirely.
-
-**Visualizer users** — toggle **Include extras layer** off in the export panel, then download. The resulting file contains core utilities only.
-
-**Tailwind plugin consumers** — pass `extras: false`:
-
-```js
-import breakoutGrid from '@astuteo/breakout-grid'
-
-export default {
-  plugins: [breakoutGrid({ extras: false })]
-}
-```
-
-This gives you a ~11 KB raw / 2.3 KB gzip CSS footprint without the advanced alignment helpers.
-
 ## Collapsing Unused Tracks
 
 Set any track width to `'0px'` in your config:

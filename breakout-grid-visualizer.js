@@ -79,10 +79,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       hasConfigOverride: false,
       showCloseWarningModal: false,
       gridOpacity: 0.8,
-      backdropOpacity: 0.85,
-      // Whether "Download CSS" emits the extras layer alongside core.
-      // Defaults to true to match the package's current behavior.
-      includeExtras: true
+      backdropOpacity: 0.85
     };
   }
   const BUILD_VERSION = "5.2.6";
@@ -98,23 +95,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 `;
   const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
-    const { layer = "combined", tailwind = false, version = BUILD_VERSION } = options;
-    let css;
-    if (layer === "core") {
-      css = coreCSS(config, version);
-    } else if (layer === "extras") {
-      css = extrasCSS(config, version, { wrapInLayer: !tailwind });
-    } else {
-      css = coreCSS(config, version) + "\n" + extrasCSS(config, version, { wrapInLayer: !tailwind });
-    }
+    const { tailwind = false, version = BUILD_VERSION } = options;
+    const css = baseCSS(config, version) + "\n" + advancedCSS(config);
     const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
     return NO_FORMAT_PRAGMA + body;
   }
-  function coreCSS(c, version) {
+  function baseCSS(c, version) {
     const breakpointLg = c.breakpoints?.lg || "1024";
     const breakpointXl = c.breakpoints?.xl || "1280";
     return `/*!
- * Breakout Grid — Core
+ * Breakout Grid
  * Version: ${version}
  * Documentation: https://github.com/astuteo-llc/breakout-grid
  *
@@ -123,17 +113,16 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  *   Ryan Mulligan, Layout Breakouts — https://ryanmulligan.dev/blog/layout-breakouts/
  *   Viget, Fluid Breakout Layout — https://www.viget.com/articles/fluid-breakout-layout-css-grid/
  *
- * Advanced utilities — breakout-none, p-breakout, p-full-gap, and the
- * *-to-content alignment paddings — live in a companion extras layer.
- * Re-generate with "Include extras layer" on in the visualizer to get
- * them bundled in, or concatenate the extras file after this one.
- *
  * TABLE OF CONTENTS
  *   CONFIGURATION ........ Customizable :root variables
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
  *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
+ *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
+ *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
+ *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
+ *   GRID ESCAPE .......... .breakout-none, .breakout-none-flex, .breakout-none-grid
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -418,74 +407,37 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .-mb-popout { margin-bottom: calc(var(--popout-width) * -1); }
 `;
   }
-  function extrasCSS(c, version, { wrapInLayer = false } = {}) {
-    c.breakpoints?.lg || "1024";
-    c.breakpoints?.xl || "1280";
+  function advancedCSS(c, version) {
     const breakoutPaddingMin = c.breakoutMin || "1rem";
     const breakoutPaddingScale = c.breakoutScale || "5vw";
-    const body = extrasBody(c, breakoutPaddingMin, breakoutPaddingScale);
-    const header = `/*!
- * Breakout Grid — Extras layer
- * Version: ${version}
- *
- * Requires the core Breakout Grid file to be loaded first — this
- * layer reuses the core's :root variables and named grid lines.
- *
- * Adds: breakout-none, p-breakout / m-breakout, p-full-gap / m-full-gap,
- * and the p-popout-to-content / p-feature-to-content alignment paddings.
- */
-`;
-    if (wrapInLayer) {
-      return `${header}
-@layer breakout-extras {
-${body}
-}
-`;
-    }
-    return `${header}
-${body}
-`;
+    return advancedBody(c, breakoutPaddingMin, breakoutPaddingScale);
   }
-  function extrasBody(c, breakoutPaddingMin, breakoutPaddingScale, breakpointLg, breakpointXl) {
-    return `/* ============================================================================
-   EXTRAS CONFIGURATION
+  function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
+    return `
+/* ============================================================================
+   BREAKOUT PADDING — config inputs
    ============================================================================ */
 
 :root {
-  /* Breakout-padding clamp inputs (extras only) */
+  /* Clamp inputs for --breakout-padding */
   --breakout-min: ${breakoutPaddingMin};
   --breakout-scale: ${breakoutPaddingScale};
 }
 
 /* ============================================================================
-   EXTRAS COMPUTED — graceful fallbacks if core is missing
+   ADVANCED COMPUTED
    ============================================================================ */
 
 :root {
   /* Larger gap for full-width elements */
-  --computed-gap: max(var(--gap, 1rem), calc((100vw - var(--content, 50rem)) / 10));
+  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
 
   /* Breakout padding clamps between min and popout-width */
-  --breakout-padding: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
+  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
 
   /* Alignment paddings to reach the content column edge */
-  --popout-to-content: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
-  --feature-to-content: calc(clamp(var(--feature-min, 0rem), var(--feature-scale, 12vw), var(--feature-max, 12rem)) + var(--popout-width, 5rem));
-}
-
-/* ============================================================================
-   BREAKOUT-NONE — escape the grid entirely
-   ============================================================================ */
-
-.breakout-none { display: block; }
-.breakout-none-flex { display: flex; }
-.breakout-none-grid { display: grid; }
-
-/* Reset col-* placement inside breakout-none containers */
-.breakout-none > [class*='col-'],
-.breakout-none-flex > [class*='col-'],
-.breakout-none-grid > [class*='col-'] {
-  grid-column: auto;
+  --popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
+  --feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
 }
 
 /* ============================================================================
@@ -562,7 +514,22 @@ ${body}
 .pt-feature-to-content { padding-top: var(--feature-to-content); }
 .pr-feature-to-content { padding-right: var(--feature-to-content); }
 .pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }`;
+.pl-feature-to-content { padding-left: var(--feature-to-content); }
+
+/* ============================================================================
+   GRID ESCAPE — breakout-none opts out of the grid entirely
+   ============================================================================ */
+
+.breakout-none { display: block; }
+.breakout-none-flex { display: flex; }
+.breakout-none-grid { display: grid; }
+
+/* Reset col-* placement inside breakout-none containers */
+.breakout-none > [class*='col-'],
+.breakout-none-flex > [class*='col-'],
+.breakout-none-grid > [class*='col-'] {
+  grid-column: auto;
+}`;
   }
   const methods = {
     init() {
@@ -794,10 +761,8 @@ ${body}
     downloadCSS(format = "plain") {
       const config = this.generateConfigExport();
       const tailwind = format === "tailwind";
-      const layer = this.includeExtras ? "combined" : "core";
-      const css = this.generateCSSExport(config, { layer, tailwind });
-      const suffix = this.includeExtras ? "" : "-core";
-      const filename = tailwind ? `_objects.breakout-grid${suffix}.tw.css` : `_objects.breakout-grid${suffix}.css`;
+      const css = this.generateCSSExport(config, { tailwind });
+      const filename = tailwind ? "_objects.breakout-grid.tw.css" : "_objects.breakout-grid.css";
       const blob = new Blob([css], { type: "text/css" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1456,8 +1421,8 @@ ${body}
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
         </div>
-        <!-- Breakout Padding (extras layer only) -->
-        <div x-show="includeExtras" style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
+        <!-- Breakout Padding -->
+        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
             <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
@@ -2211,11 +2176,6 @@ ${body}
               Reset
             </button>
           </div>
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="When on, Download emits core + extras concatenated. When off, emits core only.">
-            <input type="checkbox" x-model="includeExtras" style="cursor: pointer; margin: 0;">
-            <span>Include extras layer</span>
-            <span x-show="!includeExtras" style="color: #9ca3af; font-size: 10px;">(core only)</span>
-          </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
               Download CSS <span style="font-size: 9px;">&#9662;</span>

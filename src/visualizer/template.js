@@ -251,8 +251,8 @@ export const template = `
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
         </div>
-        <!-- Breakout Padding (extras layer only) -->
-        <div x-show="includeExtras" style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
+        <!-- Breakout Padding -->
+        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
             <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
@@ -1006,11 +1006,6 @@ export const template = `
               Reset
             </button>
           </div>
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="When on, Download emits core + extras concatenated. When off, emits core only.">
-            <input type="checkbox" x-model="includeExtras" style="cursor: pointer; margin: 0;">
-            <span>Include extras layer</span>
-            <span x-show="!includeExtras" style="color: #9ca3af; font-size: 10px;">(core only)</span>
-          </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
               Download CSS <span style="font-size: 9px;">&#9662;</span>

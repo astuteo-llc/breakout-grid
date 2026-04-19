@@ -89,18 +89,7 @@ From narrowest to widest:
 
 ## Classes
 
-The grid ships in two logical layers: **core** (grid containers, column placement, gap/popout spacing) and **extras** (advanced alignment helpers — `breakout-none`, `p-breakout`, `p-full-gap`, `p-*-to-content`). The combined CSS output in `dist/` includes both. Generate a slim core-only build from the visualizer if you don't need the extras.
-
-Using the Tailwind plugin? Pass `extras: false` to opt out programmatically:
-
-```js
-import breakoutGrid from '@astuteo/breakout-grid'
-export default { plugins: [breakoutGrid({ extras: false })] }  // core only
-```
-
-### Core
-
-#### Grid Containers
+### Grid Containers
 - `.grid-cols-breakout` - Main centered grid
 - `.grid-cols-breakout-subgrid` - CSS subgrid for nested alignment
 - `.grid-cols-{feature|popout|content}-{left|right}` - Asymmetric layouts
@@ -125,15 +114,13 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 #### Spacing
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
-- Negative variants `-m-gap`, `-m-popout`
-
-### Extras (included in combined build; opt out with `extras: false` in the Tailwind plugin)
-
-- `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid
-- `.p-breakout`, `.m-breakout` - Fluid breakout padding
-- `.p-full-gap`, `.m-full-gap` - Larger gap for full-width elements
+- `.p-breakout`, `.m-breakout` - Fluid edge padding that matches the popout track
+- `.p-full-gap`, `.m-full-gap` - Larger gap variant for full-width elements
 - `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
-- `.-m-breakout`, `.-m-full-gap` - Negative variants
+- Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`, `.-m-full-gap`
+
+#### Grid Escape
+- `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid entirely (useful inside sidebar layouts)
 
 > Need a partial span between non-adjacent tracks — e.g. a split layout where content reaches the grid's center line? Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value:
 >
