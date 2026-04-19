@@ -125,11 +125,23 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 ### Extras (opt-in via `@astuteo/breakout-grid/extras`)
 
 - `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid
-- `.col-feature-to-content`, `.col-popout-to-center`, etc. - Partial spans between non-adjacent tracks
 - `.p-breakout`, `.m-breakout` - Fluid breakout padding
 - `.p-full-gap`, `.m-full-gap` - Larger gap for full-width elements
 - `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
 - `.-m-breakout`, `.-m-full-gap` - Negative variants
+
+> Need a partial span between non-adjacent tracks — e.g. a split layout where content reaches the grid's center line? Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value:
+>
+> ```html
+> <!-- Symmetric split: left half ends at center, right half starts at center -->
+> <section class="grid-cols-breakout">
+>   <div class="col-start-feature col-end-center">Left half</div>
+>   <div class="col-start-center col-end-feature">Right half</div>
+> </section>
+>
+> <!-- Feature-wide image bleeding to the grid's midpoint -->
+> <figure class="[grid-column:feature-start/center-end]">...</figure>
+> ```
 
 ## Customization
 

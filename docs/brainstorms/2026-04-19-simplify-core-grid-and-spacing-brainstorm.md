@@ -32,7 +32,7 @@ Matching the target snippet verbatim (including `--default-col: feature`) was re
 - **JS Tailwind plugin (`index.js`)**: Gains an `extras: boolean` option defaulting to `true` so existing consumers get current behavior unchanged. Flipping the default to `false` is deferred to a future major.
 - **Visualizer**: Grows a toggle for whether "Copy CSS" output includes extras. Default matches current behavior (combined). When off, emits the two files in sequence with clear section markers.
 - **Comment / formatting style**: Core section adopts the target snippet's terser comments and section dividers. Extras retains its existing, more verbose comments for now.
-- **Versioning**: Treated as a minor release — defaults don't change, surface area only grows (new export paths, new plugin option).
+- **Versioning**: Initially scoped as a minor release (5.3.0), but the deepen-plan review flagged that the default `@import '@astuteo/breakout-grid'` changes shape — extras classes no longer resolve via the main import, which is a breaking change for direct-CSS consumers. Final decision: ship as **6.0.0**. The `col-full-limit` removal (added to scope during implementation) is an additional breaking change justifying the major bump.
 
 ## Open Questions
 

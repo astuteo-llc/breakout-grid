@@ -444,8 +444,8 @@ ${body}
 
 :root {
   /* Breakout-padding clamp inputs (extras only) */
-  --breakout-padding-min: ${breakoutPaddingMin};
-  --breakout-padding-scale: ${breakoutPaddingScale};
+  --breakout-min: ${breakoutPaddingMin};
+  --breakout-scale: ${breakoutPaddingScale};
 }
 
 /* ============================================================================
@@ -457,10 +457,10 @@ ${body}
   --computed-gap: max(var(--gap, 1rem), calc((100vw - var(--content, 50rem)) / 10));
 
   /* Breakout padding clamps between min and popout-width */
-  --breakout-padding: clamp(var(--breakout-padding-min, 1rem), var(--breakout-padding-scale, 5vw), var(--popout-width, 5rem));
+  --breakout-padding: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
 
   /* Alignment paddings to reach the content column edge */
-  --popout-to-content: clamp(var(--breakout-padding-min, 1rem), var(--breakout-padding-scale, 5vw), var(--popout-width, 5rem));
+  --popout-to-content: clamp(var(--breakout-min, 1rem), var(--breakout-scale, 5vw), var(--popout-width, 5rem));
   --feature-to-content: calc(clamp(var(--feature-min, 0rem), var(--feature-scale, 12vw), var(--feature-max, 12rem)) + var(--popout-width, 5rem));
 }
 
@@ -478,25 +478,6 @@ ${body}
 .breakout-none-grid > [class*='col-'] {
   grid-column: auto;
 }
-
-/* ============================================================================
-   ADVANCED SPANS — col-*-to-*
-   ============================================================================ */
-
-/* Feature to other columns */
-.col-feature-to-popout { grid-column: feature-start / popout-end; }
-.col-feature-to-content { grid-column: feature-start / content-end; }
-.col-feature-to-center { grid-column: feature-start / center-end; }
-
-/* Popout to other columns */
-.col-popout-to-content { grid-column: popout-start / content-end; }
-.col-popout-to-center { grid-column: popout-start / center-end; }
-.col-popout-to-feature { grid-column: popout-start / feature-end; }
-
-/* Content to other columns */
-.col-content-to-center { grid-column: content-start / center-end; }
-.col-content-to-popout { grid-column: content-start / popout-end; }
-.col-content-to-feature { grid-column: content-start / feature-end; }
 
 /* ============================================================================
    BREAKOUT PADDING — fluid padding matching popout track behavior

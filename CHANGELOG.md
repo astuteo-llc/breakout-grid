@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ⚠ Breaking
 
-**1. Default CSS import shape (CSS-file consumers only).** `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `col-*-to-*` partial spans, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
+**1. Default CSS import shape (CSS-file consumers only).** `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
 
 ```css
 @import '@astuteo/breakout-grid';
@@ -29,6 +29,24 @@ Tailwind plugin consumers: no action required. `extras` defaults to `true`, pres
 ```
 
 For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115rem`) and use `max-w-breakout`.
+
+**3. Removed `.col-*-to-*` partial-span utilities** (`col-feature-to-popout`, `col-feature-to-content`, `col-feature-to-center`, `col-popout-to-content`, `col-popout-to-center`, `col-popout-to-feature`, `col-content-to-center`, `col-content-to-popout`, `col-content-to-feature`). Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value — the center-line patterns (the main use case) stay straightforward:
+
+```html
+<!-- before -->
+<div class="col-feature-to-center">...</div>
+
+<!-- after -->
+<div class="col-start-feature col-end-center">...</div>
+<!-- or -->
+<div class="[grid-column:feature-start/center-end]">...</div>
+
+<!-- Symmetric split around the grid's center line -->
+<section class="grid-cols-breakout">
+  <div class="col-start-feature col-end-center">Left half</div>
+  <div class="col-start-center col-end-feature">Right half</div>
+</section>
+```
 
 ### Added
 
@@ -51,7 +69,7 @@ Enforced by one rule: **extras may depend on core; core must not depend on extra
 
 **Core:** grid containers, subgrid, `breakout-to-*` modifiers, `.col-*` placement, `.col-start/end-*`, `.col-*-{left,right}`, `.col-full-limit`, `.p-gap` / `.p-popout` spacing (+ margins + negatives).
 
-**Extras:** `.breakout-none*`, `.col-*-to-*` partial spans, `.p-breakout` / `.m-breakout`, `.p-full-gap` / `.m-full-gap`, `.p-popout-to-content`, `.p-feature-to-content`, and the `--breakout-padding` / `--computed-gap` / `--popout-to-content` / `--feature-to-content` computed vars.
+**Extras:** `.breakout-none*`, `.p-breakout` / `.m-breakout`, `.p-full-gap` / `.m-full-gap`, `.p-popout-to-content`, `.p-feature-to-content`, and the `--breakout-padding` / `--computed-gap` / `--popout-to-content` / `--feature-to-content` computed vars.
 
 ## [5.0.0] - 2025-01-26
 

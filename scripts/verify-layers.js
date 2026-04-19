@@ -12,8 +12,8 @@
 import { readFileSync } from 'fs';
 
 const EXTRAS_TOKEN_PATTERNS = [
-  /--breakout-padding-min\b/,
-  /--breakout-padding-scale\b/,
+  /--breakout-min\b/,
+  /--breakout-scale\b/,
   /--computed-gap\b/,
   /--breakout-padding\b/,
   /--popout-to-content\b/,

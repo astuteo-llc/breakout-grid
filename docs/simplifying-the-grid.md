@@ -2,7 +2,7 @@
 
 Two ways to slim the grid down:
 
-1. **Drop the extras layer** (v6+) — get just core grid utilities and skip the advanced `breakout-none`, `col-*-to-*`, `p-breakout`, `p-full-gap`, and `p-*-to-content` helpers.
+1. **Drop the extras layer** (v6+) — get just core grid utilities and skip the advanced `breakout-none`, `p-breakout`, `p-full-gap`, and `p-*-to-content` helpers.
 2. **Collapse unused tracks** — keep all utilities but set feature/popout widths to `0` so they take no space.
 
 ## Dropping the Extras Layer

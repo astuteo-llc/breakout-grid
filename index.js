@@ -345,7 +345,7 @@ const createSpacingUtilities = () => {
         [`.${key}-popout`]: [properties].flat()
           .reduce((styles, prop) => ({
             ...styles,
-            [prop]: 'var(--popout)'
+            [prop]: 'var(--config-popout)'
           }), {})
       }
 
@@ -897,8 +897,8 @@ module.exports = (config = {}) => {
 
         // Negative margins for gap-based spacing (full-gap + breakout are extras-only)
         const matchValues = extras
-          ? { gap: 'var(--gap)', 'full-gap': 'var(--computed-gap)', popout: 'var(--popout)', breakout: 'var(--breakout-padding)' }
-          : { gap: 'var(--gap)', popout: 'var(--popout)' }
+          ? { gap: 'var(--gap)', 'full-gap': 'var(--computed-gap)', popout: 'var(--config-popout)', breakout: 'var(--breakout-padding)' }
+          : { gap: 'var(--gap)', popout: 'var(--config-popout)' }
 
         Object.entries(marginDirections).forEach(([key, properties]) => {
           matchUtilities(
