@@ -65,6 +65,11 @@ function coreCSS(c, version) {
  * Version: ${version}
  * Documentation: https://github.com/astuteo-llc/breakout-grid
  *
+ * Inspired by:
+ *   Kevin Powell — https://www.youtube.com/watch?v=c13gpBrnGEw
+ *   Ryan Mulligan, Layout Breakouts — https://ryanmulligan.dev/blog/layout-breakouts/
+ *   Viget, Fluid Breakout Layout — https://www.viget.com/articles/fluid-breakout-layout-css-grid/
+ *
  * For the advanced utility layer (advanced spans, breakout padding,
  * full-gap, alignment paddings, grid-escape), also import:
  *   @import '@astuteo/breakout-grid/extras';
