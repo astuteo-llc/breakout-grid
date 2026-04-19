@@ -7,16 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.0] - 2026-04-19
 
-### ⚠ Breaking (CSS-file consumers only)
+### ⚠ Breaking
 
-The default `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `col-*-to-*` partial spans, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
+**1. Default CSS import shape (CSS-file consumers only).** `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `col-*-to-*` partial spans, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
 
 ```css
 @import '@astuteo/breakout-grid';
 @import '@astuteo/breakout-grid/extras';
 ```
 
-**Tailwind plugin consumers:** no action required. `extras` defaults to `true`, preserving current behavior. Pass `extras: false` for the slim build.
+Tailwind plugin consumers: no action required. `extras` defaults to `true`, preserving current behavior. Pass `extras: false` for the slim build.
+
+**2. Removed `.col-full-limit` utility.** Use Tailwind's own `max-w-*` utilities with `mx-auto` on `col-full` instead. The `fullLimit` plugin config option and the `--full-limit` CSS variable are also removed.
+
+```html
+<!-- before -->
+<div class="col-full-limit">...</div>
+
+<!-- after -->
+<div class="col-full max-w-[115rem] mx-auto">...</div>
+```
+
+For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115rem`) and use `max-w-breakout`.
 
 ### Added
 

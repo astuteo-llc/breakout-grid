@@ -13,7 +13,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 // Grid areas configuration (matches plugin)
 export const GRID_AREAS = [
   { name: 'full', label: 'Full', className: '.col-full', color: 'rgba(239, 68, 68, 0.25)', borderColor: 'rgb(239, 68, 68)' },
-  { name: 'full-limit', label: 'Full Limit', className: '.col-full-limit', color: 'rgba(220, 38, 38, 0.25)', borderColor: 'rgb(220, 38, 38)' },
   { name: 'feature', label: 'Feature', className: '.col-feature', color: 'rgba(6, 182, 212, 0.25)', borderColor: 'rgb(6, 182, 212)' },
   { name: 'popout', label: 'Popout', className: '.col-popout', color: 'rgba(34, 197, 94, 0.25)', borderColor: 'rgb(34, 197, 94)' },
   { name: 'content', label: 'Content', className: '.col-content', color: 'rgba(168, 85, 247, 0.25)', borderColor: 'rgb(168, 85, 247)' },
@@ -38,7 +37,6 @@ export function createInitialStateLite() {
     // Column widths in pixels
     columnWidths: {
       full: 0,
-      'full-limit': 0,
       feature: 0,
       popout: 0,
       content: 0,

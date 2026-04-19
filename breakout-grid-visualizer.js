@@ -6,7 +6,6 @@
 Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.`;
   const GRID_AREAS = [
     { name: "full", label: "Full", className: ".col-full", color: "rgba(239, 68, 68, 0.25)", borderColor: "rgb(239, 68, 68)" },
-    { name: "full-limit", label: "Full Limit", className: ".col-full-limit", color: "rgba(220, 38, 38, 0.25)", borderColor: "rgb(220, 38, 38)" },
     { name: "feature", label: "Feature", className: ".col-feature", color: "rgba(6, 182, 212, 0.25)", borderColor: "rgb(6, 182, 212)" },
     { name: "popout", label: "Popout", className: ".col-popout", color: "rgba(34, 197, 94, 0.25)", borderColor: "rgb(34, 197, 94)" },
     { name: "content", label: "Content", className: ".col-content", color: "rgba(168, 85, 247, 0.25)", borderColor: "rgb(168, 85, 247)" }
@@ -21,7 +20,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     featureMin: { value: "0rem", desc: "Minimum feature track width (floor)", cssVar: "--config-feature-min", liveVar: "--feature-min" },
     featureScale: { value: "12vw", desc: "Fluid feature track scaling", cssVar: "--config-feature-scale", liveVar: "--feature-scale" },
     featureMax: { value: "12rem", desc: "Maximum feature track width (ceiling)", cssVar: "--config-feature-max", liveVar: "--feature-max" },
-    fullLimit: { value: "115rem", desc: "Max width for col-full-limit. Use rem.", cssVar: "--config-full-limit", liveVar: "--full-limit" },
     defaultCol: { value: "content", desc: "Default column when no col-* class", type: "select", options: ["content", "popout", "feature", "full"], cssVar: "--config-default-col", liveVar: "--default-col" }
   };
   const GAP_SCALE_OPTIONS = {
@@ -67,7 +65,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       controlPanelCollapsed: false,
       configEditorCollapsed: false,
       // Pre-initialized for Alpine reactivity
-      columnWidths: { full: 0, "full-limit": 0, feature: 0, popout: 0, content: 0, center: 0 },
+      columnWidths: { full: 0, feature: 0, popout: 0, content: 0, center: 0 },
       currentBreakpoint: "mobile",
       spacingPanelCollapsed: false,
       spacingPanelPos: { x: 16, y: 16 },
@@ -127,7 +125,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   FULL LIMIT ........... .col-full-limit
  *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
  *
  * QUICK START
@@ -153,7 +150,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 
   /* Track widths */
   --popout-width: ${c.popoutWidth};
-  --full-limit: ${c.fullLimit};
 
   /* Feature track */
   --feature-min: ${c.featureMin};
@@ -356,19 +352,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .col-center-right { grid-column: center-start / full-end; }
 .col-narrow-left { grid-column: full-start / content-end; }
 .col-narrow-right { grid-column: content-start / full-end; }
-
-/* ----------------------------------------------------------------------------
-   Full limit — edge-to-edge, capped at --full-limit on ultra-wide screens
-   ---------------------------------------------------------------------------- */
-
-.col-full-limit {
-  grid-column: full;
-  width: 100%;
-  max-width: var(--full-limit);
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}
 
 /* ============================================================================
    SPACING — gap & popout only (extras layer adds breakout / full-gap / *-to-content)
@@ -741,7 +724,7 @@ ${body}
     configSections: {
       content: { keys: ["contentMin", "contentBase", "contentMax"], label: "Content" },
       defaultCol: { keys: ["defaultCol"], label: "Default Column" },
-      tracks: { keys: ["popoutWidth", "fullLimit"], label: "Track Widths" },
+      tracks: { keys: ["popoutWidth"], label: "Track Widths" },
       feature: { keys: ["featureMin", "featureScale", "featureMax"], label: "Feature" },
       gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" },
       breakout: { keys: ["breakoutMin", "breakoutScale"], label: "Breakout" }
@@ -792,7 +775,6 @@ ${body}
         `  --default-col: ${config.defaultCol || "content"};`,
         `  /* Track widths */`,
         `  --popout-width: ${config.popoutWidth};`,
-        `  --full-limit: ${config.fullLimit};`,
         `  /* Feature track */`,
         `  --feature-min: ${config.featureMin};`,
         `  --feature-scale: ${config.featureScale};`,
@@ -1120,7 +1102,6 @@ ${body}
     },
     getResizeConfig(colName) {
       const map = {
-        "full-limit": "fullLimit",
         "feature": "featureScale",
         "popout": "popoutWidth"
       };
@@ -1139,7 +1120,6 @@ ${body}
         "--feature-min": "featureMin",
         "--feature-scale": "featureScale",
         "--feature-max": "featureMax",
-        "--full-limit": "fullLimit",
         "--breakout-min": "breakoutMin",
         "--breakout-scale": "breakoutScale",
         "--default-col": "defaultCol"
@@ -2104,7 +2084,7 @@ ${body}
         <!-- Track Widths Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('tracks')" style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer;" :style="{ color: sectionCopied === 'tracks' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'tracks' ? '✓ Copied' : 'Track Widths'"></div>
-          <template x-for="key in ['popoutWidth', 'fullLimit']" :key="'ed_'+key">
+          <template x-for="key in ['popoutWidth']" :key="'ed_'+key">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f3f4f6;">
               <span style="font-size: 11px; color: #374151;" x-text="key.replace('Width', '')"></span>
               <div style="display: flex; align-items: center; gap: 4px;">

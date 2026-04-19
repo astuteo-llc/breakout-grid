@@ -25,7 +25,6 @@ const defaults = {
   featureMin: '0rem',
   featureScale: '12vw',
   featureMax: '12rem',
-  fullLimit: '115rem',
   defaultCol: 'content',
   gapScale: { default: '4vw', lg: '5vw', xl: '6vw' },
   breakoutMin: '1rem',

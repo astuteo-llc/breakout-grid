@@ -77,12 +77,6 @@ export interface BreakoutGridConfig {
   defaultCol?: 'content' | 'popout' | 'feature' | 'full';
 
   /**
-   * Maximum width for col-full-limit sections
-   * @default '90rem'
-   */
-  fullLimit?: string;
-
-  /**
    * Responsive gap scaling configuration
    * Can be a string (applied to all breakpoints) or an object with breakpoint-specific values
    * @default { default: '4vw', lg: '5vw', xl: '6vw' }

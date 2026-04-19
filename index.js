@@ -66,7 +66,7 @@ const validateConfig = (config) => {
   // Validate CSS unit properties
   const cssUnitProperties = [
     'baseGap', 'maxGap', 'contentMin', 'contentMax', 'contentBase',
-    'featureMin', 'featureScale', 'featureMax', 'popoutWidth', 'fullLimit'
+    'featureMin', 'featureScale', 'featureMax', 'popoutWidth'
   ]
   
   cssUnitProperties.forEach(prop => {
@@ -125,7 +125,6 @@ const validateConfig = (config) => {
  *       featureScale: '12vw',   // Fluid feature track scaling
  *       featureMax: '12rem',    // Maximum feature track width
  *       popoutWidth: '2rem',    // How far popout sections extend
- *       fullLimit: '120rem',    // Maximum width for full sections
  *
  *       // Responsive gap scaling
  *       gapScale: {
@@ -148,7 +147,6 @@ const defaultConfig = {
   contentMax: '61rem', // Max width for content column (~976px)
   contentBase: '75vw', // Preferred width for content (fluid)
   defaultCol: 'content',  // Default column for elements without a col-* class
-  fullLimit: '115rem',  // Maximum width for full-limit sections
   popoutWidth: '5rem', // How far "popout" sections stick out
   debug: false,        // Enable debug logging
   gapScale: {
@@ -237,7 +235,6 @@ const createRootCSS = (pluginConfig) => {
       '--config-content-max': pluginConfig.contentMax,
       '--config-content-base': pluginConfig.contentBase,
       '--config-popout': pluginConfig.popoutWidth,
-      '--config-full-limit': pluginConfig.fullLimit,
       '--config-default-col': pluginConfig.defaultCol,
       // Gap scale values (for visualizer)
       '--config-gap-scale-default': pluginConfig.gapScale.default,
@@ -261,7 +258,6 @@ const createRootCSS = (pluginConfig) => {
       '--content-base': pluginConfig.contentBase,
       '--gap': `clamp(var(--base-gap), ${pluginConfig.gapScale.default}, var(--max-gap))`,
       '--computed-gap': 'max(var(--gap), calc((100vw - var(--content)) / 10))',
-      '--full-limit': pluginConfig.fullLimit,
       '--content-inset': 'min(clamp(var(--content-min), var(--content-base), var(--content-max)), calc(100% - var(--gap)))',
       '--full': 'minmax(var(--gap), 1fr)',
       '--feature': `minmax(0, clamp(${pluginConfig.featureMin}, ${pluginConfig.featureScale}, ${pluginConfig.featureMax}))`,
@@ -774,7 +770,6 @@ const createGridUtilities = (config, templates) => {
  * @param {string} [config.featureScale='12vw'] - Fluid feature track scaling
  * @param {string} [config.featureMax='12rem'] - Maximum feature track width
  * @param {string} [config.defaultCol='content'] - Default column for items without col-* class
- * @param {string} [config.fullLimit='115rem'] - Maximum width for col-full-limit
  * @param {Object|string} [config.gapScale] - Responsive gap scaling
  * @param {string} [config.gapScale.default='4vw'] - Mobile/default gap
  * @param {string} [config.gapScale.lg='5vw'] - Large screens (1024px+)
@@ -886,15 +881,7 @@ module.exports = (config = {}) => {
           ...(extras ? createBreakoutPaddingUtilities() : {}),
           ...(extras ? createBreakoutMarginUtilities() : {}),
           ...gridUtilities,
-          ...createColumnUtilities(templates),
-          '.col-full-limit': {
-            'grid-column': 'full',
-            'width': '100%',
-            'max-width': 'var(--full-limit)',
-            'margin-left': 'auto',
-            'margin-right': 'auto',
-            'box-sizing': 'border-box'
-          }
+          ...createColumnUtilities(templates)
         })
 
         // Add negative margin utilities using matchUtilities for proper Tailwind support

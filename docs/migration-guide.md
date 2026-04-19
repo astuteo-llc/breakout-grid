@@ -77,18 +77,9 @@ Use traditional containers where you don't need breakout behavior, and breakout 
 </main>
 ```
 
-### Strategy 3: Use col-full-limit for Max-Width Behavior
+### Strategy 3: Full width with a max-width cap
 
-If you need to maintain a maximum width similar to `max-w-7xl` (1280px / 80rem):
-
-```js
-// tailwind.config.js
-breakoutGrid({
-  fullLimit: '80rem',  // Matches max-w-7xl (1280px)
-})
-```
-
-Then use `col-full-limit` for sections that should respect this maximum:
+If you need a full-width element that caps at a specific width on ultra-wide screens, combine `col-full` with Tailwind's own `max-w-*` and `mx-auto`:
 
 ```html
 <div class="grid-cols-breakout">
@@ -96,13 +87,15 @@ Then use `col-full-limit` for sections that should respect this maximum:
   <p class="col-content">Reading text</p>
 
   <!-- Full width but with max-width constraint -->
-  <div class="col-full-limit bg-gray-100 p-gap">
+  <div class="col-full max-w-[115rem] mx-auto bg-gray-100 p-gap">
     <div class="grid grid-cols-3 gap-8">
       <!-- Complex layout that shouldn't get too wide -->
     </div>
   </div>
 </div>
 ```
+
+For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115rem`) and use `max-w-breakout` in place of the arbitrary value.
 
 ### Strategy 4: Nested Grids Inside Traditional Containers
 
@@ -137,7 +130,7 @@ Here's how breakout grid columns map to common Tailwind max-width utilities:
 | `max-w-3xl` | 48rem (768px) | `col-content` | Close to default content min |
 | `max-w-4xl` | 56rem (896px) | `col-content` | Within default content range |
 | `max-w-6xl` | 72rem (1152px) | `col-popout` | Slightly wider |
-| `max-w-7xl` | 80rem (1280px) | `col-feature` or `col-full-limit` | Wide sections |
+| `max-w-7xl` | 80rem (1280px) | `col-feature` or `col-full max-w-[80rem] mx-auto` | Wide sections |
 | `max-w-full` | 100% | `col-full` | Edge-to-edge |
 
 ## Migration Checklist

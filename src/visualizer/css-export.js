@@ -69,7 +69,6 @@ function coreCSS(c, version) {
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   FULL LIMIT ........... .col-full-limit
  *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
  *
  * QUICK START
@@ -95,7 +94,6 @@ function coreCSS(c, version) {
 
   /* Track widths */
   --popout-width: ${c.popoutWidth};
-  --full-limit: ${c.fullLimit};
 
   /* Feature track */
   --feature-min: ${c.featureMin};
@@ -298,19 +296,6 @@ function coreCSS(c, version) {
 .col-center-right { grid-column: center-start / full-end; }
 .col-narrow-left { grid-column: full-start / content-end; }
 .col-narrow-right { grid-column: content-start / full-end; }
-
-/* ----------------------------------------------------------------------------
-   Full limit — edge-to-edge, capped at --full-limit on ultra-wide screens
-   ---------------------------------------------------------------------------- */
-
-.col-full-limit {
-  grid-column: full;
-  width: 100%;
-  max-width: var(--full-limit);
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}
 
 /* ============================================================================
    SPACING — gap & popout only (extras layer adds breakout / full-gap / *-to-content)

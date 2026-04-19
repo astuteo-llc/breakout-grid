@@ -869,7 +869,7 @@ export const template = `
         <!-- Track Widths Section -->
         <div style="padding: 8px 12px; background: white; border-bottom: 1px solid #e5e5e5;">
           <div @click="copySection('tracks')" style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; cursor: pointer;" :style="{ color: sectionCopied === 'tracks' ? '#10b981' : '#6b7280' }" x-text="sectionCopied === 'tracks' ? '✓ Copied' : 'Track Widths'"></div>
-          <template x-for="key in ['popoutWidth', 'fullLimit']" :key="'ed_'+key">
+          <template x-for="key in ['popoutWidth']" :key="'ed_'+key">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f3f4f6;">
               <span style="font-size: 11px; color: #374151;" x-text="key.replace('Width', '')"></span>
               <div style="display: flex; align-items: center; gap: 4px;">

@@ -167,7 +167,7 @@ export const methods = {
   configSections: {
     content: { keys: ['contentMin', 'contentBase', 'contentMax'], label: 'Content' },
     defaultCol: { keys: ['defaultCol'], label: 'Default Column' },
-    tracks: { keys: ['popoutWidth', 'fullLimit'], label: 'Track Widths' },
+    tracks: { keys: ['popoutWidth'], label: 'Track Widths' },
     feature: { keys: ['featureMin', 'featureScale', 'featureMax'], label: 'Feature' },
     gap: { keys: ['baseGap', 'maxGap'], nested: { gapScale: ['default', 'lg', 'xl'] }, label: 'Gap' },
     breakout: { keys: ['breakoutMin', 'breakoutScale'], label: 'Breakout' }
@@ -224,7 +224,6 @@ export const methods = {
       `  --default-col: ${config.defaultCol || 'content'};`,
       `  /* Track widths */`,
       `  --popout-width: ${config.popoutWidth};`,
-      `  --full-limit: ${config.fullLimit};`,
       `  /* Feature track */`,
       `  --feature-min: ${config.featureMin};`,
       `  --feature-scale: ${config.featureScale};`,
@@ -584,7 +583,6 @@ export const methods = {
 
   getResizeConfig(colName) {
     const map = {
-      'full-limit': 'fullLimit',
       'feature': 'featureScale',
       'popout': 'popoutWidth'
     };
@@ -605,7 +603,6 @@ export const methods = {
       '--feature-min': 'featureMin',
       '--feature-scale': 'featureScale',
       '--feature-max': 'featureMax',
-      '--full-limit': 'fullLimit',
       '--breakout-min': 'breakoutMin',
       '--breakout-scale': 'breakoutScale',
       '--default-col': 'defaultCol',

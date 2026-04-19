@@ -106,7 +106,11 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 - `.col-feature` - Wide content (images, videos)
 - `.col-popout` - Slightly wider than content
 - `.col-content` - Reading width (default)
-- `.col-full-limit` - Full width with max-width cap
+
+> Need a full-width block that caps on ultra-wide screens? Use Tailwind's own max-width utilities alongside `col-full`:
+> ```html
+> <div class="col-full max-w-[115rem] mx-auto">...</div>
+> ```
 
 #### Fine-Grained Control
 - `.col-start-{full|feature|popout|content|center}`
@@ -148,7 +152,6 @@ Override CSS variables in your own stylesheet:
 | `--content-min` | `53rem` | Min content width |
 | `--content-max` | `61rem` | Max content width |
 | `--content-base` | `75vw` | Preferred content width |
-| `--full-limit` | `115rem` | Max width for col-full-limit |
 
 See the CSS file header for the complete list.
 

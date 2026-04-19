@@ -13,7 +13,7 @@
        MASTHEAD
        ============================================ -->
   <header class="grid-cols-breakout bg-slate-900 text-white">
-    <div class="col-full-limit px-gap py-4 flex items-center justify-between">
+    <div class="col-full max-w-[115rem] mx-auto px-gap py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-lg">BG</div>
         <span class="font-semibold text-lg">Breakout Grid</span>
@@ -33,13 +33,13 @@
       <details class="text-left max-w-xl mx-auto bg-white/10 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-blue-100 text-sm font-medium hover:bg-white/10 transition-colors">View masthead markup</summary>
         <pre class="p-4 text-sm text-blue-100 overflow-x-auto"><code>&lt;header class="grid-cols-breakout bg-slate-900"&gt;
-  &lt;div class="col-full-limit px-gap py-4 flex justify-between"&gt;
+  &lt;div class="col-full max-w-[115rem] mx-auto px-gap py-4 flex justify-between"&gt;
     &lt;div&gt;Logo&lt;/div&gt;
     &lt;nav&gt;Links...&lt;/nav&gt;
   &lt;/div&gt;
 &lt;/header&gt;
 
-&lt;!-- col-full-limit: full width with max-width cap
+&lt;!-- col-full + max-w-[...] + mx-auto: full width, capped on ultra-wide
      px-gap: responsive padding that matches grid gaps --&gt;</code></pre>
       </details>
     </div>
@@ -59,9 +59,9 @@
       <span class="text-red-600 ml-2">Edge to edge</span>
     </div>
 
-    <!-- Full Limit -->
-    <div class="col-full-limit bg-red-50 border-2 border-red-200 py-4 px-gap text-center mt-2">
-      <code class="text-red-600 font-mono text-sm">.col-full-limit</code>
+    <!-- Full with max-width cap (use Tailwind's max-w + mx-auto) -->
+    <div class="col-full max-w-[115rem] mx-auto bg-red-50 border-2 border-red-200 py-4 px-gap text-center mt-2">
+      <code class="text-red-600 font-mono text-sm">col-full max-w-[115rem] mx-auto</code>
       <span class="text-red-500 ml-2">Full width with max-width constraint</span>
     </div>
 
@@ -92,7 +92,7 @@
 
   &lt;!-- Column utilities (widest to narrowest) --&gt;
   &lt;div class="col-full"&gt;Edge to edge&lt;/div&gt;
-  &lt;div class="col-full-limit"&gt;Full with max-width&lt;/div&gt;
+  &lt;div class="col-full max-w-[115rem] mx-auto"&gt;Full with max-width&lt;/div&gt;
   &lt;div class="col-feature"&gt;Extra wide&lt;/div&gt;
   &lt;div class="col-popout"&gt;Slightly wider&lt;/div&gt;
   &lt;div class="col-content"&gt;Reading width (default)&lt;/div&gt;
