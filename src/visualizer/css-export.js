@@ -70,9 +70,10 @@ function coreCSS(c, version) {
  *   Ryan Mulligan, Layout Breakouts — https://ryanmulligan.dev/blog/layout-breakouts/
  *   Viget, Fluid Breakout Layout — https://www.viget.com/articles/fluid-breakout-layout-css-grid/
  *
- * For the advanced utility layer (advanced spans, breakout padding,
- * full-gap, alignment paddings, grid-escape), also import:
- *   @import '@astuteo/breakout-grid/extras';
+ * Advanced utilities — breakout-none, p-breakout, p-full-gap, and the
+ * *-to-content alignment paddings — live in a companion extras layer.
+ * Re-generate with "Include extras layer" on in the visualizer to get
+ * them bundled in, or concatenate the extras file after this one.
  *
  * TABLE OF CONTENTS
  *   CONFIGURATION ........ Customizable :root variables
@@ -388,10 +389,11 @@ function extrasCSS(c, version, { wrapInLayer = false } = {}) {
  * Breakout Grid — Extras layer
  * Version: ${version}
  *
- * Requires @astuteo/breakout-grid to be imported first.
+ * Requires the core Breakout Grid file to be loaded first — this
+ * layer reuses the core's :root variables and named grid lines.
  *
- * Adds the optional advanced utilities:
- *   advanced spans, breakout padding, full-gap, alignment paddings, grid-escape.
+ * Adds: breakout-none, p-breakout / m-breakout, p-full-gap / m-full-gap,
+ * and the p-popout-to-content / p-feature-to-content alignment paddings.
  */
 `;
 
