@@ -214,13 +214,9 @@ export const methods = {
 
   copyConfig() {
     const config = this.generateConfigExport();
-    // Both blocks match the :root blocks inside the downloaded CSS exactly —
-    // sourced from the same helpers in css-export.js.
-    const configStr = [
-      this.configRootCSS(config),
-      '',
-      this.advancedConfigRootCSS(config)
-    ].join('\n');
+    // Matches the first :root block inside the downloaded CSS exactly —
+    // sourced from the same helper in css-export.js.
+    const configStr = this.configRootCSS(config);
     navigator.clipboard.writeText(configStr).then(() => {
       this.copySuccess = true;
       this.configCopied = true;

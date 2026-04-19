@@ -116,15 +116,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   --gap-scale-default: ${c.gapScale?.default || "4vw"};
   --gap-scale-lg: ${c.gapScale?.lg || "5vw"};
   --gap-scale-xl: ${c.gapScale?.xl || "6vw"};
-}`;
-  }
-  function advancedConfigRootCSS(c) {
-    const breakoutMin = c.breakoutMin || "1rem";
-    const breakoutScale = c.breakoutScale || "5vw";
-    return `:root {
+
   /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${breakoutMin};
-  --breakout-scale: ${breakoutScale};
+  --breakout-min: ${c.breakoutMin || "1rem"};
+  --breakout-scale: ${c.breakoutScale || "5vw"};
 }`;
   }
   const TAILWIND_FLAVOR_NOTE = `/*!
@@ -137,7 +132,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
     const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
-    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS() + "\n" + advancedCSS(config);
+    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS() + "\n" + advancedCSS();
     const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
     return NO_FORMAT_PRAGMA + body;
   }
@@ -432,16 +427,10 @@ ${configRootCSS(c)}
 `;
   }
   function advancedCSS(c, version) {
-    return advancedBody(c);
+    return advancedBody();
   }
   function advancedBody(c) {
     return `
-/* ============================================================================
-   BREAKOUT PADDING — config inputs
-   ============================================================================ */
-
-${advancedConfigRootCSS(c)}
-
 /* ============================================================================
    ADVANCED COMPUTED
    ============================================================================ */
@@ -694,11 +683,7 @@ ${advancedConfigRootCSS(c)}
     },
     copyConfig() {
       const config = this.generateConfigExport();
-      const configStr = [
-        this.configRootCSS(config),
-        "",
-        this.advancedConfigRootCSS(config)
-      ].join("\n");
+      const configStr = this.configRootCSS(config);
       navigator.clipboard.writeText(configStr).then(() => {
         this.copySuccess = true;
         this.configCopied = true;
@@ -2333,7 +2318,6 @@ ${advancedConfigRootCSS(c)}
         // CSS export
         generateCSSExport,
         configRootCSS,
-        advancedConfigRootCSS,
         cssExportVersion: BUILD_VERSION,
         // Template
         template

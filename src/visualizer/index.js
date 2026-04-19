@@ -42,7 +42,6 @@ import {
 import {
   generateCSSExport,
   configRootCSS,
-  advancedConfigRootCSS,
   CSS_EXPORT_VERSION
 } from './css-export.js';
 
@@ -75,7 +74,6 @@ import { template } from './template.js';
       // CSS export
       generateCSSExport,
       configRootCSS,
-      advancedConfigRootCSS,
       cssExportVersion: CSS_EXPORT_VERSION,
 
       // Template

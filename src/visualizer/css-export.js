@@ -20,10 +20,9 @@ export function wrapWithTailwindUtilities(css) {
 }
 
 /**
- * Grid-config :root block — the user-editable values for content width,
- * default column, track widths, feature track, outer margins, and gap
- * scaling. Emitted at the top of the generated CSS and also by the
- * visualizer's "Copy config" action so both outputs stay identical.
+ * Config :root block — every user-editable value in one place. Emitted
+ * at the top of the generated CSS and reused by the visualizer's "Copy
+ * config" action so both outputs stay byte-for-byte identical.
  */
 export function configRootCSS(c) {
   return `:root {
@@ -51,21 +50,10 @@ export function configRootCSS(c) {
   --gap-scale-default: ${c.gapScale?.default || '4vw'};
   --gap-scale-lg: ${c.gapScale?.lg || '5vw'};
   --gap-scale-xl: ${c.gapScale?.xl || '6vw'};
-}`;
-}
 
-/**
- * Advanced-config :root block — the clamp inputs for --breakout-padding.
- * Emitted inside the advanced section of the generated CSS and alongside
- * the grid config in the visualizer's "Copy config" output.
- */
-export function advancedConfigRootCSS(c) {
-  const breakoutMin = c.breakoutMin || '1rem';
-  const breakoutScale = c.breakoutScale || '5vw';
-  return `:root {
   /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${breakoutMin};
-  --breakout-scale: ${breakoutScale};
+  --breakout-min: ${c.breakoutMin || '1rem'};
+  --breakout-scale: ${c.breakoutScale || '5vw'};
 }`;
 }
 
@@ -402,12 +390,6 @@ function advancedCSS(c, version) {
 
 function advancedBody(c) {
   return `
-/* ============================================================================
-   BREAKOUT PADDING — config inputs
-   ============================================================================ */
-
-${advancedConfigRootCSS(c)}
-
 /* ============================================================================
    ADVANCED COMPUTED
    ============================================================================ */
