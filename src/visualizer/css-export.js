@@ -24,6 +24,14 @@ export function wrapWithTailwindUtilities(css) {
   return css.replace(/^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm, '@utility $1 {');
 }
 
+const TAILWIND_FLAVOR_NOTE = `/*!
+ * Tailwind v4 flavor — each rule wrapped in \`@utility\` so Tailwind
+ * variants work (\`md:col-feature\`, \`hover:col-full\`, etc.). Chained
+ * selectors like \`.grid-cols-breakout.breakout-to-content\` stay as
+ * plain classes because \`@utility\` only accepts single-class selectors.
+ */
+`;
+
 export function generateCSSExport(config, options = {}) {
   const { layer = 'combined', tailwind = false, version = BUILD_VERSION } = options;
 
@@ -36,7 +44,7 @@ export function generateCSSExport(config, options = {}) {
     css = coreCSS(config, version) + '\n' + extrasCSS(config, version, { wrapInLayer: !tailwind });
   }
 
-  return tailwind ? wrapWithTailwindUtilities(css) : css;
+  return tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
 }
 
 /* ========================================================================
