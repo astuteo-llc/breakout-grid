@@ -27,8 +27,6 @@ const defaults = {
   featureMax: '12rem',
   defaultCol: 'content',
   gapScale: { default: '4vw', lg: '5vw', xl: '6vw' },
-  breakoutMin: '1rem',
-  breakoutScale: '5vw',
   breakpoints: { lg: '1024', xl: '1280' }
 };
 

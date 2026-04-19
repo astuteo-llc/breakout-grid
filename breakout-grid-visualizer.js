@@ -27,11 +27,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     lg: { value: "5vw", desc: "Large screens (1024px+). Use vw.", cssVar: "--config-gap-scale-lg", liveVar: "--gap-scale-lg" },
     xl: { value: "6vw", desc: "Extra large (1280px+). Use vw.", cssVar: "--config-gap-scale-xl", liveVar: "--gap-scale-xl" }
   };
-  const BREAKOUT_OPTIONS = {
-    min: { value: "1rem", desc: "Minimum breakout padding (floor)", cssVar: "--config-breakout-min", liveVar: "--breakout-min" },
-    scale: { value: "5vw", desc: "Fluid breakout scaling", cssVar: "--config-breakout-scale", liveVar: "--breakout-scale" }
-    // max is popoutWidth
-  };
   const BREAKPOINT_OPTIONS = {
     lg: { value: "1024", desc: "Large breakpoint (px)", cssVar: "--config-breakpoint-lg" },
     xl: { value: "1280", desc: "Extra large breakpoint (px)", cssVar: "--config-breakpoint-xl" }
@@ -44,7 +39,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       showMeasurements: true,
       showPixelWidths: false,
       showGapPadding: false,
-      showBreakoutPadding: false,
       showAdvanced: false,
       showLoremIpsum: false,
       showEditor: false,
@@ -81,7 +75,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       gridOpacity: 0.8,
       backdropOpacity: 0.85,
       // When true, "Download CSS" emits grid + column placement + p-popout
-      // padding only. Skips gap/margin spacing and breakout-padding.
+      // padding only. Skips gap/margin spacing utilities.
       coreOnly: false
     };
   }
@@ -115,10 +109,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   --gap-scale-default: ${c.gapScale?.default || "4vw"};
   --gap-scale-lg: ${c.gapScale?.lg || "5vw"};
   --gap-scale-xl: ${c.gapScale?.xl || "6vw"};
-
-  /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${c.breakoutMin || "1rem"};
-  --breakout-scale: ${c.breakoutScale || "5vw"};
 }`;
   }
   const TAILWIND_FLAVOR_NOTE = `/*!
@@ -131,7 +121,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
     const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
-    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS() + "\n" + advancedCSS();
+    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS();
     const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
     return NO_FORMAT_PRAGMA + body;
   }
@@ -153,11 +143,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   POPOUT PADDING ....... .p-popout (sized to --popout-width, grid-unique)
+ *   POPOUT PADDING ....... .p-popout / .p-breakout (alias, sized to --popout-width)
  *
  * Full build adds:
- *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
- *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
+ *   GAP SPACING .......... .p-gap, .m-gap (+ axes + negatives)
+ *   POPOUT MARGINS ....... .m-popout / .m-breakout (alias, + axes + negatives)
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -362,6 +352,7 @@ ${configRootCSS(c)}
 
 /* ============================================================================
    POPOUT PADDING — sized to --popout-width (unique to the grid; no Tailwind equivalent)
+   .p-breakout is an alias for .p-popout, kept for backward compatibility.
    ============================================================================ */
 
 .p-popout { padding: var(--popout-width); }
@@ -371,6 +362,15 @@ ${configRootCSS(c)}
 .pr-popout { padding-right: var(--popout-width); }
 .pt-popout { padding-top: var(--popout-width); }
 .pb-popout { padding-bottom: var(--popout-width); }
+
+/* Legacy/fallback aliases — duplicate .p-popout to avoid breaking existing markup */
+.p-breakout { padding: var(--popout-width); }
+.px-breakout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
+.py-breakout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
+.pl-breakout { padding-left: var(--popout-width); }
+.pr-breakout { padding-right: var(--popout-width); }
+.pt-breakout { padding-top: var(--popout-width); }
+.pb-breakout { padding-bottom: var(--popout-width); }
 `;
   }
   function spacingCSS(c) {
@@ -405,6 +405,7 @@ ${configRootCSS(c)}
 
 /* ============================================================================
    POPOUT MARGINS — sized to --popout-width
+   .m-breakout / .-m-breakout are aliases, kept for backward compatibility.
    ============================================================================ */
 
 .m-popout { margin: var(--popout-width); }
@@ -422,49 +423,24 @@ ${configRootCSS(c)}
 .-mr-popout { margin-right: calc(var(--popout-width) * -1); }
 .-mt-popout { margin-top: calc(var(--popout-width) * -1); }
 .-mb-popout { margin-bottom: calc(var(--popout-width) * -1); }
+
+/* Legacy/fallback aliases — duplicate .m-popout / .-m-popout to avoid breaking existing markup */
+.m-breakout { margin: var(--popout-width); }
+.mx-breakout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
+.my-breakout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }
+.ml-breakout { margin-left: var(--popout-width); }
+.mr-breakout { margin-right: var(--popout-width); }
+.mt-breakout { margin-top: var(--popout-width); }
+.mb-breakout { margin-bottom: var(--popout-width); }
+
+.-m-breakout { margin: calc(var(--popout-width) * -1); }
+.-mx-breakout { margin-left: calc(var(--popout-width) * -1); margin-right: calc(var(--popout-width) * -1); }
+.-my-breakout { margin-top: calc(var(--popout-width) * -1); margin-bottom: calc(var(--popout-width) * -1); }
+.-ml-breakout { margin-left: calc(var(--popout-width) * -1); }
+.-mr-breakout { margin-right: calc(var(--popout-width) * -1); }
+.-mt-breakout { margin-top: calc(var(--popout-width) * -1); }
+.-mb-breakout { margin-bottom: calc(var(--popout-width) * -1); }
 `;
-  }
-  function advancedCSS(c, version) {
-    return advancedBody();
-  }
-  function advancedBody(c) {
-    return `
-/* ============================================================================
-   ADVANCED COMPUTED
-   ============================================================================ */
-
-:root {
-  /* Breakout padding clamps between min and popout-width */
-  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-}
-
-/* ============================================================================
-   BREAKOUT PADDING — fluid padding matching popout track behavior
-   ============================================================================ */
-
-.p-breakout { padding: var(--breakout-padding); }
-.px-breakout { padding-left: var(--breakout-padding); padding-right: var(--breakout-padding); }
-.py-breakout { padding-top: var(--breakout-padding); padding-bottom: var(--breakout-padding); }
-.pl-breakout { padding-left: var(--breakout-padding); }
-.pr-breakout { padding-right: var(--breakout-padding); }
-.pt-breakout { padding-top: var(--breakout-padding); }
-.pb-breakout { padding-bottom: var(--breakout-padding); }
-
-.m-breakout { margin: var(--breakout-padding); }
-.mx-breakout { margin-left: var(--breakout-padding); margin-right: var(--breakout-padding); }
-.my-breakout { margin-top: var(--breakout-padding); margin-bottom: var(--breakout-padding); }
-.ml-breakout { margin-left: var(--breakout-padding); }
-.mr-breakout { margin-right: var(--breakout-padding); }
-.mt-breakout { margin-top: var(--breakout-padding); }
-.mb-breakout { margin-bottom: var(--breakout-padding); }
-
-.-m-breakout { margin: calc(var(--breakout-padding) * -1); }
-.-mx-breakout { margin-left: calc(var(--breakout-padding) * -1); margin-right: calc(var(--breakout-padding) * -1); }
-.-my-breakout { margin-top: calc(var(--breakout-padding) * -1); margin-bottom: calc(var(--breakout-padding) * -1); }
-.-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
-.-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
-.-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
-.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }`;
   }
   const methods = {
     init() {
@@ -594,7 +570,6 @@ ${configRootCSS(c)}
     loadCurrentValues() {
       this.loadOptionsFromCSS(this.configOptions);
       this.loadOptionsFromCSS(this.gapScaleOptions, "gapScale");
-      this.loadOptionsFromCSS(this.breakoutOptions, "breakout");
     },
     generateConfigExport() {
       const config = {};
@@ -605,8 +580,6 @@ ${configRootCSS(c)}
       Object.keys(this.gapScaleOptions).forEach((key) => {
         config.gapScale[key] = this.editValues[`gapScale_${key}`] || this.gapScaleOptions[key].value;
       });
-      config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
-      config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
       config.breakpoints = {
         lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || "1024",
         xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || "1280"
@@ -618,8 +591,7 @@ ${configRootCSS(c)}
       defaultCol: { keys: ["defaultCol"], label: "Default Column" },
       tracks: { keys: ["popoutWidth"], label: "Track Widths" },
       feature: { keys: ["featureMin", "featureScale", "featureMax"], label: "Feature" },
-      gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" },
-      breakout: { keys: ["breakoutMin", "breakoutScale"], label: "Breakout" }
+      gap: { keys: ["baseGap", "maxGap"], nested: { gapScale: ["default", "lg", "xl"] }, label: "Gap" }
     },
     copySection(sectionName) {
       const section = this.configSections[sectionName];
@@ -630,12 +602,6 @@ ${configRootCSS(c)}
         if (this.configOptions[key]) {
           value = this.editValues[key] || this.configOptions[key].value;
           varName = this.configOptions[key].liveVar;
-        } else if (key === "breakoutMin") {
-          value = this.editValues.breakout_min || this.breakoutOptions.min.value;
-          varName = this.breakoutOptions.min.liveVar;
-        } else if (key === "breakoutScale") {
-          value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-          varName = this.breakoutOptions.scale.liveVar;
         }
         if (varName) {
           lines.push(`${varName}: ${value};`);
@@ -730,24 +696,6 @@ ${configRootCSS(c)}
       this.updateGapLive();
       this.saveConfigToStorage();
     },
-    getBreakoutNumeric(key) {
-      return this.getPrefixedNumeric("breakout", this.breakoutOptions, key);
-    },
-    getBreakoutUnit(key) {
-      return this.getPrefixedUnit("breakout", this.breakoutOptions, key);
-    },
-    updateBreakoutNumeric(key, num) {
-      this.editValues[`breakout_${key}`] = num + this.getBreakoutUnit(key);
-      this.configCopied = false;
-      this.updateBreakoutLive();
-      this.saveConfigToStorage();
-    },
-    updateBreakoutLive() {
-      const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
-      const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-      const max = this.editValues.popoutWidth || this.configOptions.popoutWidth.value;
-      document.documentElement.style.setProperty("--breakout-padding", `clamp(${min}, ${scale}, ${max})`);
-    },
     saveConfigToStorage() {
       const config = this.generateConfigExport();
       localStorage.setItem("breakoutGridConfig", JSON.stringify(config));
@@ -781,13 +729,6 @@ ${configRootCSS(c)}
         });
         this.updateGapLive();
       }
-      if (config.breakoutMin !== void 0) {
-        this.editValues.breakout_min = config.breakoutMin;
-      }
-      if (config.breakoutScale !== void 0) {
-        this.editValues.breakout_scale = config.breakoutScale;
-      }
-      this.updateBreakoutLive();
       if (config.breakpoints) {
         if (config.breakpoints.lg !== void 0) {
           this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -816,7 +757,6 @@ ${configRootCSS(c)}
       }
       if (key === "popoutWidth") {
         document.documentElement.style.setProperty("--popout", `minmax(0, ${value})`);
-        this.updateBreakoutLive();
       }
       if (key === "featureMin" || key === "featureScale" || key === "featureMax") {
         const featureMin = this.editValues.featureMin || this.configOptions.featureMin.value;
@@ -847,7 +787,6 @@ ${configRootCSS(c)}
       document.documentElement.style.removeProperty("--popout");
       document.documentElement.style.removeProperty("--feature");
       document.documentElement.style.removeProperty("--content");
-      document.documentElement.style.removeProperty("--breakout-padding");
       this.editValues = {};
       this.configCopied = false;
     },
@@ -981,8 +920,6 @@ ${configRootCSS(c)}
         "--feature-min": "featureMin",
         "--feature-scale": "featureScale",
         "--feature-max": "featureMax",
-        "--breakout-min": "breakoutMin",
-        "--breakout-scale": "breakoutScale",
         "--default-col": "defaultCol"
       };
       const gapScaleMap = {
@@ -1056,13 +993,6 @@ ${configRootCSS(c)}
           });
           this.updateGapLive();
         }
-        if (config.breakoutMin !== void 0) {
-          this.editValues.breakout_min = config.breakoutMin;
-        }
-        if (config.breakoutScale !== void 0) {
-          this.editValues.breakout_scale = config.breakoutScale;
-        }
-        this.updateBreakoutLive();
         if (config.breakpoints) {
           if (config.breakpoints.lg !== void 0) {
             this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -1327,40 +1257,6 @@ ${configRootCSS(c)}
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
         </div>
-        <!-- Breakout Padding -->
-        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
-            <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
-          </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px;">
-            <div style="width: var(--breakout-padding); height: 24px; background: #8b5cf6; min-width: 20px;"></div>
-            <div style="width: 24px; height: var(--breakout-padding); background: #8b5cf6; min-height: 20px;"></div>
-          </div>
-          <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
-            clamp(<span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_min || breakoutOptions.min.value"></span>, <span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_scale || breakoutOptions.scale.value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span>)
-          </div>
-          <!-- Editable breakout values -->
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">min</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('min')" @input="updateBreakoutNumeric('min', $event.target.value)" step="0.5"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('min')"></span>
-              </div>
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">scale</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('scale')" @input="updateBreakoutNumeric('scale', $event.target.value)" step="1"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('scale')"></span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 8px; color: #9ca3af; font-style: italic;">max = popout width</div>
-        </div>
       </div>
     </div>
 
@@ -1432,7 +1328,7 @@ ${configRootCSS(c)}
                :style="{
                  position: 'absolute',
                  inset: '0',
-                 padding: showGapPadding ? 'var(--gap)' : (showBreakoutPadding ? 'var(--breakout-padding)' : '1.5rem 0'),
+                 padding: showGapPadding ? 'var(--gap)' : '1.5rem 0',
                  boxSizing: 'border-box',
                  overflow: 'hidden',
                  whiteSpace: 'pre-line',
@@ -1467,32 +1363,6 @@ ${configRootCSS(c)}
               borderRadius: '0.25rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }">p-gap</div>
-          </div>
-
-          <!-- p-breakout / px-breakout Padding Overlay -->
-          <div x-show="showBreakoutPadding"
-               :style="{
-                 position: 'absolute',
-                 inset: 'var(--breakout-padding)',
-                 border: '3px dashed ' + area.borderColor,
-                 backgroundColor: area.color.replace('0.1', '0.25'),
-                 pointerEvents: 'none',
-                 zIndex: '10'
-               }">
-            <div :style="{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              fontSize: '0.625rem',
-              fontWeight: '700',
-              color: area.borderColor,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }">p-breakout</div>
           </div>
 
           <!-- Drag Handle - Left (edit mode only, for resizable columns) -->
@@ -1801,10 +1671,6 @@ ${configRootCSS(c)}
           <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
             <input type="checkbox" x-model="showGapPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
             p-gap
-          </label>
-          <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
-            <input type="checkbox" x-model="showBreakoutPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
-            p-breakout
           </label>
         </div>
       </div>
@@ -2253,7 +2119,7 @@ ${configRootCSS(c)}
         </div>
         <!-- Padding explanation -->
         <div style="margin-top: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 0.25rem; font-size: 0.5625rem; color: #4b5563;">
-          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-breakout aligns full-width content:</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-popout aligns full-width content:</div>
           <div>Uses <span style="color: #3b82f6;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span> padding so content aligns with .col-content edge</div>
         </div>
       </div>
@@ -2282,7 +2148,6 @@ ${configRootCSS(c)}
         gridAreas: GRID_AREAS,
         configOptions: CONFIG_OPTIONS,
         gapScaleOptions: GAP_SCALE_OPTIONS,
-        breakoutOptions: BREAKOUT_OPTIONS,
         breakpointOptions: BREAKPOINT_OPTIONS,
         // State
         ...createInitialState(),

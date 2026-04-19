@@ -143,7 +143,6 @@ export const methods = {
   loadCurrentValues() {
     this.loadOptionsFromCSS(this.configOptions);
     this.loadOptionsFromCSS(this.gapScaleOptions, 'gapScale');
-    this.loadOptionsFromCSS(this.breakoutOptions, 'breakout');
   },
 
   generateConfigExport() {
@@ -155,8 +154,6 @@ export const methods = {
     Object.keys(this.gapScaleOptions).forEach(key => {
       config.gapScale[key] = this.editValues[`gapScale_${key}`] || this.gapScaleOptions[key].value;
     });
-    config.breakoutMin = this.editValues.breakout_min || this.breakoutOptions.min.value;
-    config.breakoutScale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
     config.breakpoints = {
       lg: this.editValues.breakpoint_lg || this.breakpointOptions?.lg?.value || '1024',
       xl: this.editValues.breakpoint_xl || this.breakpointOptions?.xl?.value || '1280',
@@ -170,7 +167,6 @@ export const methods = {
     tracks: { keys: ['popoutWidth'], label: 'Track Widths' },
     feature: { keys: ['featureMin', 'featureScale', 'featureMax'], label: 'Feature' },
     gap: { keys: ['baseGap', 'maxGap'], nested: { gapScale: ['default', 'lg', 'xl'] }, label: 'Gap' },
-    breakout: { keys: ['breakoutMin', 'breakoutScale'], label: 'Breakout' }
   },
 
   copySection(sectionName) {
@@ -184,12 +180,6 @@ export const methods = {
       if (this.configOptions[key]) {
         value = this.editValues[key] || this.configOptions[key].value;
         varName = this.configOptions[key].liveVar;
-      } else if (key === 'breakoutMin') {
-        value = this.editValues.breakout_min || this.breakoutOptions.min.value;
-        varName = this.breakoutOptions.min.liveVar;
-      } else if (key === 'breakoutScale') {
-        value = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-        varName = this.breakoutOptions.scale.liveVar;
       }
       if (varName) {
         lines.push(`${varName}: ${value};`);
@@ -299,22 +289,6 @@ export const methods = {
     this.saveConfigToStorage();
   },
 
-  getBreakoutNumeric(key) { return this.getPrefixedNumeric('breakout', this.breakoutOptions, key); },
-  getBreakoutUnit(key) { return this.getPrefixedUnit('breakout', this.breakoutOptions, key); },
-  updateBreakoutNumeric(key, num) {
-    this.editValues[`breakout_${key}`] = num + this.getBreakoutUnit(key);
-    this.configCopied = false;
-    this.updateBreakoutLive();
-    this.saveConfigToStorage();
-  },
-
-  updateBreakoutLive() {
-    const min = this.editValues.breakout_min || this.breakoutOptions.min.value;
-    const scale = this.editValues.breakout_scale || this.breakoutOptions.scale.value;
-    const max = this.editValues.popoutWidth || this.configOptions.popoutWidth.value;
-    document.documentElement.style.setProperty('--breakout-padding', `clamp(${min}, ${scale}, ${max})`);
-  },
-
   saveConfigToStorage() {
     const config = this.generateConfigExport();
     localStorage.setItem('breakoutGridConfig', JSON.stringify(config));
@@ -354,14 +328,6 @@ export const methods = {
       this.updateGapLive();
     }
 
-    if (config.breakoutMin !== undefined) {
-      this.editValues.breakout_min = config.breakoutMin;
-    }
-    if (config.breakoutScale !== undefined) {
-      this.editValues.breakout_scale = config.breakoutScale;
-    }
-    this.updateBreakoutLive();
-
     if (config.breakpoints) {
       if (config.breakpoints.lg !== undefined) {
         this.editValues.breakpoint_lg = config.breakpoints.lg;
@@ -394,7 +360,6 @@ export const methods = {
     // Track widths need minmax wrapper for CSS grid
     if (key === 'popoutWidth') {
       document.documentElement.style.setProperty('--popout', `minmax(0, ${value})`);
-      this.updateBreakoutLive();
     }
     if (key === 'featureMin' || key === 'featureScale' || key === 'featureMax') {
       const featureMin = this.editValues.featureMin || this.configOptions.featureMin.value;
@@ -428,7 +393,6 @@ export const methods = {
     document.documentElement.style.removeProperty('--popout');
     document.documentElement.style.removeProperty('--feature');
     document.documentElement.style.removeProperty('--content');
-    document.documentElement.style.removeProperty('--breakout-padding');
     this.editValues = {};
     this.configCopied = false;
   },
@@ -574,8 +538,6 @@ export const methods = {
       '--feature-min': 'featureMin',
       '--feature-scale': 'featureScale',
       '--feature-max': 'featureMax',
-      '--breakout-min': 'breakoutMin',
-      '--breakout-scale': 'breakoutScale',
       '--default-col': 'defaultCol',
     };
 
@@ -667,14 +629,6 @@ export const methods = {
         });
         this.updateGapLive();
       }
-
-      if (config.breakoutMin !== undefined) {
-        this.editValues.breakout_min = config.breakoutMin;
-      }
-      if (config.breakoutScale !== undefined) {
-        this.editValues.breakout_scale = config.breakoutScale;
-      }
-      this.updateBreakoutLive();
 
       if (config.breakpoints) {
         if (config.breakpoints.lg !== undefined) {

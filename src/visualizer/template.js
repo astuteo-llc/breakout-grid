@@ -251,40 +251,6 @@ export const template = `
             clamp(<span style="color: #10b981; font-weight: 600;" x-text="editValues.baseGap || configOptions.baseGap.value"></span>, <span style="color: #6366f1; font-weight: 600;" x-text="editValues['gapScale_' + (currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint)] || gapScaleOptions[currentBreakpoint === 'mobile' ? 'default' : currentBreakpoint].value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.maxGap || configOptions.maxGap.value"></span>)
           </div>
         </div>
-        <!-- Breakout Padding -->
-        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
-            <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
-          </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px;">
-            <div style="width: var(--breakout-padding); height: 24px; background: #8b5cf6; min-width: 20px;"></div>
-            <div style="width: 24px; height: var(--breakout-padding); background: #8b5cf6; min-height: 20px;"></div>
-          </div>
-          <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
-            clamp(<span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_min || breakoutOptions.min.value"></span>, <span style="color: #8b5cf6; font-weight: 600;" x-text="editValues.breakout_scale || breakoutOptions.scale.value"></span>, <span style="color: #10b981; font-weight: 600;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span>)
-          </div>
-          <!-- Editable breakout values -->
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">min</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('min')" @input="updateBreakoutNumeric('min', $event.target.value)" step="0.5"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('min')"></span>
-              </div>
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 8px; color: #9ca3af; margin-bottom: 2px;">scale</div>
-              <div style="display: flex; align-items: center; gap: 2px;">
-                <input type="number" :value="getBreakoutNumeric('scale')" @input="updateBreakoutNumeric('scale', $event.target.value)" step="1"
-                       style="width: 100%; padding: 4px 6px; font-size: 10px; font-family: 'SF Mono', Monaco, monospace; border: 1px solid #e5e5e5; border-radius: 3px; background: white; text-align: right;">
-                <span style="font-size: 9px; color: #9ca3af;" x-text="getBreakoutUnit('scale')"></span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 8px; color: #9ca3af; font-style: italic;">max = popout width</div>
-        </div>
       </div>
     </div>
 
@@ -356,7 +322,7 @@ export const template = `
                :style="{
                  position: 'absolute',
                  inset: '0',
-                 padding: showGapPadding ? 'var(--gap)' : (showBreakoutPadding ? 'var(--breakout-padding)' : '1.5rem 0'),
+                 padding: showGapPadding ? 'var(--gap)' : '1.5rem 0',
                  boxSizing: 'border-box',
                  overflow: 'hidden',
                  whiteSpace: 'pre-line',
@@ -391,32 +357,6 @@ export const template = `
               borderRadius: '0.25rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }">p-gap</div>
-          </div>
-
-          <!-- p-breakout / px-breakout Padding Overlay -->
-          <div x-show="showBreakoutPadding"
-               :style="{
-                 position: 'absolute',
-                 inset: 'var(--breakout-padding)',
-                 border: '3px dashed ' + area.borderColor,
-                 backgroundColor: area.color.replace('0.1', '0.25'),
-                 pointerEvents: 'none',
-                 zIndex: '10'
-               }">
-            <div :style="{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              fontSize: '0.625rem',
-              fontWeight: '700',
-              color: area.borderColor,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }">p-breakout</div>
           </div>
 
           <!-- Drag Handle - Left (edit mode only, for resizable columns) -->
@@ -725,10 +665,6 @@ export const template = `
           <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
             <input type="checkbox" x-model="showGapPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
             p-gap
-          </label>
-          <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
-            <input type="checkbox" x-model="showBreakoutPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
-            p-breakout
           </label>
         </div>
       </div>
@@ -1177,7 +1113,7 @@ export const template = `
         </div>
         <!-- Padding explanation -->
         <div style="margin-top: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 0.25rem; font-size: 0.5625rem; color: #4b5563;">
-          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-breakout aligns full-width content:</div>
+          <div style="font-weight: 700; margin-bottom: 0.25rem;">px-popout aligns full-width content:</div>
           <div>Uses <span style="color: #3b82f6;" x-text="editValues.popoutWidth || configOptions.popoutWidth.value"></span> padding so content aligns with .col-content edge</div>
         </div>
       </div>

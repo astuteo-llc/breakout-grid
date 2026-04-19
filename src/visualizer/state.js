@@ -31,12 +31,6 @@ export const GAP_SCALE_OPTIONS = {
   xl: { value: '6vw', desc: 'Extra large (1280px+). Use vw.', cssVar: '--config-gap-scale-xl', liveVar: '--gap-scale-xl' },
 };
 
-export const BREAKOUT_OPTIONS = {
-  min: { value: '1rem', desc: 'Minimum breakout padding (floor)', cssVar: '--config-breakout-min', liveVar: '--breakout-min' },
-  scale: { value: '5vw', desc: 'Fluid breakout scaling', cssVar: '--config-breakout-scale', liveVar: '--breakout-scale' },
-  // max is popoutWidth
-};
-
 export const BREAKPOINT_OPTIONS = {
   lg: { value: '1024', desc: 'Large breakpoint (px)', cssVar: '--config-breakpoint-lg' },
   xl: { value: '1280', desc: 'Extra large breakpoint (px)', cssVar: '--config-breakpoint-xl' },
@@ -50,7 +44,6 @@ export function createInitialState() {
     showMeasurements: true,
     showPixelWidths: false,
     showGapPadding: false,
-    showBreakoutPadding: false,
     showAdvanced: false,
     showLoremIpsum: false,
     showEditor: false,
@@ -87,7 +80,7 @@ export function createInitialState() {
     gridOpacity: 0.8,
     backdropOpacity: 0.85,
     // When true, "Download CSS" emits grid + column placement + p-popout
-    // padding only. Skips gap/margin spacing and breakout-padding.
+    // padding only. Skips gap/margin spacing utilities.
     coreOnly: false,
   };
 }

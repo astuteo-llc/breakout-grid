@@ -185,9 +185,9 @@ When converting an existing page:
 </div>
 ```
 
-## Using p-breakout for Easy Migration
+## Using p-popout for Easy Migration
 
-If your legacy project uses consistent padding patterns like `p-6 md:px-16`, use `p-breakout` utilities to quickly replace them:
+If your legacy project uses consistent padding patterns like `p-6 md:px-16`, use `p-popout` for a single value that matches the grid's popout track:
 
 **Before (Legacy):**
 ```html
@@ -199,29 +199,24 @@ If your legacy project uses consistent padding patterns like `p-6 md:px-16`, use
 
 **After (Quick Migration):**
 ```html
-<section class="col-full bg-blue-900 p-breakout relative z-10">
+<section class="col-full bg-blue-900 p-popout relative z-10">
   <h2>Section Title</h2>
   <p>Content here...</p>
 </section>
 ```
 
-**Customize if needed:**
-```js
-// tailwind.config.js - Match your existing padding patterns
-breakoutGrid({
-  breakoutPadding: {
-    base: '1.5rem',  // Matches p-6
-    md: '4rem',      // Matches md:px-16/pt-12
-    lg: '5rem'       // Matches lg:px-20
-  }
-})
+For a fluid, responsive value, drop to Tailwind's arbitrary value syntax:
+
+```html
+<section class="col-full bg-blue-900 p-[clamp(1.5rem,5vw,var(--popout-width))]">
+  ...
+</section>
 ```
 
 This approach lets you:
-- Keep familiar padding values from your legacy project
+- Match the grid's popout track exactly (one knob: `popoutWidth`)
 - Reduce HTML verbosity (one class vs multiple responsive classes)
-- Maintain design consistency across the migration
-- Easily adjust all breakout padding globally via config
+- Drop to arbitrary values when you need a custom fluid clamp
 
 ## Real-World Example: Converting a Blog Post
 

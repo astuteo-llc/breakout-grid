@@ -35,7 +35,6 @@ import {
   GRID_AREAS,
   CONFIG_OPTIONS,
   GAP_SCALE_OPTIONS,
-  BREAKOUT_OPTIONS,
   BREAKPOINT_OPTIONS,
   createInitialState
 } from './state.js';
@@ -62,7 +61,6 @@ import { template } from './template.js';
       gridAreas: GRID_AREAS,
       configOptions: CONFIG_OPTIONS,
       gapScaleOptions: GAP_SCALE_OPTIONS,
-      breakoutOptions: BREAKOUT_OPTIONS,
       breakpointOptions: BREAKPOINT_OPTIONS,
 
       // State

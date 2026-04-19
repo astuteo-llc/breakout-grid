@@ -50,10 +50,6 @@ export function configRootCSS(c) {
   --gap-scale-default: ${c.gapScale?.default || '4vw'};
   --gap-scale-lg: ${c.gapScale?.lg || '5vw'};
   --gap-scale-xl: ${c.gapScale?.xl || '6vw'};
-
-  /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${c.breakoutMin || '1rem'};
-  --breakout-scale: ${c.breakoutScale || '5vw'};
 }`;
 }
 
@@ -74,7 +70,7 @@ export function generateCSSExport(config, options = {}) {
 
   const css = coreOnly
     ? gridCSS(config, version)
-    : gridCSS(config, version) + '\n' + spacingCSS(config) + '\n' + advancedCSS(config, version);
+    : gridCSS(config, version) + '\n' + spacingCSS(config);
   const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
   return NO_FORMAT_PRAGMA + body;
 }
@@ -102,11 +98,11 @@ function gridCSS(c, version) {
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   POPOUT PADDING ....... .p-popout (sized to --popout-width, grid-unique)
+ *   POPOUT PADDING ....... .p-popout / .p-breakout (alias, sized to --popout-width)
  *
  * Full build adds:
- *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
- *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
+ *   GAP SPACING .......... .p-gap, .m-gap (+ axes + negatives)
+ *   POPOUT MARGINS ....... .m-popout / .m-breakout (alias, + axes + negatives)
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -311,6 +307,7 @@ ${configRootCSS(c)}
 
 /* ============================================================================
    POPOUT PADDING — sized to --popout-width (unique to the grid; no Tailwind equivalent)
+   .p-breakout is an alias for .p-popout, kept for backward compatibility.
    ============================================================================ */
 
 .p-popout { padding: var(--popout-width); }
@@ -320,6 +317,15 @@ ${configRootCSS(c)}
 .pr-popout { padding-right: var(--popout-width); }
 .pt-popout { padding-top: var(--popout-width); }
 .pb-popout { padding-bottom: var(--popout-width); }
+
+/* Legacy/fallback aliases — duplicate .p-popout to avoid breaking existing markup */
+.p-breakout { padding: var(--popout-width); }
+.px-breakout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
+.py-breakout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
+.pl-breakout { padding-left: var(--popout-width); }
+.pr-breakout { padding-right: var(--popout-width); }
+.pt-breakout { padding-top: var(--popout-width); }
+.pb-breakout { padding-bottom: var(--popout-width); }
 `;
 }
 
@@ -359,6 +365,7 @@ function spacingCSS(c) {
 
 /* ============================================================================
    POPOUT MARGINS — sized to --popout-width
+   .m-breakout / .-m-breakout are aliases, kept for backward compatibility.
    ============================================================================ */
 
 .m-popout { margin: var(--popout-width); }
@@ -376,53 +383,23 @@ function spacingCSS(c) {
 .-mr-popout { margin-right: calc(var(--popout-width) * -1); }
 .-mt-popout { margin-top: calc(var(--popout-width) * -1); }
 .-mb-popout { margin-bottom: calc(var(--popout-width) * -1); }
+
+/* Legacy/fallback aliases — duplicate .m-popout / .-m-popout to avoid breaking existing markup */
+.m-breakout { margin: var(--popout-width); }
+.mx-breakout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
+.my-breakout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }
+.ml-breakout { margin-left: var(--popout-width); }
+.mr-breakout { margin-right: var(--popout-width); }
+.mt-breakout { margin-top: var(--popout-width); }
+.mb-breakout { margin-bottom: var(--popout-width); }
+
+.-m-breakout { margin: calc(var(--popout-width) * -1); }
+.-mx-breakout { margin-left: calc(var(--popout-width) * -1); margin-right: calc(var(--popout-width) * -1); }
+.-my-breakout { margin-top: calc(var(--popout-width) * -1); margin-bottom: calc(var(--popout-width) * -1); }
+.-ml-breakout { margin-left: calc(var(--popout-width) * -1); }
+.-mr-breakout { margin-right: calc(var(--popout-width) * -1); }
+.-mt-breakout { margin-top: calc(var(--popout-width) * -1); }
+.-mb-breakout { margin-bottom: calc(var(--popout-width) * -1); }
 `;
 }
 
-/* ========================================================================
-   ADVANCED — breakout padding
-   ======================================================================== */
-
-function advancedCSS(c, version) {
-  return advancedBody(c);
-}
-
-function advancedBody(c) {
-  return `
-/* ============================================================================
-   ADVANCED COMPUTED
-   ============================================================================ */
-
-:root {
-  /* Breakout padding clamps between min and popout-width */
-  --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-}
-
-/* ============================================================================
-   BREAKOUT PADDING — fluid padding matching popout track behavior
-   ============================================================================ */
-
-.p-breakout { padding: var(--breakout-padding); }
-.px-breakout { padding-left: var(--breakout-padding); padding-right: var(--breakout-padding); }
-.py-breakout { padding-top: var(--breakout-padding); padding-bottom: var(--breakout-padding); }
-.pl-breakout { padding-left: var(--breakout-padding); }
-.pr-breakout { padding-right: var(--breakout-padding); }
-.pt-breakout { padding-top: var(--breakout-padding); }
-.pb-breakout { padding-bottom: var(--breakout-padding); }
-
-.m-breakout { margin: var(--breakout-padding); }
-.mx-breakout { margin-left: var(--breakout-padding); margin-right: var(--breakout-padding); }
-.my-breakout { margin-top: var(--breakout-padding); margin-bottom: var(--breakout-padding); }
-.ml-breakout { margin-left: var(--breakout-padding); }
-.mr-breakout { margin-right: var(--breakout-padding); }
-.mt-breakout { margin-top: var(--breakout-padding); }
-.mb-breakout { margin-bottom: var(--breakout-padding); }
-
-.-m-breakout { margin: calc(var(--breakout-padding) * -1); }
-.-mx-breakout { margin-left: calc(var(--breakout-padding) * -1); margin-right: calc(var(--breakout-padding) * -1); }
-.-my-breakout { margin-top: calc(var(--breakout-padding) * -1); margin-bottom: calc(var(--breakout-padding) * -1); }
-.-ml-breakout { margin-left: calc(var(--breakout-padding) * -1); }
-.-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
-.-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
-.-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }`;
-}

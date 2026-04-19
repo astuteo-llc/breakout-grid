@@ -239,20 +239,6 @@ export const templateLite = `
             var(--gap)
           </div>
         </div>
-        <!-- Breakout Padding -->
-        <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 12px; border-top: 1px solid #e5e5e5;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Breakout</span>
-            <span style="font-size: 9px; color: #9ca3af;">p-breakout / m-breakout</span>
-          </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px;">
-            <div style="width: var(--breakout-padding); height: 24px; background: #8b5cf6; min-width: 20px;"></div>
-            <div style="width: 24px; height: var(--breakout-padding); background: #8b5cf6; min-height: 20px;"></div>
-          </div>
-          <div style="font-size: 9px; font-family: 'SF Mono', Monaco, monospace; color: #6b7280;">
-            var(--breakout-padding)
-          </div>
-        </div>
       </div>
     </div>
 
@@ -324,7 +310,7 @@ export const templateLite = `
                :style="{
                  position: 'absolute',
                  inset: '0',
-                 padding: showGapPadding ? 'var(--gap)' : (showBreakoutPadding ? 'var(--breakout-padding)' : '1.5rem 0'),
+                 padding: showGapPadding ? 'var(--gap)' : '1.5rem 0',
                  boxSizing: 'border-box',
                  overflow: 'hidden',
                  whiteSpace: 'pre-line',
@@ -361,31 +347,6 @@ export const templateLite = `
             }">p-gap</div>
           </div>
 
-          <!-- p-breakout / px-breakout Padding Overlay -->
-          <div x-show="showBreakoutPadding"
-               :style="{
-                 position: 'absolute',
-                 inset: 'var(--breakout-padding)',
-                 border: '3px dashed ' + area.borderColor,
-                 backgroundColor: area.color.replace('0.1', '0.25'),
-                 pointerEvents: 'none',
-                 zIndex: '10'
-               }">
-            <div :style="{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              fontSize: '0.625rem',
-              fontWeight: '700',
-              color: area.borderColor,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }">p-breakout</div>
-          </div>
         </div>
       </template>
     </div>
@@ -456,10 +417,6 @@ export const templateLite = `
           <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
             <input type="checkbox" x-model="showGapPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
             p-gap
-          </label>
-          <label style="display: flex; align-items: center; cursor: pointer; font-size: 11px; color: #374151;">
-            <input type="checkbox" x-model="showBreakoutPadding" style="margin-right: 6px; cursor: pointer; accent-color: #1a1a2e;">
-            p-breakout
           </label>
         </div>
       </div>

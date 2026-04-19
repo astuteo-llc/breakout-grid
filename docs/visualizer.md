@@ -13,7 +13,7 @@ An Alpine.js-powered visual debugging tool that helps designers see and understa
 - **Column labels** with both human-readable names and CSS class names
 - **Live measurements** displaying current CSS variable values in real-time
 - **Viewport width tracker** for responsive debugging
-- **Padding visualization** for both `p-gap` and `p-breakout` utilities
+- **Padding visualization** for `p-gap` utility
 - **Keyboard shortcut** (Ctrl/Cmd + G) to toggle visibility
 - **Persistent state** remembers visibility and settings across page reloads
 - **Responsive updates** automatically refreshes measurements on window resize
@@ -40,7 +40,6 @@ The visualizer uses a consistent color scheme to identify different grid areas:
 - **Values Toggle** - Show/hide live CSS variable measurements
 - **Lorem Toggle** - Fill columns with lorem ipsum to visualize text flow
 - **p-gap Visualization** - Overlay showing `p-gap` padding areas
-- **p-breakout Visualization** - Overlay showing `p-breakout` padding areas
 - **Column Selection** - Click any column to highlight and view details
 
 ## Installation
@@ -146,7 +145,6 @@ When active, the visualizer displays a control panel with:
   - **Class Names**: Toggle CSS class names (e.g., `.col-full`, `.col-feature`)
   - **Values**: Toggle measurement display
   - **p-gap**: Visualize the padding created by `p-gap`/`px-gap` utilities
-  - **p-breakout**: Visualize the padding created by `p-breakout`/`px-breakout` utilities
 - **Selected Column**: Click any column to highlight and view its class name
 
 ## Config Editor

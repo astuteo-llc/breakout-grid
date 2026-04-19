@@ -14,7 +14,7 @@ Open http://localhost:5173
 ## Features Demonstrated
 
 - **Basic Column Widths** - full, feature, popout, content, narrow
-- **Padding Utilities** - px-breakout, px-gap
+- **Padding Utilities** - px-popout, px-gap
 - **Left/Right Alignment** - col-feature-left, col-center-right, etc.
 - **CSS Subgrid** - grid-cols-breakout-subgrid
 - **Nested Grids** - breakout-to-* modifiers

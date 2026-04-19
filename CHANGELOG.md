@@ -61,19 +61,10 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 <div class="col-popout px-popout-to-content">...</div>
 
 <!-- after -->
-<div class="col-popout px-[clamp(var(--breakout-min),var(--breakout-scale),var(--popout-width))]">...</div>
+<div class="col-popout px-[var(--popout-width)]">...</div>
 
 <!-- feature-to-content equivalent -->
 <div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
-```
-
-For reusable tokens, register them in your Tailwind theme:
-
-```css
-@theme {
-  --spacing-popout-to-content: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
-  --spacing-feature-to-content: calc(clamp(var(--feature-min), var(--feature-scale), var(--feature-max)) + var(--popout-width));
-}
 ```
 
 **4. Removed the `full-gap` spacing family** (`.p-full-gap`, `.m-full-gap`, `.-m-full-gap`, and all their axis variants) and the `--computed-gap` CSS variable. The "larger gap for full-width" pattern was niche and adequately served by Tailwind's arbitrary value syntax when it's actually needed:
@@ -96,6 +87,7 @@ For reusable tokens, register them in your Tailwind theme:
 
 ### Changed
 
+- **`.p-breakout` / `.m-breakout` are now aliases for `.p-popout` / `.m-popout`** — both emit `var(--popout-width)` (the fixed popout track width). The fluid clamp they previously used (`clamp(--breakout-min, --breakout-scale, --popout-width)`) was too close to `--popout-width` to justify carrying both systems. The `--breakout-padding`, `--breakout-min`, `--breakout-scale` CSS variables and the `breakoutMin`/`breakoutScale`/`breakoutPadding` plugin config options are removed. If you need a custom fluid clamp, drop to Tailwind's arbitrary value syntax: `p-[clamp(1rem,5vw,var(--popout-width))]`.
 - **Combined CSS** is **17.9 KB raw / 3.2 KB gzip** (Tailwind flavor: 19.3 KB / 3.4 KB gzip), down from ~26 KB / 5.7 KB gzip in v5
 - **dist output** collapsed from four files (core + extras × plain/Tailwind) to two (single unified output × plain/Tailwind)
 - **Removed stale `style` field** from `package.json` — superseded by the `exports` map
@@ -104,7 +96,7 @@ For reusable tokens, register them in your Tailwind theme:
 
 ### What ships
 
-All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, and breakout padding. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
+All utilities live in one unified layer — grid containers, column placement, and gap/popout spacing. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
 
 ## [5.0.0] - 2025-01-26
 

@@ -28,7 +28,6 @@ export function createInitialStateLite() {
     showMeasurements: true,
     showPixelWidths: false,
     showGapPadding: false,
-    showBreakoutPadding: false,
     showAdvanced: false,
     showLoremIpsum: false,
     viewportWidth: window.innerWidth,

@@ -114,15 +114,12 @@ From narrowest to widest:
 #### Spacing
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
-- `.p-breakout`, `.m-breakout` - Fluid edge padding that matches the popout track
+- `.p-breakout`, `.m-breakout`, etc. - Legacy/fallback aliases for `.p-popout` / `.m-popout` (kept to avoid breaking existing markup)
 - Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`
 
-> Need to align content inside a wider column with the content column edge? Compose with Tailwind arbitrary values — the grid vars (`--popout-width`, `--breakout-min`, `--breakout-scale`, `--feature-min/scale/max`) are already available:
+> Need to align content inside a wider column with the content column edge? Compose with Tailwind arbitrary values — the grid vars (`--popout-width`, `--feature-min/scale/max`) are already available:
 >
 > ```html
-> <!-- popout-column content aligned to content column edge -->
-> <div class="col-popout px-[clamp(var(--breakout-min),var(--breakout-scale),var(--popout-width))]">...</div>
->
 > <!-- feature-column content aligned to content column edge -->
 > <div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
 > ```

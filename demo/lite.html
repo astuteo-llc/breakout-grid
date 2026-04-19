@@ -40,9 +40,6 @@
       --feature: minmax(0, clamp(0rem, 12vw, 12rem));
       --popout: minmax(0, 5rem);
       --full-limit: 115rem;
-
-      /* Breakout padding */
-      --breakout-padding: clamp(1rem, 5vw, 5rem);
     }
 
     @media (min-width: 1024px) {
@@ -119,9 +116,9 @@
     .col-content-right { grid-column: content-start / full-end; }
 
     /* Padding utilities */
-    .p-breakout { padding: var(--breakout-padding); }
-    .px-breakout { padding-left: var(--breakout-padding); padding-right: var(--breakout-padding); }
-    .py-breakout { padding-top: var(--breakout-padding); padding-bottom: var(--breakout-padding); }
+    .p-popout { padding: var(--popout-width, 5rem); }
+    .px-popout { padding-left: var(--popout-width, 5rem); padding-right: var(--popout-width, 5rem); }
+    .py-popout { padding-top: var(--popout-width, 5rem); padding-bottom: var(--popout-width, 5rem); }
 
     .p-gap { padding: var(--gap); }
     .px-gap { padding-left: var(--gap); padding-right: var(--gap); }
@@ -267,7 +264,7 @@
     </blockquote>
 
     <div class="col-full bg-slate-900 text-white">
-      <div class="px-breakout py-12 text-center">
+      <div class="px-popout py-12 text-center">
         <h3 class="text-2xl font-bold mb-3">Try the Lite Visualizer</h3>
         <p class="text-slate-300 mb-6">Press <kbd class="bg-slate-800 px-2 py-1 rounded text-sm">Cmd+G</kbd> to see the grid overlay</p>
         <p class="text-slate-400 text-sm">The lite version shows measurements without config editing—perfect for standalone CSS users.</p>
