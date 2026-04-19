@@ -56,9 +56,10 @@
   "scripts": {
     "demo": "vite",
     "build": "vite build && vite build --mode lite && npm run build:css",
-    "build:css": "node scripts/build-css.js",
+    "build:css": "node scripts/build-css.js && npm run verify:layers",
     "build:full": "vite build",
     "build:lite": "vite build --mode lite",
+    "verify:layers": "node scripts/verify-layers.js",
     "check-version": "node scripts/check-version.js",
     "prepublishOnly": "npm run build && npm run check-files",
     "check-files": "npm pack --dry-run",
