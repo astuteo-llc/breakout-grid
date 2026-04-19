@@ -14,34 +14,47 @@ Inspired by [Kevin Powell's video](https://www.youtube.com/watch?v=c13gpBrnGEw),
 
 ## Installation
 
-### CDN / Direct Download
+Primary flow: generate the CSS you want from the visualizer, drop it into your project, and `@import` it. No runtime dependency on this package.
 
-Download the CSS file and include it directly:
+### 1. Generate from the visualizer (recommended)
 
-```html
-<link rel="stylesheet" href="_objects.breakout-grid.css">
-```
+1. Open the visualizer locally: `npm run demo` → <http://localhost:5173> → press <kbd>Cmd/Ctrl</kbd> + <kbd>G</kbd>
+2. Configure content widths, gap, popout, feature track, etc.
+3. Toggle **Include extras layer** on (default) if you want the advanced utilities, off for slim core only
+4. Click **Download CSS** and pick Plain or Tailwind v4 flavor
+5. Drop the file into your project source and import it
 
-### npm
+### 2. Copy from the repo
+
+Pre-built combined files live in `dist/`. Copy whichever matches your stack:
+
+| File | Purpose |
+|---|---|
+| `_objects.breakout-grid.css` | Plain CSS — core + extras combined |
+| `_objects.breakout-grid.tw.css` | Tailwind v4 `@utility` flavor — core + extras combined |
+
+For a slim build without the extras utilities, generate it from the visualizer with **Include extras layer** toggled off.
+
+### 3. npm (alternative)
+
+Also available as a package if that fits your workflow better:
 
 ```bash
 npm install @astuteo/breakout-grid
 ```
 
-Import the CSS in your build:
-
-```js
-import '@astuteo/breakout-grid'
-// or
-import '@astuteo/breakout-grid/css'
+```css
+@import '@astuteo/breakout-grid';           /* plain */
+/* or */
+@import '@astuteo/breakout-grid/tailwind';  /* Tailwind v4 @utility flavor */
 ```
 
-For the visualizer:
+The same package ships the visualizer for dev-time use:
 
 ```js
-import '@astuteo/breakout-grid/visualizer'
-// or lite version
-import '@astuteo/breakout-grid/visualizer-lite'
+if (import.meta.env.DEV) {
+  await import('@astuteo/breakout-grid/visualizer')
+}
 ```
 
 ## Quick Start
@@ -76,17 +89,9 @@ From narrowest to widest:
 
 ## Classes
 
-The grid ships in two layers: **core** (default) and an optional **extras** layer with advanced alignment helpers. Import only what you need.
+The grid ships in two logical layers: **core** (grid containers, column placement, gap/popout spacing) and **extras** (advanced alignment helpers — `breakout-none`, `p-breakout`, `p-full-gap`, `p-*-to-content`). The combined CSS output in `dist/` includes both. Generate a slim core-only build from the visualizer if you don't need the extras.
 
-```css
-/* Core — grid, column placement, gap/popout spacing */
-@import '@astuteo/breakout-grid';
-
-/* Extras — add when you need the advanced helpers below */
-@import '@astuteo/breakout-grid/extras';
-```
-
-Or with the Tailwind plugin, pass `extras: false` to opt out of the extras layer:
+Using the Tailwind plugin? Pass `extras: false` to opt out programmatically:
 
 ```js
 import breakoutGrid from '@astuteo/breakout-grid'
@@ -122,7 +127,7 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
 - Negative variants `-m-gap`, `-m-popout`
 
-### Extras (opt-in via `@astuteo/breakout-grid/extras`)
+### Extras (included in combined build; opt out with `extras: false` in the Tailwind plugin)
 
 - `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid
 - `.p-breakout`, `.m-breakout` - Fluid breakout padding
@@ -147,18 +152,18 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 
 The generated CSS files open with a `/* @formatter:off */` pragma, which **JetBrains-family IDEs** (WebStorm, PhpStorm, IntelliJ, etc.) honor automatically — no config needed.
 
-**Prettier** doesn't read that pragma. Add the dist path to your `.prettierignore` instead so format-on-save (and `prettier --write`) skip these files:
-
-```
-# .prettierignore
-node_modules/@astuteo/breakout-grid/dist/
-```
-
-If you've copied the CSS into your own source tree, list the local paths:
+**Prettier** doesn't read that pragma. Add the path to your `.prettierignore` instead so format-on-save (and `prettier --write`) skip it:
 
 ```
 # .prettierignore
 **/_objects.breakout-grid*.css
+```
+
+If you're loading from npm rather than copying the CSS into your source tree:
+
+```
+# .prettierignore
+node_modules/@astuteo/breakout-grid/dist/
 ```
 
 The Prettier VS Code extension reads `.prettierignore` too — no separate VS Code setting needed. Same for ESLint/Stylelint toolchains that use Prettier under the hood.

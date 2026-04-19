@@ -9,12 +9,7 @@ Two ways to slim the grid down:
 
 If you only need the grid, basic `col-*` placement, and gap/popout spacing, skip the extras layer entirely.
 
-**CSS file consumers** — just don't import the extras file:
-
-```css
-@import '@astuteo/breakout-grid';
-/* no @import '@astuteo/breakout-grid/extras'; */
-```
+**Visualizer users** — toggle **Include extras layer** off in the export panel, then download. The resulting file contains core utilities only.
 
 **Tailwind plugin consumers** — pass `extras: false`:
 
@@ -26,7 +21,7 @@ export default {
 }
 ```
 
-This gives you a ~13 KB raw / 2.5 KB gzip CSS footprint without the advanced alignment helpers.
+This gives you a ~11 KB raw / 2.3 KB gzip CSS footprint without the advanced alignment helpers.
 
 ## Collapsing Unused Tracks
 

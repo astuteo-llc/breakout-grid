@@ -34,11 +34,12 @@ const defaults = {
 
 mkdirSync('dist', { recursive: true });
 
+// Emit combined-only. The visualizer's "Include extras layer" toggle
+// produces core-only output on demand; no need to ship a separate extras
+// file since the package isn't intended as an npm subpath-import target.
 const targets = [
-  ['dist/_objects.breakout-grid.css',           { layer: 'core',   tailwind: false }],
-  ['dist/_objects.breakout-grid.tw.css',        { layer: 'core',   tailwind: true  }],
-  ['dist/_objects.breakout-grid-extras.css',    { layer: 'extras', tailwind: false }],
-  ['dist/_objects.breakout-grid-extras.tw.css', { layer: 'extras', tailwind: true  }],
+  ['dist/_objects.breakout-grid.css',    { layer: 'combined', tailwind: false }],
+  ['dist/_objects.breakout-grid.tw.css', { layer: 'combined', tailwind: true  }],
 ];
 
 console.log(`Breakout Grid v${pkg.version} — build output`);

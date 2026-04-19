@@ -7,18 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.0] - 2026-04-19
 
+### Changed (primary consumption pattern)
+
+The package is now oriented around the **visualizer download** as the primary way to consume the grid. Generate the CSS once with the settings you want, drop it into your project source, and import it directly. npm install still works for loading the visualizer (and as a legacy CSS-import path), but it's no longer the intended production flow.
+
 ### ⚠ Breaking
 
-**1. Default CSS import shape (CSS-file consumers only).** `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
-
-```css
-@import '@astuteo/breakout-grid';
-@import '@astuteo/breakout-grid/extras';
-```
-
-Tailwind plugin consumers: no action required. `extras` defaults to `true`, preserving current behavior. Pass `extras: false` for the slim build.
-
-**2. Removed `.col-full-limit` utility.** Use Tailwind's own `max-w-*` utilities with `mx-auto` on `col-full` instead. The `fullLimit` plugin config option and the `--full-limit` CSS variable are also removed.
+**1. Removed `.col-full-limit` utility.** Use Tailwind's own `max-w-*` utilities with `mx-auto` on `col-full` instead. The `fullLimit` plugin config option and the `--full-limit` CSS variable are also removed.
 
 ```html
 <!-- before -->
@@ -30,7 +25,7 @@ Tailwind plugin consumers: no action required. `extras` defaults to `true`, pres
 
 For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115rem`) and use `max-w-breakout`.
 
-**3. Removed `.col-*-to-*` partial-span utilities** (`col-feature-to-popout`, `col-feature-to-content`, `col-feature-to-center`, `col-popout-to-content`, `col-popout-to-center`, `col-popout-to-feature`, `col-content-to-center`, `col-content-to-popout`, `col-content-to-feature`). Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value — the center-line patterns (the main use case) stay straightforward:
+**2. Removed `.col-*-to-*` partial-span utilities** (`col-feature-to-popout`, `col-feature-to-content`, `col-feature-to-center`, `col-popout-to-content`, `col-popout-to-center`, `col-popout-to-feature`, `col-content-to-center`, `col-content-to-popout`, `col-content-to-feature`). Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value — the center-line patterns (the main use case) stay straightforward:
 
 ```html
 <!-- before -->
@@ -48,26 +43,27 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 </section>
 ```
 
+**3. Removed `@astuteo/breakout-grid/extras` subpath export.** The extras utilities now ship bundled into the default CSS output. If you were importing the extras file separately, drop the second `@import` — the main import already covers both layers.
+
 ### Added
 
-- **Extras layer** — optional advanced utilities split into their own file and package export (`@astuteo/breakout-grid/extras`, `@astuteo/breakout-grid/extras/tailwind`)
-- **Tailwind plugin `extras` option** (default `true`) — set to `false` to emit core only
-- **Visualizer "Include extras" toggle** — controls whether "Download CSS" emits combined or core-only output
-- **Graceful fallbacks** in the extras layer — missing core vars fall back to sensible defaults instead of a silently broken cascade
-- **`@layer breakout-extras` wrapping** on the plain-CSS extras file — import order irrelevant
+- **Tailwind plugin `extras` option** (default `true`) — set to `false` for a core-only build when you're using the plugin programmatically
+- **Visualizer "Include extras layer" toggle** — controls whether "Download CSS" emits the combined output (default) or core-only
+- **`/* @formatter:off */` pragma** at the top of every generated CSS file so JetBrains-family IDEs don't auto-reformat on save
 
 ### Changed
 
-- **Core CSS** reduced from ~26 KB raw / 5.7 KB gzip to **~12 KB raw / 2.5 KB gzip** (~55% gzip reduction for core-only consumers)
-- **Extras CSS** is **7.6 KB raw / 1.4 KB gzip**; combined is **~20 KB / ~3.9 KB gzip** (still smaller than the previous single file)
+- **Combined CSS** is **18.3 KB raw / 3.4 KB gzip** (Tailwind flavor: 19.7 KB / 3.6 KB gzip), down from ~26 KB / 5.7 KB gzip in v5
+- **dist output** collapsed from four files to two — only the combined plain + Tailwind variants ship. Generate a slim core-only build from the visualizer when you need it
 - **Removed stale `style` field** from `package.json` — superseded by the `exports` map
-- **CSS generator simplified** to a single parameterized `generateCSSExport(config, { layer, tailwind })` entry point
+- **CSS generator** simplified to a single parameterized `generateCSSExport(config, { layer, tailwind })` entry point
+- **Primary consumption pattern** is now the visualizer download — copy the generated file into your project source rather than importing from `node_modules`. npm install still works for loading the visualizer itself
 
 ### Core / Extras boundary
 
-Enforced by one rule: **extras may depend on core; core must not depend on extras.** Core file is grep-verified during build to contain zero extras tokens.
+Enforced by one rule: **extras may depend on core; core must not depend on extras.** The build runs a generator-based verifier that fails if core output ever contains an extras token.
 
-**Core:** grid containers, subgrid, `breakout-to-*` modifiers, `.col-*` placement, `.col-start/end-*`, `.col-*-{left,right}`, `.col-full-limit`, `.p-gap` / `.p-popout` spacing (+ margins + negatives).
+**Core:** grid containers, subgrid, `breakout-to-*` modifiers, `.col-*` placement, `.col-start/end-*`, `.col-*-{left,right}`, `.p-gap` / `.p-popout` spacing (+ margins + negatives).
 
 **Extras:** `.breakout-none*`, `.p-breakout` / `.m-breakout`, `.p-full-gap` / `.m-full-gap`, `.p-popout-to-content`, `.p-feature-to-content`, and the `--breakout-padding` / `--computed-gap` / `--popout-to-content` / `--feature-to-content` computed vars.
 
