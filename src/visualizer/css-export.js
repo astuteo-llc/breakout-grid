@@ -2,7 +2,7 @@
  * Breakout Grid Visualizer - CSS Export
  *
  * Single unified generator. Produces the full utility set (grid, columns,
- * spacing, alignment helpers, grid-escape) as one CSS file. Tailwind flavor
+ * spacing, alignment helpers) as one CSS file. Tailwind flavor
  * wraps every single-class selector in `@utility` blocks so consumers can
  * use responsive/state variants (md:col-feature, hover:col-full, etc.).
  *
@@ -71,7 +71,6 @@ function gridCSS(c, version) {
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
  *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
  *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
- *   GRID ESCAPE .......... .breakout-none, .breakout-none-flex, .breakout-none-grid
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -481,20 +480,5 @@ function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
 .pt-feature-to-content { padding-top: var(--feature-to-content); }
 .pr-feature-to-content { padding-right: var(--feature-to-content); }
 .pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }
-
-/* ============================================================================
-   GRID ESCAPE — breakout-none opts out of the grid entirely
-   ============================================================================ */
-
-.breakout-none { display: block; }
-.breakout-none-flex { display: flex; }
-.breakout-none-grid { display: grid; }
-
-/* Reset col-* placement inside breakout-none containers */
-.breakout-none > [class*='col-'],
-.breakout-none-flex > [class*='col-'],
-.breakout-none-grid > [class*='col-'] {
-  grid-column: auto;
-}`;
+.pl-feature-to-content { padding-left: var(--feature-to-content); }`;
 }

@@ -43,19 +43,16 @@
        MAIN LAYOUT: Feature-width sidebar layout
        ============================================
 
-       breakout-none-grid escapes the breakout grid and starts a plain
-       CSS grid. Direct children with breakout col-* classes are
-       automatically reset to grid-column: auto so they don't reference
-       named lines that no longer exist.
-
-       We define the sidebar/content split with grid-template-columns
-       instead of grid-cols-12 + col-span-*, which avoids any selector
-       conflict between the col-* reset and Tailwind's col-span utilities.
+       Uses the feature column for the outer container width, then
+       switches to a native Tailwind grid for the sidebar/content split.
+       The inner content is written inline (not via shared blocks) so
+       there are no col-* classes that would reference the outer grid's
+       named tracks.
        ============================================ -->
   <main class="grid-cols-breakout py-12">
 
-    <!-- Feature-width container with sidebar grid -->
-    <div class="col-feature breakout-none-grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
+    <!-- Feature-width container with native Tailwind grid -->
+    <div class="col-feature grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
 
       <!-- Sidebar -->
       <aside>
@@ -96,15 +93,12 @@
         <!-- KEY CLASSES CALLOUT -->
         <div class="bg-slate-900 text-white rounded-lg p-6 mb-8">
           <h2 class="text-lg font-bold mb-4 text-amber-400">Sidebar Layout Pattern</h2>
-          <p class="text-slate-300 text-sm mb-4">This page demonstrates how to escape the breakout grid for a sidebar layout. The key classes:</p>
+          <p class="text-slate-300 text-sm mb-4">Use `col-feature` to size the outer container, then switch to a native Tailwind grid for the sidebar/content split:</p>
           <div class="bg-slate-800 rounded p-4 font-mono text-sm mb-4 overflow-x-auto">
             <div class="text-slate-400">&lt;main class="<span class="text-emerald-400">grid-cols-breakout</span>"&gt;</div>
-            <div class="text-slate-400 pl-4">&lt;div class="<span class="text-amber-400">col-feature</span> <span class="text-pink-400">breakout-none-grid</span> <span class="text-blue-400">grid-cols-[250px_1fr] gap-8</span>"&gt;</div>
+            <div class="text-slate-400 pl-4">&lt;div class="<span class="text-amber-400">col-feature</span> <span class="text-pink-400">grid</span> <span class="text-blue-400">grid-cols-[250px_1fr] gap-8</span>"&gt;</div>
             <div class="text-slate-400 pl-8">&lt;aside&gt;Sidebar&lt;/aside&gt;</div>
-            <div class="text-slate-400 pl-8">&lt;div&gt;</div>
-            <div class="text-slate-400 pl-12">&lt;!-- Blocks with col-* classes are reset to auto --&gt;</div>
-            <div class="text-slate-400 pl-12">&lt;div class="<span class="text-slate-500 line-through">col-popout</span>"&gt;Reset to auto&lt;/div&gt;</div>
-            <div class="text-slate-400 pl-8">&lt;/div&gt;</div>
+            <div class="text-slate-400 pl-8">&lt;div&gt;Content&lt;/div&gt;</div>
             <div class="text-slate-400 pl-4">&lt;/div&gt;</div>
             <div class="text-slate-400">&lt;/main&gt;</div>
           </div>
@@ -118,24 +112,28 @@
               <p class="text-slate-400 mt-1">Container width for sidebar area</p>
             </div>
             <div>
-              <span class="text-pink-400 font-semibold">breakout-none-grid</span>
-              <p class="text-slate-400 mt-1">Escapes breakout, resets col-* to auto</p>
+              <span class="text-pink-400 font-semibold">grid grid-cols-[250px_1fr]</span>
+              <p class="text-slate-400 mt-1">Native Tailwind grid for the sidebar split</p>
             </div>
           </div>
         </div>
 
-        <!-- Shared blocks intro -->
-        <div class="bg-amber-50 border border-amber-200 rounded p-4 mb-8">
-          <p class="text-sm text-amber-800"><strong>Shared Components:</strong> The blocks below are loaded from <code class="bg-amber-100 px-1 rounded">shared-blocks.js</code> — the exact same source used on the <a href="/product.html" class="text-amber-600 hover:underline font-semibold">Product page</a>. Compare how the <code class="bg-amber-100 px-1 rounded">col-*</code> classes work there vs. here.</p>
-        </div>
+        <!-- Placeholder content for the sidebar pane -->
+        <div class="prose prose-slate max-w-none">
+          <h2 class="text-xl font-bold mb-3">Installation</h2>
+          <p class="mb-4 text-gray-700">Unbox your CNC-5000 and follow the included quick-start card. Make sure the mounting surface is level to within 0.5 mm before securing the base.</p>
 
-        <!-- Shared blocks injected via JS - same as product page -->
-        <div data-shared-block="infoCallout"></div>
-        <div data-shared-block="keySpecs"></div>
-        <div data-shared-block="warningCallout"></div>
-        <div data-shared-block="specsTable"></div>
-        <div data-shared-block="testimonial"></div>
-        <div data-shared-block="featureCards"></div>
+          <h2 class="text-xl font-bold mb-3 mt-8">Control Panel Overview</h2>
+          <p class="mb-4 text-gray-700">The control panel exposes jog, home, probe, and emergency-stop controls. A 5-inch display shows the active tool, coordinate system, and current program.</p>
+
+          <h2 class="text-xl font-bold mb-3 mt-8">First Job</h2>
+          <p class="mb-4 text-gray-700">Load a short test program (a 10 mm square pocket is included on the sample USB drive), clamp a piece of aluminum scrap, and verify tool offsets before running at full feed.</p>
+
+          <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r">
+            <p class="font-semibold text-amber-800 mb-1">Safety Reminder</p>
+            <p class="text-amber-700 text-sm">Always wear eye protection and ensure the enclosure door is latched before starting a program.</p>
+          </div>
+        </div>
 
         <!-- Pagination -->
         <div class="flex justify-between items-center mt-12 pt-8 border-t border-gray-200">

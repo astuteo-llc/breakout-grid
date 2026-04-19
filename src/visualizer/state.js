@@ -86,9 +86,9 @@ export function createInitialState() {
     showCloseWarningModal: false,
     gridOpacity: 0.8,
     backdropOpacity: 0.85,
-    // When true, "Download CSS" emits grid + column placement + gap/popout
-    // spacing only. Skips breakout-padding, full-gap, alignment paddings,
-    // and grid-escape.
+    // When true, "Download CSS" emits grid + column placement + p-popout
+    // padding only. Skips gap/margin spacing, breakout-padding, full-gap,
+    // and alignment paddings.
     coreOnly: false,
   };
 }

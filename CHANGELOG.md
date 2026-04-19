@@ -43,6 +43,17 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 </section>
 ```
 
+**3. Removed `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid`** and the `col-*` descendant reset. The three display classes are 1-to-1 with Tailwind's `block`, `flex`, `grid`. For sidebar-style layouts, use a native Tailwind grid on a `col-feature` (or similar) container and keep the inner content free of `col-*` classes:
+
+```html
+<main class="grid-cols-breakout">
+  <div class="col-feature grid grid-cols-[250px_1fr] gap-8">
+    <aside>...</aside>
+    <div>...</div>
+  </div>
+</main>
+```
+
 ### Added
 
 - **`/* @formatter:off */` pragma** at the top of every generated CSS file so JetBrains-family IDEs don't auto-reformat on save
@@ -57,7 +68,7 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 
 ### What ships
 
-All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, breakout padding, full-gap, alignment paddings, and grid escape. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
+All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, breakout padding, full-gap, and alignment paddings. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
 
 ## [5.0.0] - 2025-01-26
 

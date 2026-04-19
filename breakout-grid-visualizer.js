@@ -80,9 +80,9 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       showCloseWarningModal: false,
       gridOpacity: 0.8,
       backdropOpacity: 0.85,
-      // When true, "Download CSS" emits grid + column placement + gap/popout
-      // spacing only. Skips breakout-padding, full-gap, alignment paddings,
-      // and grid-escape.
+      // When true, "Download CSS" emits grid + column placement + p-popout
+      // padding only. Skips gap/margin spacing, breakout-padding, full-gap,
+      // and alignment paddings.
       coreOnly: false
     };
   }
@@ -129,7 +129,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
  *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
  *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
- *   GRID ESCAPE .......... .breakout-none, .breakout-none-flex, .breakout-none-grid
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -528,22 +527,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .pt-feature-to-content { padding-top: var(--feature-to-content); }
 .pr-feature-to-content { padding-right: var(--feature-to-content); }
 .pb-feature-to-content { padding-bottom: var(--feature-to-content); }
-.pl-feature-to-content { padding-left: var(--feature-to-content); }
-
-/* ============================================================================
-   GRID ESCAPE — breakout-none opts out of the grid entirely
-   ============================================================================ */
-
-.breakout-none { display: block; }
-.breakout-none-flex { display: flex; }
-.breakout-none-grid { display: grid; }
-
-/* Reset col-* placement inside breakout-none containers */
-.breakout-none > [class*='col-'],
-.breakout-none-flex > [class*='col-'],
-.breakout-none-grid > [class*='col-'] {
-  grid-column: auto;
-}`;
+.pl-feature-to-content { padding-left: var(--feature-to-content); }`;
   }
   const methods = {
     init() {

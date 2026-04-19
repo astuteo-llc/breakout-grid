@@ -119,9 +119,6 @@ From narrowest to widest:
 - `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
 - Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`, `.-m-full-gap`
 
-#### Grid Escape
-- `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid entirely (useful inside sidebar layouts)
-
 > Need a partial span between non-adjacent tracks — e.g. a split layout where content reaches the grid's center line? Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value:
 >
 > ```html
