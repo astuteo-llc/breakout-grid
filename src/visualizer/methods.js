@@ -254,10 +254,11 @@ export const methods = {
   downloadCSS(format = 'plain') {
     const config = this.generateConfigExport();
     const tailwind = format === 'tailwind';
-    const css = this.generateCSSExport(config, { tailwind });
+    const css = this.generateCSSExport(config, { tailwind, coreOnly: this.coreOnly });
+    const suffix = this.coreOnly ? '-core' : '';
     const filename = tailwind
-      ? '_objects.breakout-grid.tw.css'
-      : '_objects.breakout-grid.css';
+      ? `_objects.breakout-grid${suffix}.tw.css`
+      : `_objects.breakout-grid${suffix}.css`;
     const blob = new Blob([css], { type: 'text/css' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

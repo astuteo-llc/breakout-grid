@@ -32,9 +32,11 @@ const TAILWIND_FLAVOR_NOTE = `/*!
 const NO_FORMAT_PRAGMA = '/* @formatter:off */\n';
 
 export function generateCSSExport(config, options = {}) {
-  const { tailwind = false, version = BUILD_VERSION } = options;
+  const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
 
-  const css = baseCSS(config, version) + '\n' + advancedCSS(config, version);
+  const css = coreOnly
+    ? baseCSS(config, version)
+    : baseCSS(config, version) + '\n' + advancedCSS(config, version);
   const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
   return NO_FORMAT_PRAGMA + body;
 }

@@ -79,7 +79,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
       hasConfigOverride: false,
       showCloseWarningModal: false,
       gridOpacity: 0.8,
-      backdropOpacity: 0.85
+      backdropOpacity: 0.85,
+      // When true, "Download CSS" emits grid + column placement + gap/popout
+      // spacing only. Skips breakout-padding, full-gap, alignment paddings,
+      // and grid-escape.
+      coreOnly: false
     };
   }
   const BUILD_VERSION = "5.2.6";
@@ -95,8 +99,8 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 `;
   const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
-    const { tailwind = false, version = BUILD_VERSION } = options;
-    const css = baseCSS(config, version) + "\n" + advancedCSS(config);
+    const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
+    const css = coreOnly ? baseCSS(config, version) : baseCSS(config, version) + "\n" + advancedCSS(config);
     const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
     return NO_FORMAT_PRAGMA + body;
   }
@@ -761,8 +765,9 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     downloadCSS(format = "plain") {
       const config = this.generateConfigExport();
       const tailwind = format === "tailwind";
-      const css = this.generateCSSExport(config, { tailwind });
-      const filename = tailwind ? "_objects.breakout-grid.tw.css" : "_objects.breakout-grid.css";
+      const css = this.generateCSSExport(config, { tailwind, coreOnly: this.coreOnly });
+      const suffix = this.coreOnly ? "-core" : "";
+      const filename = tailwind ? `_objects.breakout-grid${suffix}.tw.css` : `_objects.breakout-grid${suffix}.css`;
       const blob = new Blob([css], { type: "text/css" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -2176,6 +2181,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
               Reset
             </button>
           </div>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid + column placement + gap/popout spacing only. Skips breakout-padding, full-gap, alignment paddings, and grid-escape utilities.">
+            <input type="checkbox" x-model="coreOnly" style="cursor: pointer; margin: 0;">
+            <span>Core only</span>
+            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(drops advanced spacing)</span>
+          </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
               Download CSS <span style="font-size: 9px;">&#9662;</span>
