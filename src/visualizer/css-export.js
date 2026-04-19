@@ -32,6 +32,10 @@ const TAILWIND_FLAVOR_NOTE = `/*!
  */
 `;
 
+// Prevents JetBrains IDEs from auto-formatting the generated file on save.
+// Prettier users need a separate `.prettierignore` entry — see README.
+const NO_FORMAT_PRAGMA = '/* @formatter:off */\n';
+
 export function generateCSSExport(config, options = {}) {
   const { layer = 'combined', tailwind = false, version = BUILD_VERSION } = options;
 
@@ -44,7 +48,8 @@ export function generateCSSExport(config, options = {}) {
     css = coreCSS(config, version) + '\n' + extrasCSS(config, version, { wrapInLayer: !tailwind });
   }
 
-  return tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
+  const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
+  return NO_FORMAT_PRAGMA + body;
 }
 
 /* ========================================================================

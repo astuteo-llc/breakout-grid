@@ -96,6 +96,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  * plain classes because \`@utility\` only accepts single-class selectors.
  */
 `;
+  const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
     const { layer = "combined", tailwind = false, version = BUILD_VERSION } = options;
     let css;
@@ -106,7 +107,8 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     } else {
       css = coreCSS(config, version) + "\n" + extrasCSS(config, version, { wrapInLayer: !tailwind });
     }
-    return tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
+    const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
+    return NO_FORMAT_PRAGMA + body;
   }
   function coreCSS(c, version) {
     const breakpointLg = c.breakpoints?.lg || "1024";

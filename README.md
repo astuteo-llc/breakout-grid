@@ -143,6 +143,26 @@ export default { plugins: [breakoutGrid({ extras: false })] }  // core only
 > <figure class="[grid-column:feature-start/center-end]">...</figure>
 > ```
 
+## Formatter Setup
+
+The generated CSS files open with a `/* @formatter:off */` pragma, which **JetBrains-family IDEs** (WebStorm, PhpStorm, IntelliJ, etc.) honor automatically — no config needed.
+
+**Prettier** doesn't read that pragma. Add the dist path to your `.prettierignore` instead so format-on-save (and `prettier --write`) skip these files:
+
+```
+# .prettierignore
+node_modules/@astuteo/breakout-grid/dist/
+```
+
+If you've copied the CSS into your own source tree, list the local paths:
+
+```
+# .prettierignore
+**/_objects.breakout-grid*.css
+```
+
+The Prettier VS Code extension reads `.prettierignore` too — no separate VS Code setting needed. Same for ESLint/Stylelint toolchains that use Prettier under the hood.
+
 ## Customization
 
 Override CSS variables in your own stylesheet:
