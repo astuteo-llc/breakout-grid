@@ -35,17 +35,17 @@ export function generateCSSExport(config, options = {}) {
   const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
 
   const css = coreOnly
-    ? baseCSS(config, version)
-    : baseCSS(config, version) + '\n' + advancedCSS(config, version);
+    ? gridCSS(config, version)
+    : gridCSS(config, version) + '\n' + spacingCSS(config) + '\n' + advancedCSS(config, version);
   const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
   return NO_FORMAT_PRAGMA + body;
 }
 
 /* ========================================================================
-   BASE — grid, columns, core spacing
+   GRID — structure, columns, and popout padding (the one unique spacing unit)
    ======================================================================== */
 
-function baseCSS(c, version) {
+function gridCSS(c, version) {
   const breakpointLg = c.breakpoints?.lg || '1024';
   const breakpointXl = c.breakpoints?.xl || '1280';
 
@@ -64,7 +64,10 @@ function baseCSS(c, version) {
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
+ *   POPOUT PADDING ....... .p-popout (sized to --popout-width, grid-unique)
+ *
+ * Full build adds:
+ *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
  *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
  *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
@@ -297,10 +300,29 @@ function baseCSS(c, version) {
 .col-narrow-right { grid-column: content-start / full-end; }
 
 /* ============================================================================
-   SPACING — gap & popout only (extras layer adds breakout / full-gap / *-to-content)
+   POPOUT PADDING — sized to --popout-width (unique to the grid; no Tailwind equivalent)
    ============================================================================ */
 
-/* Gap-based padding */
+.p-popout { padding: var(--popout-width); }
+.px-popout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
+.py-popout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
+.pl-popout { padding-left: var(--popout-width); }
+.pr-popout { padding-right: var(--popout-width); }
+.pt-popout { padding-top: var(--popout-width); }
+.pb-popout { padding-bottom: var(--popout-width); }
+`;
+}
+
+/* ========================================================================
+   SPACING — gap margins/padding and popout margins (tied to grid units)
+   ======================================================================== */
+
+function spacingCSS(c) {
+  return `
+/* ============================================================================
+   GAP — sized to --gap
+   ============================================================================ */
+
 .p-gap { padding: var(--gap); }
 .px-gap { padding-left: var(--gap); padding-right: var(--gap); }
 .py-gap { padding-top: var(--gap); padding-bottom: var(--gap); }
@@ -309,16 +331,6 @@ function baseCSS(c, version) {
 .pt-gap { padding-top: var(--gap); }
 .pb-gap { padding-bottom: var(--gap); }
 
-/* Popout-width padding */
-.p-popout { padding: var(--popout-width); }
-.px-popout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
-.py-popout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
-.pl-popout { padding-left: var(--popout-width); }
-.pr-popout { padding-right: var(--popout-width); }
-.pt-popout { padding-top: var(--popout-width); }
-.pb-popout { padding-bottom: var(--popout-width); }
-
-/* Gap-based margins */
 .m-gap { margin: var(--gap); }
 .mx-gap { margin-left: var(--gap); margin-right: var(--gap); }
 .my-gap { margin-top: var(--gap); margin-bottom: var(--gap); }
@@ -335,7 +347,10 @@ function baseCSS(c, version) {
 .-mt-gap { margin-top: calc(var(--gap) * -1); }
 .-mb-gap { margin-bottom: calc(var(--gap) * -1); }
 
-/* Popout-width margins */
+/* ============================================================================
+   POPOUT MARGINS — sized to --popout-width
+   ============================================================================ */
+
 .m-popout { margin: var(--popout-width); }
 .mx-popout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
 .my-popout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }

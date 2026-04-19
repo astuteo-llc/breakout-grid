@@ -100,11 +100,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   const NO_FORMAT_PRAGMA = "/* @formatter:off */\n";
   function generateCSSExport(config, options = {}) {
     const { tailwind = false, coreOnly = false, version = BUILD_VERSION } = options;
-    const css = coreOnly ? baseCSS(config, version) : baseCSS(config, version) + "\n" + advancedCSS(config);
+    const css = coreOnly ? gridCSS(config, version) : gridCSS(config, version) + "\n" + spacingCSS() + "\n" + advancedCSS(config);
     const body = tailwind ? TAILWIND_FLAVOR_NOTE + wrapWithTailwindUtilities(css) : css;
     return NO_FORMAT_PRAGMA + body;
   }
-  function baseCSS(c, version) {
+  function gridCSS(c, version) {
     const breakpointLg = c.breakpoints?.lg || "1024";
     const breakpointXl = c.breakpoints?.xl || "1280";
     return `/*!
@@ -122,7 +122,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
  *   COMPUTED ............. Auto-calculated (do not edit)
  *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
- *   SPACING .............. .p-gap, .p-popout, .m-gap, .m-popout (+ axes + negatives)
+ *   POPOUT PADDING ....... .p-popout (sized to --popout-width, grid-unique)
+ *
+ * Full build adds:
+ *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
  *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
  *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
@@ -355,10 +358,24 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .col-narrow-right { grid-column: content-start / full-end; }
 
 /* ============================================================================
-   SPACING — gap & popout only (extras layer adds breakout / full-gap / *-to-content)
+   POPOUT PADDING — sized to --popout-width (unique to the grid; no Tailwind equivalent)
    ============================================================================ */
 
-/* Gap-based padding */
+.p-popout { padding: var(--popout-width); }
+.px-popout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
+.py-popout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
+.pl-popout { padding-left: var(--popout-width); }
+.pr-popout { padding-right: var(--popout-width); }
+.pt-popout { padding-top: var(--popout-width); }
+.pb-popout { padding-bottom: var(--popout-width); }
+`;
+  }
+  function spacingCSS(c) {
+    return `
+/* ============================================================================
+   GAP — sized to --gap
+   ============================================================================ */
+
 .p-gap { padding: var(--gap); }
 .px-gap { padding-left: var(--gap); padding-right: var(--gap); }
 .py-gap { padding-top: var(--gap); padding-bottom: var(--gap); }
@@ -367,16 +384,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .pt-gap { padding-top: var(--gap); }
 .pb-gap { padding-bottom: var(--gap); }
 
-/* Popout-width padding */
-.p-popout { padding: var(--popout-width); }
-.px-popout { padding-left: var(--popout-width); padding-right: var(--popout-width); }
-.py-popout { padding-top: var(--popout-width); padding-bottom: var(--popout-width); }
-.pl-popout { padding-left: var(--popout-width); }
-.pr-popout { padding-right: var(--popout-width); }
-.pt-popout { padding-top: var(--popout-width); }
-.pb-popout { padding-bottom: var(--popout-width); }
-
-/* Gap-based margins */
 .m-gap { margin: var(--gap); }
 .mx-gap { margin-left: var(--gap); margin-right: var(--gap); }
 .my-gap { margin-top: var(--gap); margin-bottom: var(--gap); }
@@ -393,7 +400,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 .-mt-gap { margin-top: calc(var(--gap) * -1); }
 .-mb-gap { margin-bottom: calc(var(--gap) * -1); }
 
-/* Popout-width margins */
+/* ============================================================================
+   POPOUT MARGINS — sized to --popout-width
+   ============================================================================ */
+
 .m-popout { margin: var(--popout-width); }
 .mx-popout { margin-left: var(--popout-width); margin-right: var(--popout-width); }
 .my-popout { margin-top: var(--popout-width); margin-bottom: var(--popout-width); }
@@ -2181,10 +2191,10 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
               Reset
             </button>
           </div>
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid + column placement + gap/popout spacing only. Skips breakout-padding, full-gap, alignment paddings, and grid-escape utilities.">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid structure, column placement, and p-popout padding only. Bring your own padding/margin via Tailwind for everything else.">
             <input type="checkbox" x-model="coreOnly" style="cursor: pointer; margin: 0;">
             <span>Core only</span>
-            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(drops advanced spacing)</span>
+            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(grid + columns + p-popout)</span>
           </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">

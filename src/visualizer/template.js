@@ -1006,10 +1006,10 @@ export const template = `
               Reset
             </button>
           </div>
-          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid + column placement + gap/popout spacing only. Skips breakout-padding, full-gap, alignment paddings, and grid-escape utilities.">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; padding: 4px 2px; cursor: pointer;" title="Emit grid structure, column placement, and p-popout padding only. Bring your own padding/margin via Tailwind for everything else.">
             <input type="checkbox" x-model="coreOnly" style="cursor: pointer; margin: 0;">
             <span>Core only</span>
-            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(drops advanced spacing)</span>
+            <span x-show="coreOnly" style="color: #9ca3af; font-size: 10px;">(grid + columns + p-popout)</span>
           </label>
           <div style="position: relative; width: 100%;">
             <button @click="cssDropdownOpen = !cssDropdownOpen" style="width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
