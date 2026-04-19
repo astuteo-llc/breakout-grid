@@ -518,35 +518,11 @@ const createGridUtilities = (config, templates) => {
     '.grid-cols-breakout': {
       'display': 'grid',
       'grid-template-columns': templates.default
-    },
-    // Subgrid utility for nested elements that need to align to parent's grid lines
-    '.grid-cols-breakout-subgrid': {
-      'display': 'grid',
-      'grid-template-columns': 'subgrid'
     }
   })
 
-  // Modifier classes that constrain nested breakout grids to a specific level
-  // These redefine grid-template-columns with collapsed outer tracks
-  // while maintaining named grid lines for col-* utilities
-  // Uses minmax(0, 1fr) for the center column to fill available space
-  const breakoutModifiers = {
-    // Constrain to content - collapses all outer tracks, content spans full width
-    '.grid-cols-breakout.breakout-to-content': {
-      'grid-template-columns': `[full-start feature-start popout-start content-start center-start] minmax(0, 1fr) [center-end content-end popout-end feature-end full-end]`
-    },
-    // Constrain to popout - keeps popout margins only
-    '.grid-cols-breakout.breakout-to-popout': {
-      'grid-template-columns': `[full-start feature-start popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end feature-end full-end]`
-    },
-    // Constrain to feature - keeps feature and popout margins
-    '.grid-cols-breakout.breakout-to-feature': {
-      'grid-template-columns': `[full-start feature-start] var(--feature) [popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end] var(--feature) [feature-end full-end]`
-    }
-  }
-
-  debugLog(config, 'Generated utilities:', { ...utilities, ...breakoutModifiers })
-  return { ...utilities, ...breakoutModifiers }
+  debugLog(config, 'Generated utilities:', utilities)
+  return utilities
 }
 
 /**

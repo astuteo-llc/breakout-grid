@@ -16,7 +16,7 @@ Open http://localhost:5173
 - **Basic Column Widths** - full, feature, popout, content, narrow
 - **Padding Utilities** - px-popout, px-gap
 - **Left/Right Alignment** - col-feature-left, col-center-right, etc.
-- **CSS Subgrid** - grid-cols-breakout-subgrid
+- **CSS Subgrid** - Tailwind's `grid grid-cols-subgrid`
 - **Nested Grids** - subgrid alignment inside `.col-feature`
 - **Real World Example** - Article layout with mixed column widths
 

@@ -67,6 +67,32 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 <div class="col-feature px-[calc(clamp(var(--feature-min),var(--feature-scale),var(--feature-max))+var(--popout-width))]">...</div>
 ```
 
+**7. Removed `.grid-cols-breakout-subgrid`.** Use Tailwind's native `grid grid-cols-subgrid` (or the plain CSS equivalent `display: grid; grid-template-columns: subgrid;`). Identical output, one fewer bespoke utility.
+
+```html
+<!-- before -->
+<div class="col-feature grid-cols-breakout-subgrid">...</div>
+
+<!-- after -->
+<div class="col-feature grid grid-cols-subgrid">...</div>
+```
+
+**8. Removed the `.breakout-to-content` / `.breakout-to-popout` / `.breakout-to-feature` modifiers.** They produced misaligned tracks when nested inside an outer breakout grid (the outer's `minmax(0, X)` tracks shrink at narrow viewports; the nested grid doesn't know, so the nested tracks end up different sizes). Subgrid is the correct tool for that case. If you need a mini-breakout grid inside a non-breakout parent, just wrap with `grid-cols-breakout` to create a full breakout grid.
+
+```html
+<!-- before: nested breakout with modifier -->
+<div class="col-feature">
+  <div class="grid-cols-breakout breakout-to-feature">
+    <div class="col-content">...</div>
+  </div>
+</div>
+
+<!-- after: subgrid (aligns to outer tracks exactly) -->
+<div class="col-feature grid grid-cols-subgrid">
+  <div class="col-content">...</div>
+</div>
+```
+
 **4. Removed the `full-gap` spacing family** (`.p-full-gap`, `.m-full-gap`, `.-m-full-gap`, and all their axis variants) and the `--computed-gap` CSS variable. The "larger gap for full-width" pattern was niche and adequately served by Tailwind's arbitrary value syntax when it's actually needed:
 
 ```html

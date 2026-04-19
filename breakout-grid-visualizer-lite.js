@@ -1,6 +1,6 @@
 (function() {
   "use strict";
-  const VERSION = `v${"6.0.1"} lite`;
+  const VERSION = `v${"6.0.2"} lite`;
   const LOREM_CONTENT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
 
 Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.`;
@@ -225,50 +225,6 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         </div>
       </div>
 
-      <!-- Nested grid example: breakout-to-feature inside col-feature -->
-      <div x-data="{ hovered: false }"
-           @mouseenter="hovered = true"
-           @mouseleave="hovered = false"
-           :style="{
-             gridColumn: 'feature',
-             border: '3px dashed rgb(59, 130, 246)',
-             margin: '1rem 0',
-             background: hovered ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.05)',
-             transition: 'background 0.2s ease',
-             padding: '0.5rem'
-           }">
-        <div style="font-size: 0.625rem; font-family: monospace; color: rgb(30, 64, 175); margin-bottom: 0.5rem; padding: 0.25rem;">
-          Parent: .col-feature container
-        </div>
-        <div class="grid-cols-breakout breakout-to-feature"
-             style="background: rgba(59, 130, 246, 0.1);">
-          <div style="grid-column: feature;
-                      background: rgba(59, 130, 246, 0.3);
-                      padding: 0.5rem;
-                      font-size: 0.625rem;
-                      font-family: monospace;
-                      color: rgb(30, 64, 175);">
-            .col-feature → fills container
-          </div>
-          <div style="grid-column: content;
-                      background: rgb(59, 130, 246);
-                      color: white;
-                      padding: 0.75rem 1rem;
-                      font-size: 0.75rem;
-                      font-weight: 700;
-                      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-            <div style="font-family: monospace; margin-bottom: 0.5rem;">.col-content → has margins</div>
-            <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">breakout-to-feature collapses outer tracks</div>
-            <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature"&gt;
-  &lt;div class="grid-cols-breakout breakout-to-feature"&gt;
-    &lt;div class="col-feature"&gt;Fills container&lt;/div&gt;
-    &lt;p class="col-content"&gt;Has margins&lt;/p&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre>
-          </div>
-        </div>
-      </div>
-
       <!-- Subgrid example: child aligns to parent grid tracks -->
       <div x-data="{ hovered: false }"
            @mouseenter="hovered = true"
@@ -289,7 +245,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                     color: rgb(157, 23, 77);
                     padding: 0.5rem;
                     background: rgba(236, 72, 153, 0.1);">
-          Parent: .col-feature-right .grid-cols-breakout-subgrid
+          Parent: .col-feature-right .grid .grid-cols-subgrid
         </div>
         <!-- Child spanning feature (wider, lighter) -->
         <div style="grid-column: feature;
@@ -312,7 +268,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
           <div style="font-family: monospace; margin-bottom: 0.5rem;">Child: .col-content</div>
           <div style="font-size: 0.625rem; opacity: 0.9; font-weight: 500; margin-bottom: 0.75rem;">Subgrid lets children align to parent's named lines</div>
-          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid-cols-breakout-subgrid"&gt;
+          <pre style="font-size: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; margin: 0; white-space: pre-wrap; text-align: left;">&lt;div class="col-feature-right grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;Aligns to feature!&lt;/div&gt;
   &lt;div class="col-content"&gt;Aligns to content!&lt;/div&gt;
 &lt;/div&gt;</pre>

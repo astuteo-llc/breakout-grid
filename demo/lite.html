@@ -72,25 +72,6 @@
       grid-column: content;
     }
 
-    /* Subgrid */
-    .grid-cols-breakout-subgrid {
-      display: grid;
-      grid-template-columns: subgrid;
-    }
-
-    /* Breakout modifiers */
-    .grid-cols-breakout.breakout-to-content {
-      grid-template-columns: [full-start feature-start popout-start content-start center-start] minmax(0, 1fr) [center-end content-end popout-end feature-end full-end];
-    }
-
-    .grid-cols-breakout.breakout-to-popout {
-      grid-template-columns: [full-start feature-start popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end feature-end full-end];
-    }
-
-    .grid-cols-breakout.breakout-to-feature {
-      grid-template-columns: [full-start feature-start] var(--feature) [popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end] var(--feature) [feature-end full-end];
-    }
-
     /* Column utilities */
     .col-full { grid-column: full; }
     .col-feature { grid-column: feature; }

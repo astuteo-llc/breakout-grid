@@ -258,10 +258,10 @@
   <section id="subgrid" class="grid-cols-breakout py-12 bg-gray-100">
 
     <h2 class="col-content text-2xl font-bold mb-2">CSS Subgrid</h2>
-    <p class="col-content text-gray-600 mb-8">Use .grid-cols-breakout-subgrid on nested elements to inherit the parent grid's tracks. Children can align to any named line.</p>
+    <p class="col-content text-gray-600 mb-8">Use Tailwind's <code class="bg-gray-100 px-1 rounded text-sm">grid grid-cols-subgrid</code> on a nested element to inherit the parent grid's tracks. Children can align to any named line.</p>
 
     <!-- Subgrid Example 1 -->
-    <div class="col-feature-right grid-cols-breakout-subgrid bg-amber-100 border-2 border-amber-400">
+    <div class="col-feature-right grid grid-cols-subgrid bg-amber-100 border-2 border-amber-400">
       <div class="col-feature py-3 px-4 bg-amber-200 border-b border-amber-300">
         <code class="font-mono text-sm text-amber-800">.col-feature</code> - spans the feature area
       </div>
@@ -277,7 +277,7 @@
     <div class="col-content mt-4 mb-8">
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-right grid-cols-breakout-subgrid"&gt;
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-right grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;
     Spans the feature area
   &lt;/div&gt;
@@ -292,7 +292,7 @@
     </div>
 
     <!-- Subgrid Example 2 -->
-    <div class="col-feature-left grid-cols-breakout-subgrid bg-sky-100 border-2 border-sky-400">
+    <div class="col-feature-left grid grid-cols-subgrid bg-sky-100 border-2 border-sky-400">
       <div class="col-popout py-3 px-4 bg-sky-200 border-b border-sky-300">
         <code class="font-mono text-sm text-sky-800">.col-popout</code> - popout width
       </div>
@@ -305,7 +305,7 @@
     <div class="col-content mt-4 mb-6">
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
-        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-left grid-cols-breakout-subgrid"&gt;
+        <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;div class="col-feature-left grid grid-cols-subgrid"&gt;
   &lt;div class="col-popout"&gt;
     Popout width
   &lt;/div&gt;
@@ -332,10 +332,10 @@
   <section class="grid-cols-breakout py-12">
 
     <h2 class="col-content text-2xl font-bold mb-2">Nested Grids</h2>
-    <p class="col-content text-gray-600 mb-8">Use <code class="bg-gray-100 px-1 rounded text-sm">grid-cols-breakout-subgrid</code> on a column element so its children align to the outer grid's named tracks.</p>
+    <p class="col-content text-gray-600 mb-8">Use <code class="bg-gray-100 px-1 rounded text-sm">grid grid-cols-subgrid</code> on a column element so its children align to the outer grid's named tracks.</p>
 
     <!-- Feature container as a subgrid — inherits the outer grid's tracks exactly -->
-    <div class="col-feature grid-cols-breakout-subgrid bg-indigo-50">
+    <div class="col-feature grid grid-cols-subgrid bg-indigo-50">
       <p class="col-content text-indigo-600 text-sm pt-3">Parent: <code class="bg-indigo-100 px-1 rounded">.col-feature</code></p>
 
       <div class="col-feature bg-indigo-100 py-2 px-3 mt-3 text-sm text-indigo-700">
@@ -348,7 +348,7 @@
         .col-content for readable text
       </div>
 
-      <p class="col-content text-indigo-500 text-xs py-3">Nested: <code class="bg-indigo-100 px-1 rounded">.col-feature .grid-cols-breakout-subgrid</code></p>
+      <p class="col-content text-indigo-500 text-xs py-3">Nested: <code class="bg-indigo-100 px-1 rounded">col-feature grid grid-cols-subgrid</code></p>
     </div>
 
     <!-- Code Example -->
@@ -356,7 +356,7 @@
       <details class="bg-slate-800 rounded-lg overflow-hidden">
         <summary class="px-4 py-3 cursor-pointer text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">View markup</summary>
         <pre class="p-4 text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- Feature column that's also a subgrid --&gt;
-&lt;div class="col-feature grid-cols-breakout-subgrid"&gt;
+&lt;div class="col-feature grid grid-cols-subgrid"&gt;
   &lt;div class="col-feature"&gt;Fills the container&lt;/div&gt;
   &lt;div class="col-content"&gt;Aligns with outer .col-content&lt;/div&gt;
   &lt;div class="col-content"&gt;Any named line from the outer grid works&lt;/div&gt;
@@ -419,7 +419,7 @@
     </p>
 
     <!-- Feature-width inset — colored band bleeds to feature, inner text stays at content via subgrid -->
-    <aside class="col-feature grid-cols-breakout-subgrid bg-emerald-900 text-white rounded-lg my-8">
+    <aside class="col-feature grid grid-cols-subgrid bg-emerald-900 text-white rounded-lg my-8">
       <div class="col-content py-8">
         <p class="text-emerald-300 text-xs font-semibold uppercase tracking-wide mb-2">Key takeaway</p>
         <p class="text-emerald-50 text-lg">Inset breakouts let a colored background bleed wider than the content column while the text stays at reading width. The wider the band, the stronger the visual pause.</p>
@@ -463,7 +463,7 @@
   &lt;blockquote class="col-popout bg-blue-50"&gt;Pull quote...&lt;/blockquote&gt;
 
   &lt;!-- Inset breakout (subgrid): feature-width band, content-width text --&gt;
-  &lt;aside class="col-feature grid-cols-breakout-subgrid bg-emerald-900"&gt;
+  &lt;aside class="col-feature grid grid-cols-subgrid bg-emerald-900"&gt;
     &lt;div class="col-content py-8"&gt;Key takeaway...&lt;/div&gt;
   &lt;/aside&gt;
 

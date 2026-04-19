@@ -96,13 +96,23 @@ function gridCSS(c, version) {
  * TABLE OF CONTENTS
  *   CONFIGURATION ........ Customizable :root variables
  *   COMPUTED ............. Auto-calculated (do not edit)
- *   GRID CONTAINERS ...... .grid-cols-breakout, subgrid, left/right, modifiers
+ *   GRID CONTAINERS ...... .grid-cols-breakout, left/right variants
  *   COLUMN UTILITIES ..... .col-*, .col-start-*, .col-end-*, .col-*-{left,right}
  *   POPOUT PADDING ....... .p-popout (fixed --popout-width), .p-breakout (fluid clamp)
  *
  * Full build adds:
  *   GAP SPACING .......... .p-gap, .m-gap (+ axes + negatives)
  *   POPOUT MARGINS ....... .m-popout (fixed), .m-breakout (fluid) (+ axes + negatives)
+ *
+ * NESTED ALIGNMENT
+ *   For a column element whose children should align to the outer grid's
+ *   named tracks, use CSS subgrid (Tailwind: grid grid-cols-subgrid):
+ *
+ *     <section class="col-feature grid grid-cols-subgrid">
+ *       <div class="col-content">Aligns with outer .col-content</div>
+ *     </section>
+ *
+ *   Plain CSS equivalent: display: grid; grid-template-columns: subgrid;
  *
  * QUICK START
  *   <main class="grid-cols-breakout">
@@ -184,12 +194,6 @@ ${configRootCSS(c)}
   grid-column: var(--default-col, content);
 }
 
-/* Subgrid — nested items align to parent grid's tracks (~93% support 4/2026) */
-.grid-cols-breakout-subgrid {
-  display: grid;
-  grid-template-columns: subgrid;
-}
-
 /* ----------------------------------------------------------------------------
    Left / Right aligned variants
    ---------------------------------------------------------------------------- */
@@ -252,22 +256,6 @@ ${configRootCSS(c)}
     var(--popout) [popout-end]
     var(--feature) [feature-end]
     var(--full) [full-end];
-}
-
-/* ----------------------------------------------------------------------------
-   Breakout modifiers (for nested grids)
-   ---------------------------------------------------------------------------- */
-
-.grid-cols-breakout.breakout-to-content {
-  grid-template-columns: [full-start feature-start popout-start content-start center-start] minmax(0, 1fr) [center-end content-end popout-end feature-end full-end];
-}
-
-.grid-cols-breakout.breakout-to-popout {
-  grid-template-columns: [full-start feature-start popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end feature-end full-end];
-}
-
-.grid-cols-breakout.breakout-to-feature {
-  grid-template-columns: [full-start feature-start] var(--feature) [popout-start] var(--popout) [content-start center-start] minmax(0, 1fr) [center-end content-end] var(--popout) [popout-end] var(--feature) [feature-end full-end];
 }
 
 /* ============================================================================
