@@ -90,6 +90,43 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
   function wrapWithTailwindUtilities(css) {
     return css.replace(/^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm, "@utility $1 {");
   }
+  function configRootCSS(c) {
+    return `:root {
+  /* Content (text width) */
+  --content-min: ${c.contentMin};
+  --content-base: ${c.contentBase};
+  --content-max: ${c.contentMax};
+
+  /* Default column for children without col-* class */
+  --default-col: ${c.defaultCol || "content"};
+
+  /* Track widths */
+  --popout-width: ${c.popoutWidth};
+
+  /* Feature track */
+  --feature-min: ${c.featureMin};
+  --feature-scale: ${c.featureScale};
+  --feature-max: ${c.featureMax};
+
+  /* Outer margins */
+  --base-gap: ${c.baseGap};
+  --max-gap: ${c.maxGap};
+
+  /* Responsive scale */
+  --gap-scale-default: ${c.gapScale?.default || "4vw"};
+  --gap-scale-lg: ${c.gapScale?.lg || "5vw"};
+  --gap-scale-xl: ${c.gapScale?.xl || "6vw"};
+}`;
+  }
+  function advancedConfigRootCSS(c) {
+    const breakoutMin = c.breakoutMin || "1rem";
+    const breakoutScale = c.breakoutScale || "5vw";
+    return `:root {
+  /* Clamp inputs for --breakout-padding */
+  --breakout-min: ${breakoutMin};
+  --breakout-scale: ${breakoutScale};
+}`;
+  }
   const TAILWIND_FLAVOR_NOTE = `/*!
  * Tailwind v4 flavor — each rule wrapped in \`@utility\` so Tailwind
  * variants work (\`md:col-feature\`, \`hover:col-full\`, etc.). Chained
@@ -141,32 +178,7 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
    CONFIGURATION
    ============================================================================ */
 
-:root {
-  /* Content (text width) */
-  --content-min: ${c.contentMin};
-  --content-base: ${c.contentBase};
-  --content-max: ${c.contentMax};
-
-  /* Default column for children without col-* class */
-  --default-col: ${c.defaultCol || "content"};
-
-  /* Track widths */
-  --popout-width: ${c.popoutWidth};
-
-  /* Feature track */
-  --feature-min: ${c.featureMin};
-  --feature-scale: ${c.featureScale};
-  --feature-max: ${c.featureMax};
-
-  /* Outer margins */
-  --base-gap: ${c.baseGap};
-  --max-gap: ${c.maxGap};
-
-  /* Responsive scale */
-  --gap-scale-default: ${c.gapScale?.default || "4vw"};
-  --gap-scale-lg: ${c.gapScale?.lg || "5vw"};
-  --gap-scale-xl: ${c.gapScale?.xl || "6vw"};
-}
+${configRootCSS(c)}
 
 /* ============================================================================
    COMPUTED - DO NOT EDIT
@@ -420,21 +432,15 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
 `;
   }
   function advancedCSS(c, version) {
-    const breakoutPaddingMin = c.breakoutMin || "1rem";
-    const breakoutPaddingScale = c.breakoutScale || "5vw";
-    return advancedBody(c, breakoutPaddingMin, breakoutPaddingScale);
+    return advancedBody(c);
   }
-  function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
+  function advancedBody(c) {
     return `
 /* ============================================================================
    BREAKOUT PADDING — config inputs
    ============================================================================ */
 
-:root {
-  /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${breakoutPaddingMin};
-  --breakout-scale: ${breakoutPaddingScale};
-}
+${advancedConfigRootCSS(c)}
 
 /* ============================================================================
    ADVANCED COMPUTED
@@ -688,36 +694,11 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
     },
     copyConfig() {
       const config = this.generateConfigExport();
-      const lines = [
-        ":root {",
-        `  /* Content (text width) */`,
-        `  --content-min: ${config.contentMin};`,
-        `  --content-base: ${config.contentBase};`,
-        `  --content-max: ${config.contentMax};`,
-        `  /* Default column */`,
-        `  --default-col: ${config.defaultCol || "content"};`,
-        `  /* Track widths */`,
-        `  --popout-width: ${config.popoutWidth};`,
-        `  /* Feature track */`,
-        `  --feature-min: ${config.featureMin};`,
-        `  --feature-scale: ${config.featureScale};`,
-        `  --feature-max: ${config.featureMax};`,
-        `  /* Outer margins */`,
-        `  --base-gap: ${config.baseGap};`,
-        `  --max-gap: ${config.maxGap};`,
-        `  /* Responsive scale */`,
-        `  --gap-scale-default: ${config.gapScale?.default || "4vw"};`,
-        `  --gap-scale-lg: ${config.gapScale?.lg || "5vw"};`,
-        `  --gap-scale-xl: ${config.gapScale?.xl || "6vw"};`,
-        `  /* Breakout padding */`,
-        `  --breakout-min: ${config.breakoutMin || "1rem"};`,
-        `  --breakout-scale: ${config.breakoutScale || "5vw"};`,
-        `  /* Breakpoints */`,
-        `  /* --breakpoint-lg: ${config.breakpoints?.lg || "1024"}px; */`,
-        `  /* --breakpoint-xl: ${config.breakpoints?.xl || "1280"}px; */`,
-        "}"
-      ];
-      const configStr = lines.join("\n");
+      const configStr = [
+        this.configRootCSS(config),
+        "",
+        this.advancedConfigRootCSS(config)
+      ].join("\n");
       navigator.clipboard.writeText(configStr).then(() => {
         this.copySuccess = true;
         this.configCopied = true;
@@ -2351,6 +2332,8 @@ Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed 
         ...methods,
         // CSS export
         generateCSSExport,
+        configRootCSS,
+        advancedConfigRootCSS,
         cssExportVersion: BUILD_VERSION,
         // Template
         template

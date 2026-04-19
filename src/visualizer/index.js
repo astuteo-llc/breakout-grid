@@ -39,7 +39,12 @@ import {
   BREAKPOINT_OPTIONS,
   createInitialState
 } from './state.js';
-import { generateCSSExport, CSS_EXPORT_VERSION } from './css-export.js';
+import {
+  generateCSSExport,
+  configRootCSS,
+  advancedConfigRootCSS,
+  CSS_EXPORT_VERSION
+} from './css-export.js';
 
 import { methods } from './methods.js';
 import { template } from './template.js';
@@ -69,6 +74,8 @@ import { template } from './template.js';
 
       // CSS export
       generateCSSExport,
+      configRootCSS,
+      advancedConfigRootCSS,
       cssExportVersion: CSS_EXPORT_VERSION,
 
       // Template

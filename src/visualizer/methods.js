@@ -214,36 +214,13 @@ export const methods = {
 
   copyConfig() {
     const config = this.generateConfigExport();
-    const lines = [
-      ':root {',
-      `  /* Content (text width) */`,
-      `  --content-min: ${config.contentMin};`,
-      `  --content-base: ${config.contentBase};`,
-      `  --content-max: ${config.contentMax};`,
-      `  /* Default column */`,
-      `  --default-col: ${config.defaultCol || 'content'};`,
-      `  /* Track widths */`,
-      `  --popout-width: ${config.popoutWidth};`,
-      `  /* Feature track */`,
-      `  --feature-min: ${config.featureMin};`,
-      `  --feature-scale: ${config.featureScale};`,
-      `  --feature-max: ${config.featureMax};`,
-      `  /* Outer margins */`,
-      `  --base-gap: ${config.baseGap};`,
-      `  --max-gap: ${config.maxGap};`,
-      `  /* Responsive scale */`,
-      `  --gap-scale-default: ${config.gapScale?.default || '4vw'};`,
-      `  --gap-scale-lg: ${config.gapScale?.lg || '5vw'};`,
-      `  --gap-scale-xl: ${config.gapScale?.xl || '6vw'};`,
-      `  /* Breakout padding */`,
-      `  --breakout-min: ${config.breakoutMin || '1rem'};`,
-      `  --breakout-scale: ${config.breakoutScale || '5vw'};`,
-      `  /* Breakpoints */`,
-      `  /* --breakpoint-lg: ${config.breakpoints?.lg || '1024'}px; */`,
-      `  /* --breakpoint-xl: ${config.breakpoints?.xl || '1280'}px; */`,
-      '}'
-    ];
-    const configStr = lines.join('\n');
+    // Both blocks match the :root blocks inside the downloaded CSS exactly —
+    // sourced from the same helpers in css-export.js.
+    const configStr = [
+      this.configRootCSS(config),
+      '',
+      this.advancedConfigRootCSS(config)
+    ].join('\n');
     navigator.clipboard.writeText(configStr).then(() => {
       this.copySuccess = true;
       this.configCopied = true;

@@ -19,6 +19,56 @@ export function wrapWithTailwindUtilities(css) {
   return css.replace(/^\.(-?[a-zA-Z_][\w-]*)\s*\{/gm, '@utility $1 {');
 }
 
+/**
+ * Grid-config :root block — the user-editable values for content width,
+ * default column, track widths, feature track, outer margins, and gap
+ * scaling. Emitted at the top of the generated CSS and also by the
+ * visualizer's "Copy config" action so both outputs stay identical.
+ */
+export function configRootCSS(c) {
+  return `:root {
+  /* Content (text width) */
+  --content-min: ${c.contentMin};
+  --content-base: ${c.contentBase};
+  --content-max: ${c.contentMax};
+
+  /* Default column for children without col-* class */
+  --default-col: ${c.defaultCol || 'content'};
+
+  /* Track widths */
+  --popout-width: ${c.popoutWidth};
+
+  /* Feature track */
+  --feature-min: ${c.featureMin};
+  --feature-scale: ${c.featureScale};
+  --feature-max: ${c.featureMax};
+
+  /* Outer margins */
+  --base-gap: ${c.baseGap};
+  --max-gap: ${c.maxGap};
+
+  /* Responsive scale */
+  --gap-scale-default: ${c.gapScale?.default || '4vw'};
+  --gap-scale-lg: ${c.gapScale?.lg || '5vw'};
+  --gap-scale-xl: ${c.gapScale?.xl || '6vw'};
+}`;
+}
+
+/**
+ * Advanced-config :root block — the clamp inputs for --breakout-padding.
+ * Emitted inside the advanced section of the generated CSS and alongside
+ * the grid config in the visualizer's "Copy config" output.
+ */
+export function advancedConfigRootCSS(c) {
+  const breakoutMin = c.breakoutMin || '1rem';
+  const breakoutScale = c.breakoutScale || '5vw';
+  return `:root {
+  /* Clamp inputs for --breakout-padding */
+  --breakout-min: ${breakoutMin};
+  --breakout-scale: ${breakoutScale};
+}`;
+}
+
 const TAILWIND_FLAVOR_NOTE = `/*!
  * Tailwind v4 flavor — each rule wrapped in \`@utility\` so Tailwind
  * variants work (\`md:col-feature\`, \`hover:col-full\`, etc.). Chained
@@ -83,32 +133,7 @@ function gridCSS(c, version) {
    CONFIGURATION
    ============================================================================ */
 
-:root {
-  /* Content (text width) */
-  --content-min: ${c.contentMin};
-  --content-base: ${c.contentBase};
-  --content-max: ${c.contentMax};
-
-  /* Default column for children without col-* class */
-  --default-col: ${c.defaultCol || 'content'};
-
-  /* Track widths */
-  --popout-width: ${c.popoutWidth};
-
-  /* Feature track */
-  --feature-min: ${c.featureMin};
-  --feature-scale: ${c.featureScale};
-  --feature-max: ${c.featureMax};
-
-  /* Outer margins */
-  --base-gap: ${c.baseGap};
-  --max-gap: ${c.maxGap};
-
-  /* Responsive scale */
-  --gap-scale-default: ${c.gapScale?.default || '4vw'};
-  --gap-scale-lg: ${c.gapScale?.lg || '5vw'};
-  --gap-scale-xl: ${c.gapScale?.xl || '6vw'};
-}
+${configRootCSS(c)}
 
 /* ============================================================================
    COMPUTED - DO NOT EDIT
@@ -372,22 +397,16 @@ function spacingCSS(c) {
    ======================================================================== */
 
 function advancedCSS(c, version) {
-  const breakoutPaddingMin = c.breakoutMin || '1rem';
-  const breakoutPaddingScale = c.breakoutScale || '5vw';
-  return advancedBody(c, breakoutPaddingMin, breakoutPaddingScale);
+  return advancedBody(c);
 }
 
-function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
+function advancedBody(c) {
   return `
 /* ============================================================================
    BREAKOUT PADDING — config inputs
    ============================================================================ */
 
-:root {
-  /* Clamp inputs for --breakout-padding */
-  --breakout-min: ${breakoutPaddingMin};
-  --breakout-scale: ${breakoutPaddingScale};
-}
+${advancedConfigRootCSS(c)}
 
 /* ============================================================================
    ADVANCED COMPUTED
