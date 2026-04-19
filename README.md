@@ -76,27 +76,56 @@ From narrowest to widest:
 
 ## Classes
 
-### Grid Containers
+The grid ships in two layers: **core** (default) and an optional **extras** layer with advanced alignment helpers. Import only what you need.
+
+```css
+/* Core — grid, column placement, gap/popout spacing */
+@import '@astuteo/breakout-grid';
+
+/* Extras — add when you need the advanced helpers below */
+@import '@astuteo/breakout-grid/extras';
+```
+
+Or with the Tailwind plugin, pass `extras: false` to opt out of the extras layer:
+
+```js
+import breakoutGrid from '@astuteo/breakout-grid'
+export default { plugins: [breakoutGrid({ extras: false })] }  // core only
+```
+
+### Core
+
+#### Grid Containers
 - `.grid-cols-breakout` - Main centered grid
 - `.grid-cols-breakout-subgrid` - CSS subgrid for nested alignment
 - `.grid-cols-{feature|popout|content}-{left|right}` - Asymmetric layouts
+- `.breakout-to-{content|popout|feature}` - Nested grid modifiers
 
-### Column Placement
+#### Column Placement
 - `.col-full` - Edge to edge
 - `.col-feature` - Wide content (images, videos)
 - `.col-popout` - Slightly wider than content
 - `.col-content` - Reading width (default)
 - `.col-full-limit` - Full width with max-width cap
 
-### Fine-Grained Control
+#### Fine-Grained Control
 - `.col-start-{full|feature|popout|content|center}`
 - `.col-end-{full|feature|popout|content|center}`
 - `.col-{area}-left` / `.col-{area}-right` - Asymmetric spans
 
-### Spacing
+#### Spacing
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
-- `.p-breakout`, `.px-breakout` - Responsive padding
-- `.-mx-gap`, `.-mx-breakout` - Negative margins
+- `.p-popout`, `.m-popout`, etc. - Popout-width spacing
+- Negative variants `-m-gap`, `-m-popout`
+
+### Extras (opt-in via `@astuteo/breakout-grid/extras`)
+
+- `.breakout-none`, `.breakout-none-flex`, `.breakout-none-grid` - Escape the grid
+- `.col-feature-to-content`, `.col-popout-to-center`, etc. - Partial spans between non-adjacent tracks
+- `.p-breakout`, `.m-breakout` - Fluid breakout padding
+- `.p-full-gap`, `.m-full-gap` - Larger gap for full-width elements
+- `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
+- `.-m-breakout`, `.-m-full-gap` - Negative variants
 
 ## Customization
 

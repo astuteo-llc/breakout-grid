@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2026-04-19
+
+### ⚠ Breaking (CSS-file consumers only)
+
+The default `@import '@astuteo/breakout-grid'` now emits only the **core** utilities. If you use `breakout-none`, `col-*-to-*` partial spans, `p-breakout`, `m-breakout`, `p-full-gap`, `m-full-gap`, `p-popout-to-content`, or `p-feature-to-content`, also import the extras layer:
+
+```css
+@import '@astuteo/breakout-grid';
+@import '@astuteo/breakout-grid/extras';
+```
+
+**Tailwind plugin consumers:** no action required. `extras` defaults to `true`, preserving current behavior. Pass `extras: false` for the slim build.
+
+### Added
+
+- **Extras layer** — optional advanced utilities split into their own file and package export (`@astuteo/breakout-grid/extras`, `@astuteo/breakout-grid/extras/tailwind`)
+- **Tailwind plugin `extras` option** (default `true`) — set to `false` to emit core only
+- **Visualizer "Include extras" toggle** — controls whether "Download CSS" emits combined or core-only output
+- **Graceful fallbacks** in the extras layer — missing core vars fall back to sensible defaults instead of a silently broken cascade
+- **`@layer breakout-extras` wrapping** on the plain-CSS extras file — import order irrelevant
+
+### Changed
+
+- **Core CSS** reduced from ~26 KB raw / 5.7 KB gzip to **~12 KB raw / 2.5 KB gzip** (~55% gzip reduction for core-only consumers)
+- **Extras CSS** is **7.6 KB raw / 1.4 KB gzip**; combined is **~20 KB / ~3.9 KB gzip** (still smaller than the previous single file)
+- **Removed stale `style` field** from `package.json` — superseded by the `exports` map
+- **CSS generator simplified** to a single parameterized `generateCSSExport(config, { layer, tailwind })` entry point
+
+### Core / Extras boundary
+
+Enforced by one rule: **extras may depend on core; core must not depend on extras.** Core file is grep-verified during build to contain zero extras tokens.
+
+**Core:** grid containers, subgrid, `breakout-to-*` modifiers, `.col-*` placement, `.col-start/end-*`, `.col-*-{left,right}`, `.col-full-limit`, `.p-gap` / `.p-popout` spacing (+ margins + negatives).
+
+**Extras:** `.breakout-none*`, `.col-*-to-*` partial spans, `.p-breakout` / `.m-breakout`, `.p-full-gap` / `.m-full-gap`, `.p-popout-to-content`, `.p-feature-to-content`, and the `--breakout-padding` / `--computed-gap` / `--popout-to-content` / `--feature-to-content` computed vars.
+
 ## [5.0.0] - 2025-01-26
 
 ### Breaking Changes

@@ -1,6 +1,32 @@
 # Simplifying the Grid
 
-The breakout grid includes 5 column levels by default. If your project doesn't need all of them, you can collapse unused tracks to zero width. The grid lines still exist (so utilities won't break), but they take no space.
+Two ways to slim the grid down:
+
+1. **Drop the extras layer** (v6+) — get just core grid utilities and skip the advanced `breakout-none`, `col-*-to-*`, `p-breakout`, `p-full-gap`, and `p-*-to-content` helpers.
+2. **Collapse unused tracks** — keep all utilities but set feature/popout widths to `0` so they take no space.
+
+## Dropping the Extras Layer
+
+If you only need the grid, basic `col-*` placement, and gap/popout spacing, skip the extras layer entirely.
+
+**CSS file consumers** — just don't import the extras file:
+
+```css
+@import '@astuteo/breakout-grid';
+/* no @import '@astuteo/breakout-grid/extras'; */
+```
+
+**Tailwind plugin consumers** — pass `extras: false`:
+
+```js
+import breakoutGrid from '@astuteo/breakout-grid'
+
+export default {
+  plugins: [breakoutGrid({ extras: false })]
+}
+```
+
+This gives you a ~13 KB raw / 2.5 KB gzip CSS footprint without the advanced alignment helpers.
 
 ## Collapsing Unused Tracks
 
