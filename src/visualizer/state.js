@@ -88,5 +88,8 @@ export function createInitialState() {
     showCloseWarningModal: false,
     gridOpacity: 0.8,
     backdropOpacity: 0.85,
+    // Whether "Download CSS" emits the extras layer alongside core.
+    // Defaults to true to match the package's current behavior.
+    includeExtras: true,
   };
 }
