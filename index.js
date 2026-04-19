@@ -232,7 +232,6 @@ const createRootCSS = (pluginConfig) => {
       '--content-max': pluginConfig.contentMax,
       '--content-base': pluginConfig.contentBase,
       '--gap': `clamp(var(--base-gap), ${pluginConfig.gapScale.default}, var(--max-gap))`,
-      '--computed-gap': 'max(var(--gap), calc((100vw - var(--content)) / 10))',
       '--content-inset': 'min(clamp(var(--content-min), var(--content-base), var(--content-max)), calc(100% - var(--gap)))',
       '--full': 'minmax(var(--gap), 1fr)',
       '--feature': `minmax(0, clamp(${pluginConfig.featureMin}, ${pluginConfig.featureScale}, ${pluginConfig.featureMax}))`,
@@ -278,8 +277,6 @@ const debugLog = (config, ...args) => {
  * Generated classes:
  * - .p-gap, .px-gap, .py-gap, .pt-gap, .pr-gap, .pb-gap, .pl-gap
  * - .m-gap, .mx-gap, .my-gap, .mt-gap, .mr-gap, .mb-gap, .ml-gap
- * - .p-full-gap, .px-full-gap, etc. (using computed gap)
- * - .m-full-gap, etc. (using computed gap)
  * - .p-popout, .px-popout, etc. (using popout width)
  * - .m-popout, etc. (using popout width)
  *
@@ -311,11 +308,6 @@ const createSpacingUtilities = () => {
           .reduce((styles, prop) => ({
             ...styles,
             [prop]: 'var(--gap)'
-          }), {}),
-        [`.${key}-full-gap`]: [properties].flat()
-          .reduce((styles, prop) => ({
-            ...styles,
-            [prop]: 'var(--computed-gap)'
           }), {}),
         [`.${key}-popout`]: [properties].flat()
           .reduce((styles, prop) => ({
@@ -834,7 +826,6 @@ module.exports = (config = {}) => {
 
         const matchValues = {
           gap: 'var(--gap)',
-          'full-gap': 'var(--computed-gap)',
           popout: 'var(--config-popout)',
           breakout: 'var(--breakout-padding)'
         }

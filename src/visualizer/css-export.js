@@ -69,7 +69,6 @@ function gridCSS(c, version) {
  * Full build adds:
  *   GAP SPACING .......... .p-gap, .m-gap, .m-popout (+ axes + negatives)
  *   BREAKOUT PADDING ..... .p-breakout, .m-breakout (fluid edge padding)
- *   FULL-GAP ............. .p-full-gap, .m-full-gap (larger gap for full-width)
  *   ALIGNMENT PADDING .... .p-popout-to-content, .p-feature-to-content
  *
  * QUICK START
@@ -369,7 +368,7 @@ function spacingCSS(c) {
 }
 
 /* ========================================================================
-   ADVANCED — breakout padding, full-gap, alignment helpers, grid escape
+   ADVANCED — breakout padding and alignment helpers
    ======================================================================== */
 
 function advancedCSS(c, version) {
@@ -395,9 +394,6 @@ function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
    ============================================================================ */
 
 :root {
-  /* Larger gap for full-width elements */
-  --computed-gap: max(var(--gap), calc((100vw - var(--content)) / 10));
-
   /* Breakout padding clamps between min and popout-width */
   --breakout-padding: clamp(var(--breakout-min), var(--breakout-scale), var(--popout-width));
 
@@ -433,34 +429,6 @@ function advancedBody(c, breakoutPaddingMin, breakoutPaddingScale) {
 .-mr-breakout { margin-right: calc(var(--breakout-padding) * -1); }
 .-mt-breakout { margin-top: calc(var(--breakout-padding) * -1); }
 .-mb-breakout { margin-bottom: calc(var(--breakout-padding) * -1); }
-
-/* ============================================================================
-   FULL-GAP — larger gap for full-width elements
-   ============================================================================ */
-
-.p-full-gap { padding: var(--computed-gap); }
-.px-full-gap { padding-left: var(--computed-gap); padding-right: var(--computed-gap); }
-.py-full-gap { padding-top: var(--computed-gap); padding-bottom: var(--computed-gap); }
-.pl-full-gap { padding-left: var(--computed-gap); }
-.pr-full-gap { padding-right: var(--computed-gap); }
-.pt-full-gap { padding-top: var(--computed-gap); }
-.pb-full-gap { padding-bottom: var(--computed-gap); }
-
-.m-full-gap { margin: var(--computed-gap); }
-.mx-full-gap { margin-left: var(--computed-gap); margin-right: var(--computed-gap); }
-.my-full-gap { margin-top: var(--computed-gap); margin-bottom: var(--computed-gap); }
-.ml-full-gap { margin-left: var(--computed-gap); }
-.mr-full-gap { margin-right: var(--computed-gap); }
-.mt-full-gap { margin-top: var(--computed-gap); }
-.mb-full-gap { margin-bottom: var(--computed-gap); }
-
-.-m-full-gap { margin: calc(var(--computed-gap) * -1); }
-.-mx-full-gap { margin-left: calc(var(--computed-gap) * -1); margin-right: calc(var(--computed-gap) * -1); }
-.-my-full-gap { margin-top: calc(var(--computed-gap) * -1); margin-bottom: calc(var(--computed-gap) * -1); }
-.-ml-full-gap { margin-left: calc(var(--computed-gap) * -1); }
-.-mr-full-gap { margin-right: calc(var(--computed-gap) * -1); }
-.-mt-full-gap { margin-top: calc(var(--computed-gap) * -1); }
-.-mb-full-gap { margin-bottom: calc(var(--computed-gap) * -1); }
 
 /* ============================================================================
    ALIGNMENT PADDING — align content inside wider columns

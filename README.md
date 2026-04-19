@@ -115,9 +115,8 @@ From narrowest to widest:
 - `.p-gap`, `.px-gap`, `.m-gap`, etc. - Gap-based spacing
 - `.p-popout`, `.m-popout`, etc. - Popout-width spacing
 - `.p-breakout`, `.m-breakout` - Fluid edge padding that matches the popout track
-- `.p-full-gap`, `.m-full-gap` - Larger gap variant for full-width elements
 - `.p-popout-to-content`, `.p-feature-to-content` - Align content inside wider columns
-- Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`, `.-m-full-gap`
+- Negative variants: `.-m-gap`, `.-m-popout`, `.-m-breakout`
 
 > Need a partial span between non-adjacent tracks — e.g. a split layout where content reaches the grid's center line? Compose `col-start-*` with `col-end-*`, or drop to an arbitrary `grid-column` value:
 >

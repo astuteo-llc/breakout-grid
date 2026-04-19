@@ -54,6 +54,20 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 </main>
 ```
 
+**4. Removed the `full-gap` spacing family** (`.p-full-gap`, `.m-full-gap`, `.-m-full-gap`, and all their axis variants) and the `--computed-gap` CSS variable. The "larger gap for full-width" pattern was niche and adequately served by Tailwind's arbitrary value syntax when it's actually needed:
+
+```html
+<!-- before -->
+<section class="col-full py-full-gap">...</section>
+
+<!-- after (arbitrary value) -->
+<section class="col-full py-[max(var(--gap),calc((100vw-var(--content))/10))]">...</section>
+
+<!-- or register a token in your Tailwind theme -->
+<!--   @theme { --spacing-full-gap: max(var(--gap), calc((100vw - var(--content)) / 10)); } -->
+<section class="col-full py-full-gap">...</section>
+```
+
 ### Added
 
 - **`/* @formatter:off */` pragma** at the top of every generated CSS file so JetBrains-family IDEs don't auto-reformat on save
@@ -68,7 +82,7 @@ For a reusable token, define it in your Tailwind theme (`--max-w-breakout: 115re
 
 ### What ships
 
-All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, breakout padding, full-gap, and alignment paddings. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
+All utilities live in one unified layer — grid containers, column placement, gap/popout spacing, breakout padding, and alignment paddings. The CSS output is section-organized (see the TOC in the generated file's header) but there's no programmatic split to opt in or out of.
 
 ## [5.0.0] - 2025-01-26
 
